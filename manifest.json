@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "name": "SizeCompare",
+  "version": "0.1.0",
+  "description": "Crowdsourced running shoe sizing data across brands",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.nike.com/*",
+    "https://www.brooksrunning.com/*",
+    "https://www.saucony.com/*",
+    "https://www.asics.com/*",
+    "https://www.adidas.com/*",
+    "https://runrepeat.com/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.nike.com/*"],
+      "js": ["content-scripts/nike.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.brooksrunning.com/*"],
+      "js": ["content-scripts/brooks.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.saucony.com/*"],
+      "js": ["content-scripts/saucony.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.asics.com/*"],
+      "js": ["content-scripts/asics.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.adidas.com/*"],
+      "js": ["content-scripts/adidas.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://runrepeat.com/*"],
+      "js": ["content-scripts/runrepeat.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

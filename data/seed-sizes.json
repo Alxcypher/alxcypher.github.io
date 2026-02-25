@@ -1,0 +1,346 @@
+{
+  "brands": [
+    {
+      "name": "Nike",
+      "website_url": "https://www.nike.com",
+      "size_chart_url": "https://www.nike.com/size-fit-guide",
+      "models": [
+        { "name": "Air Zoom Pegasus", "category": "road" },
+        { "name": "Vomero", "category": "road" },
+        { "name": "InfinityRN", "category": "road" },
+        { "name": "Structure", "category": "road" },
+        { "name": "Winflo", "category": "road" },
+        { "name": "Zoom Fly", "category": "road" },
+        { "name": "Vaporfly", "category": "road" },
+        { "name": "Alphafly", "category": "road" },
+        { "name": "Wildhorse", "category": "trail" },
+        { "name": "Pegasus Trail", "category": "trail" },
+        { "name": "Kiger", "category": "trail" },
+        { "name": "Invincible", "category": "road" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 4, "uk": 3.5, "eu": 36, "cm": 22.0 },
+            { "us": 4.5, "uk": 4, "eu": 36.5, "cm": 22.4 },
+            { "us": 5, "uk": 4.5, "eu": 37.5, "cm": 23.0 },
+            { "us": 5.5, "uk": 5, "eu": 38, "cm": 23.5 },
+            { "us": 6, "uk": 5.5, "eu": 38.5, "cm": 24.0 },
+            { "us": 6.5, "uk": 6, "eu": 39, "cm": 24.4 },
+            { "us": 7, "uk": 6, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 6.5, "eu": 40.5, "cm": 25.4 },
+            { "us": 8, "uk": 7, "eu": 41, "cm": 26.0 },
+            { "us": 8.5, "uk": 7.5, "eu": 42, "cm": 26.4 },
+            { "us": 9, "uk": 8, "eu": 42.5, "cm": 27.0 },
+            { "us": 9.5, "uk": 8.5, "eu": 43, "cm": 27.4 },
+            { "us": 10, "uk": 9, "eu": 44, "cm": 28.0 },
+            { "us": 10.5, "uk": 9.5, "eu": 44.5, "cm": 28.4 },
+            { "us": 11, "uk": 10, "eu": 45, "cm": 29.0 },
+            { "us": 11.5, "uk": 10.5, "eu": 45.5, "cm": 29.4 },
+            { "us": 12, "uk": 11, "eu": 46, "cm": 30.0 },
+            { "us": 12.5, "uk": 11.5, "eu": 47, "cm": 30.4 },
+            { "us": 13, "uk": 12, "eu": 47.5, "cm": 31.0 },
+            { "us": 14, "uk": 13, "eu": 48.5, "cm": 32.0 },
+            { "us": 15, "uk": 14, "eu": 49.5, "cm": 33.0 },
+            { "us": 16, "uk": 15, "eu": 50.5, "cm": 34.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 2.5, "eu": 35.5, "cm": 22.0 },
+            { "us": 5.5, "uk": 3, "eu": 36, "cm": 22.4 },
+            { "us": 6, "uk": 3.5, "eu": 36.5, "cm": 22.9 },
+            { "us": 6.5, "uk": 4, "eu": 37.5, "cm": 23.4 },
+            { "us": 7, "uk": 4.5, "eu": 38, "cm": 24.0 },
+            { "us": 7.5, "uk": 5, "eu": 38.5, "cm": 24.4 },
+            { "us": 8, "uk": 5.5, "eu": 39, "cm": 25.0 },
+            { "us": 8.5, "uk": 6, "eu": 40, "cm": 25.4 },
+            { "us": 9, "uk": 6.5, "eu": 40.5, "cm": 26.0 },
+            { "us": 9.5, "uk": 7, "eu": 41, "cm": 26.4 },
+            { "us": 10, "uk": 7.5, "eu": 42, "cm": 27.0 },
+            { "us": 10.5, "uk": 8, "eu": 42.5, "cm": 27.4 },
+            { "us": 11, "uk": 8.5, "eu": 43, "cm": 28.0 },
+            { "us": 11.5, "uk": 9, "eu": 44, "cm": 28.4 },
+            { "us": 12, "uk": 9.5, "eu": 44.5, "cm": 29.0 },
+            { "us": 13, "uk": 10.5, "eu": 45.5, "cm": 30.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Brooks",
+      "website_url": "https://www.brooksrunning.com",
+      "size_chart_url": "https://www.brooksrunning.com/en_us/size-charts",
+      "models": [
+        { "name": "Ghost", "category": "road" },
+        { "name": "Glycerin", "category": "road" },
+        { "name": "Adrenaline GTS", "category": "road" },
+        { "name": "Launch", "category": "road" },
+        { "name": "Levitate", "category": "road" },
+        { "name": "Hyperion", "category": "road" },
+        { "name": "Hyperion Tempo", "category": "road" },
+        { "name": "Hyperion Elite", "category": "road" },
+        { "name": "Cascadia", "category": "trail" },
+        { "name": "Caldera", "category": "trail" },
+        { "name": "Catamount", "category": "trail" },
+        { "name": "Trace", "category": "road" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 4, "uk": 3, "eu": 36.5, "cm": 22.0 },
+            { "us": 4.5, "uk": 3.5, "eu": 37, "cm": 22.5 },
+            { "us": 5, "uk": 4, "eu": 37.5, "cm": 23.0 },
+            { "us": 5.5, "uk": 4.5, "eu": 38, "cm": 23.5 },
+            { "us": 6, "uk": 5, "eu": 38.5, "cm": 24.0 },
+            { "us": 6.5, "uk": 5.5, "eu": 39, "cm": 24.3 },
+            { "us": 7, "uk": 6, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 6.5, "eu": 40.5, "cm": 25.3 },
+            { "us": 8, "uk": 7, "eu": 41, "cm": 26.0 },
+            { "us": 8.5, "uk": 7.5, "eu": 42, "cm": 26.3 },
+            { "us": 9, "uk": 8, "eu": 42.5, "cm": 27.0 },
+            { "us": 9.5, "uk": 8.5, "eu": 43, "cm": 27.3 },
+            { "us": 10, "uk": 9, "eu": 44, "cm": 28.0 },
+            { "us": 10.5, "uk": 9.5, "eu": 44.5, "cm": 28.3 },
+            { "us": 11, "uk": 10, "eu": 45, "cm": 29.0 },
+            { "us": 11.5, "uk": 10.5, "eu": 45.5, "cm": 29.3 },
+            { "us": 12, "uk": 11, "eu": 46, "cm": 30.0 },
+            { "us": 12.5, "uk": 11.5, "eu": 46.5, "cm": 30.3 },
+            { "us": 13, "uk": 12, "eu": 47, "cm": 31.0 },
+            { "us": 14, "uk": 13, "eu": 48.5, "cm": 32.0 },
+            { "us": 15, "uk": 14, "eu": 49.5, "cm": 33.0 },
+            { "us": 16, "uk": 15, "eu": 50.5, "cm": 34.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 3, "eu": 35.5, "cm": 22.0 },
+            { "us": 5.5, "uk": 3.5, "eu": 36, "cm": 22.5 },
+            { "us": 6, "uk": 4, "eu": 36.5, "cm": 23.0 },
+            { "us": 6.5, "uk": 4.5, "eu": 37.5, "cm": 23.3 },
+            { "us": 7, "uk": 5, "eu": 38, "cm": 24.0 },
+            { "us": 7.5, "uk": 5.5, "eu": 38.5, "cm": 24.3 },
+            { "us": 8, "uk": 6, "eu": 39, "cm": 25.0 },
+            { "us": 8.5, "uk": 6.5, "eu": 40, "cm": 25.3 },
+            { "us": 9, "uk": 7, "eu": 40.5, "cm": 26.0 },
+            { "us": 9.5, "uk": 7.5, "eu": 41, "cm": 26.3 },
+            { "us": 10, "uk": 8, "eu": 42, "cm": 27.0 },
+            { "us": 10.5, "uk": 8.5, "eu": 42.5, "cm": 27.3 },
+            { "us": 11, "uk": 9, "eu": 43, "cm": 28.0 },
+            { "us": 12, "uk": 10, "eu": 44, "cm": 29.0 },
+            { "us": 13, "uk": 11, "eu": 45.5, "cm": 30.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Saucony",
+      "website_url": "https://www.saucony.com",
+      "size_chart_url": "https://www.saucony.com/en/sizing-guide",
+      "models": [
+        { "name": "Kinvara", "category": "road" },
+        { "name": "Ride", "category": "road" },
+        { "name": "Guide", "category": "road" },
+        { "name": "Triumph", "category": "road" },
+        { "name": "Endorphin Speed", "category": "road" },
+        { "name": "Endorphin Pro", "category": "road" },
+        { "name": "Endorphin Shift", "category": "road" },
+        { "name": "Freedom", "category": "road" },
+        { "name": "Tempus", "category": "road" },
+        { "name": "Peregrine", "category": "trail" },
+        { "name": "Xodus", "category": "trail" },
+        { "name": "Cohesion", "category": "road" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 4, "uk": 3, "eu": 36, "cm": 22.0 },
+            { "us": 4.5, "uk": 3.5, "eu": 36.5, "cm": 22.5 },
+            { "us": 5, "uk": 4, "eu": 37.5, "cm": 23.0 },
+            { "us": 5.5, "uk": 4.5, "eu": 38, "cm": 23.5 },
+            { "us": 6, "uk": 5, "eu": 39, "cm": 24.0 },
+            { "us": 6.5, "uk": 5.5, "eu": 39.5, "cm": 24.5 },
+            { "us": 7, "uk": 6, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 6.5, "eu": 40.5, "cm": 25.5 },
+            { "us": 8, "uk": 7, "eu": 41, "cm": 26.0 },
+            { "us": 8.5, "uk": 7.5, "eu": 42, "cm": 26.5 },
+            { "us": 9, "uk": 8, "eu": 42.5, "cm": 27.0 },
+            { "us": 9.5, "uk": 8.5, "eu": 43, "cm": 27.5 },
+            { "us": 10, "uk": 9, "eu": 44, "cm": 28.0 },
+            { "us": 10.5, "uk": 9.5, "eu": 44.5, "cm": 28.5 },
+            { "us": 11, "uk": 10, "eu": 45, "cm": 29.0 },
+            { "us": 11.5, "uk": 10.5, "eu": 45.5, "cm": 29.5 },
+            { "us": 12, "uk": 11, "eu": 46, "cm": 30.0 },
+            { "us": 12.5, "uk": 11.5, "eu": 46.5, "cm": 30.5 },
+            { "us": 13, "uk": 12, "eu": 47, "cm": 31.0 },
+            { "us": 14, "uk": 13, "eu": 48.5, "cm": 32.0 },
+            { "us": 15, "uk": 14, "eu": 49.5, "cm": 33.0 },
+            { "us": 16, "uk": 15, "eu": 50.5, "cm": 34.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 3, "eu": 35.5, "cm": 22.0 },
+            { "us": 5.5, "uk": 3.5, "eu": 36, "cm": 22.5 },
+            { "us": 6, "uk": 4, "eu": 36.5, "cm": 23.0 },
+            { "us": 6.5, "uk": 4.5, "eu": 37.5, "cm": 23.5 },
+            { "us": 7, "uk": 5, "eu": 38, "cm": 24.0 },
+            { "us": 7.5, "uk": 5.5, "eu": 38.5, "cm": 24.5 },
+            { "us": 8, "uk": 6, "eu": 39, "cm": 25.0 },
+            { "us": 8.5, "uk": 6.5, "eu": 40, "cm": 25.5 },
+            { "us": 9, "uk": 7, "eu": 40.5, "cm": 26.0 },
+            { "us": 9.5, "uk": 7.5, "eu": 41, "cm": 26.5 },
+            { "us": 10, "uk": 8, "eu": 42, "cm": 27.0 },
+            { "us": 10.5, "uk": 8.5, "eu": 42.5, "cm": 27.5 },
+            { "us": 11, "uk": 9, "eu": 43, "cm": 28.0 },
+            { "us": 12, "uk": 10, "eu": 44, "cm": 29.0 },
+            { "us": 13, "uk": 11, "eu": 45.5, "cm": 30.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Asics",
+      "website_url": "https://www.asics.com",
+      "size_chart_url": "https://www.asics.com/us/en-us/size-chart.html",
+      "models": [
+        { "name": "Gel-Nimbus", "category": "road" },
+        { "name": "Gel-Kayano", "category": "road" },
+        { "name": "Gel-Cumulus", "category": "road" },
+        { "name": "GT-2000", "category": "road" },
+        { "name": "Novablast", "category": "road" },
+        { "name": "Magic Speed", "category": "road" },
+        { "name": "Metaspeed Sky", "category": "road" },
+        { "name": "Metaspeed Edge", "category": "road" },
+        { "name": "Gel-Excite", "category": "road" },
+        { "name": "Gel-Trabuco", "category": "trail" },
+        { "name": "Gel-Venture", "category": "trail" },
+        { "name": "Fuji Lite", "category": "trail" },
+        { "name": "Superblast", "category": "road" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 4, "uk": 3, "eu": 36, "cm": 22.5 },
+            { "us": 4.5, "uk": 3.5, "eu": 37, "cm": 22.75 },
+            { "us": 5, "uk": 4, "eu": 37.5, "cm": 23.0 },
+            { "us": 5.5, "uk": 4.5, "eu": 38, "cm": 23.5 },
+            { "us": 6, "uk": 5, "eu": 39, "cm": 24.0 },
+            { "us": 6.5, "uk": 5.5, "eu": 39.5, "cm": 24.5 },
+            { "us": 7, "uk": 6, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 6.5, "eu": 40.5, "cm": 25.25 },
+            { "us": 8, "uk": 7, "eu": 41.5, "cm": 25.5 },
+            { "us": 8.5, "uk": 7.5, "eu": 42, "cm": 26.0 },
+            { "us": 9, "uk": 8, "eu": 42.5, "cm": 26.5 },
+            { "us": 9.5, "uk": 8.5, "eu": 43.5, "cm": 27.0 },
+            { "us": 10, "uk": 9, "eu": 44, "cm": 27.5 },
+            { "us": 10.5, "uk": 9.5, "eu": 44.5, "cm": 28.0 },
+            { "us": 11, "uk": 10, "eu": 45, "cm": 28.25 },
+            { "us": 11.5, "uk": 10.5, "eu": 46, "cm": 28.5 },
+            { "us": 12, "uk": 11, "eu": 46.5, "cm": 29.0 },
+            { "us": 12.5, "uk": 11.5, "eu": 47, "cm": 29.5 },
+            { "us": 13, "uk": 12, "eu": 48, "cm": 30.0 },
+            { "us": 14, "uk": 13, "eu": 49, "cm": 31.0 },
+            { "us": 15, "uk": 14, "eu": 50.5, "cm": 32.0 },
+            { "us": 16, "uk": 15, "eu": 51.5, "cm": 33.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 3, "eu": 35, "cm": 22.0 },
+            { "us": 5.5, "uk": 3.5, "eu": 35.5, "cm": 22.5 },
+            { "us": 6, "uk": 4, "eu": 36, "cm": 23.0 },
+            { "us": 6.5, "uk": 4.5, "eu": 37, "cm": 23.25 },
+            { "us": 7, "uk": 5, "eu": 37.5, "cm": 23.5 },
+            { "us": 7.5, "uk": 5.5, "eu": 38, "cm": 24.0 },
+            { "us": 8, "uk": 6, "eu": 39, "cm": 24.5 },
+            { "us": 8.5, "uk": 6.5, "eu": 39.5, "cm": 25.0 },
+            { "us": 9, "uk": 7, "eu": 40, "cm": 25.25 },
+            { "us": 9.5, "uk": 7.5, "eu": 40.5, "cm": 25.5 },
+            { "us": 10, "uk": 8, "eu": 41.5, "cm": 26.0 },
+            { "us": 10.5, "uk": 8.5, "eu": 42, "cm": 26.5 },
+            { "us": 11, "uk": 9, "eu": 42.5, "cm": 27.0 },
+            { "us": 12, "uk": 10, "eu": 44, "cm": 28.0 },
+            { "us": 13, "uk": 11, "eu": 45, "cm": 29.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Adidas",
+      "website_url": "https://www.adidas.com",
+      "size_chart_url": "https://www.adidas.com/us/help/size-charts",
+      "models": [
+        { "name": "Ultraboost", "category": "road" },
+        { "name": "Adizero Adios Pro", "category": "road" },
+        { "name": "Adizero Boston", "category": "road" },
+        { "name": "Adizero SL", "category": "road" },
+        { "name": "Supernova", "category": "road" },
+        { "name": "Solarglide", "category": "road" },
+        { "name": "Solarboost", "category": "road" },
+        { "name": "Adistar", "category": "road" },
+        { "name": "Terrex Agravic", "category": "trail" },
+        { "name": "Terrex Speed", "category": "trail" },
+        { "name": "Terrex Free Hiker", "category": "trail" },
+        { "name": "Duramo", "category": "road" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 4, "uk": 3.5, "eu": 36, "cm": 22.1 },
+            { "us": 4.5, "uk": 4, "eu": 36.7, "cm": 22.5 },
+            { "us": 5, "uk": 4.5, "eu": 37.3, "cm": 23.0 },
+            { "us": 5.5, "uk": 5, "eu": 38, "cm": 23.5 },
+            { "us": 6, "uk": 5.5, "eu": 38.7, "cm": 23.9 },
+            { "us": 6.5, "uk": 6, "eu": 39.3, "cm": 24.4 },
+            { "us": 7, "uk": 6.5, "eu": 40, "cm": 24.8 },
+            { "us": 7.5, "uk": 7, "eu": 40.7, "cm": 25.3 },
+            { "us": 8, "uk": 7.5, "eu": 41.3, "cm": 25.7 },
+            { "us": 8.5, "uk": 8, "eu": 42, "cm": 26.2 },
+            { "us": 9, "uk": 8.5, "eu": 42.7, "cm": 26.6 },
+            { "us": 9.5, "uk": 9, "eu": 43.3, "cm": 27.1 },
+            { "us": 10, "uk": 9.5, "eu": 44, "cm": 27.5 },
+            { "us": 10.5, "uk": 10, "eu": 44.7, "cm": 27.9 },
+            { "us": 11, "uk": 10.5, "eu": 45.3, "cm": 28.4 },
+            { "us": 11.5, "uk": 11, "eu": 46, "cm": 28.8 },
+            { "us": 12, "uk": 11.5, "eu": 46.7, "cm": 29.3 },
+            { "us": 12.5, "uk": 12, "eu": 47.3, "cm": 29.7 },
+            { "us": 13, "uk": 12.5, "eu": 48, "cm": 30.2 },
+            { "us": 14, "uk": 13.5, "eu": 49.3, "cm": 31.1 },
+            { "us": 15, "uk": 14.5, "eu": 50.7, "cm": 32.0 },
+            { "us": 16, "uk": 15.5, "eu": 51.3, "cm": 32.9 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 3.5, "eu": 36, "cm": 22.1 },
+            { "us": 5.5, "uk": 4, "eu": 36.7, "cm": 22.5 },
+            { "us": 6, "uk": 4.5, "eu": 37.3, "cm": 23.0 },
+            { "us": 6.5, "uk": 5, "eu": 38, "cm": 23.5 },
+            { "us": 7, "uk": 5.5, "eu": 38.7, "cm": 23.9 },
+            { "us": 7.5, "uk": 6, "eu": 39.3, "cm": 24.4 },
+            { "us": 8, "uk": 6.5, "eu": 40, "cm": 24.8 },
+            { "us": 8.5, "uk": 7, "eu": 40.7, "cm": 25.3 },
+            { "us": 9, "uk": 7.5, "eu": 41.3, "cm": 25.7 },
+            { "us": 9.5, "uk": 8, "eu": 42, "cm": 26.2 },
+            { "us": 10, "uk": 8.5, "eu": 42.7, "cm": 26.6 },
+            { "us": 10.5, "uk": 9, "eu": 43.3, "cm": 27.1 },
+            { "us": 11, "uk": 9.5, "eu": 44, "cm": 27.5 },
+            { "us": 12, "uk": 10.5, "eu": 45.3, "cm": 28.4 },
+            { "us": 13, "uk": 11.5, "eu": 46.7, "cm": 29.3 }
+          ]
+        }
+      ]
+    }
+  ]
+}

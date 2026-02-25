@@ -1,0 +1,118 @@
+/**
+ * SizeCompare — Scraper Coordinator
+ *
+ * Parses and normalizes scraped data received from content scripts.
+ * Handles natural language fit descriptions → structured fit_rating + fit_offset.
+ */
+
+// ---------------------------------------------------------------------------
+// Fit description parser
+// ---------------------------------------------------------------------------
+
+const FIT_PATTERNS = [
+  // Exact matches first
+  { pattern: /true to size/i, rating: 'true_to_size', offset: 0 },
+  { pattern: /fits true/i, rating: 'true_to_size', offset: 0 },
+  { pattern: /fits as expected/i, rating: 'true_to_size', offset: 0 },
+  { pattern: /perfect fit/i, rating: 'true_to_size', offset: 0 },
+
+  // Runs small patterns
+  { pattern: /runs?\s+(a\s+)?full\s+size\s+small/i, rating: 'runs_small', offset: -1.0 },
+  { pattern: /runs?\s+(a\s+)?half\s+size\s+small/i, rating: 'runs_small', offset: -0.5 },
+  { pattern: /runs?\s+small/i, rating: 'runs_small', offset: -0.5 },
+  { pattern: /size\s+up/i, rating: 'runs_small', offset: -0.5 },
+  { pattern: /go\s+(a\s+)?(half\s+)?size\s+up/i, rating: 'runs_small', offset: -0.5 },
+  { pattern: /narrow\s+fit/i, rating: 'runs_small', offset: -0.25 },
+  { pattern: /tight\s+fit/i, rating: 'runs_small', offset: -0.5 },
+  { pattern: /snug/i, rating: 'runs_small', offset: -0.25 },
+
+  // Runs large patterns
+  { pattern: /runs?\s+(a\s+)?full\s+size\s+large/i, rating: 'runs_large', offset: 1.0 },
+  { pattern: /runs?\s+(a\s+)?half\s+size\s+large/i, rating: 'runs_large', offset: 0.5 },
+  { pattern: /runs?\s+large/i, rating: 'runs_large', offset: 0.5 },
+  { pattern: /runs?\s+big/i, rating: 'runs_large', offset: 0.5 },
+  { pattern: /size\s+down/i, rating: 'runs_large', offset: 0.5 },
+  { pattern: /go\s+(a\s+)?(half\s+)?size\s+down/i, rating: 'runs_large', offset: 0.5 },
+  { pattern: /loose\s+fit/i, rating: 'runs_large', offset: 0.25 },
+  { pattern: /roomy/i, rating: 'runs_large', offset: 0.25 },
+];
+
+function parseFitDescription(text) {
+  if (!text) return null;
+
+  for (const { pattern, rating, offset } of FIT_PATTERNS) {
+    if (pattern.test(text)) {
+      return { rating, offset };
+    }
+  }
+
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Size chart data normalizer
+// ---------------------------------------------------------------------------
+
+function normalizeSizeChartData(rawData, brandName) {
+  // Normalize scraped size chart data into our standard format
+  // rawData: array of objects with varying key names
+  if (!Array.isArray(rawData)) return [];
+
+  return rawData.map((row) => {
+    return {
+      us: parseSize(row.us || row.US || row['US Size'] || row['US Men'] || row['US Women']),
+      uk: parseSize(row.uk || row.UK || row['UK Size'] || row['UK']),
+      eu: parseSize(row.eu || row.EU || row['EU Size'] || row['EUR'] || row['EU']),
+      cm: parseSize(row.cm || row.CM || row['cm'] || row['Foot Length (cm)'] || row['CM']),
+    };
+  }).filter((row) => row.us !== null);
+}
+
+function parseSize(value) {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number') return value;
+  const cleaned = String(value).replace(/[^0-9.]/g, '');
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? null : parsed;
+}
+
+// ---------------------------------------------------------------------------
+// RunRepeat data extractor
+// ---------------------------------------------------------------------------
+
+function extractRunRepeatData(scrapedData) {
+  // scrapedData: { url, brandName, modelName, sizingText, scores }
+  const parsed = parseFitDescription(scrapedData.sizingText);
+
+  return {
+    sourceUrl: scrapedData.url,
+    sourceSite: 'runrepeat',
+    brandName: scrapedData.brandName,
+    modelName: scrapedData.modelName,
+    rawSizingText: scrapedData.sizingText,
+    parsedFit: parsed?.rating || null,
+    parsedOffset: parsed?.offset || null,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Brand name normalizer
+// ---------------------------------------------------------------------------
+
+const BRAND_ALIASES = {
+  nike: 'Nike',
+  'nike running': 'Nike',
+  brooks: 'Brooks',
+  'brooks running': 'Brooks',
+  saucony: 'Saucony',
+  asics: 'Asics',
+  'asics running': 'Asics',
+  adidas: 'Adidas',
+  'adidas running': 'Adidas',
+};
+
+function normalizeBrandName(raw) {
+  if (!raw) return null;
+  const lower = raw.trim().toLowerCase();
+  return BRAND_ALIASES[lower] || raw.trim();
+}

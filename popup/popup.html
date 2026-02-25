@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SizeCompare</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <h1>SizeCompare</h1>
+    <p class="subtitle">Crowdsourced shoe sizing</p>
+  </header>
+
+  <!-- Tab navigation -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="compare">Compare</button>
+    <button class="tab" data-tab="report">Report Fit</button>
+    <button class="tab" data-tab="profile">Profile</button>
+  </nav>
+
+  <!-- ================================================================== -->
+  <!-- Tab 1: Compare sizes across brands -->
+  <!-- ================================================================== -->
+  <section id="tab-compare" class="tab-content active">
+    <div class="field">
+      <label for="ref-brand">I wear this brand:</label>
+      <select id="ref-brand">
+        <option value="">Select brand...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="ref-model">Model:</label>
+      <select id="ref-model" disabled>
+        <option value="">Select model...</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="ref-gender">Gender:</label>
+        <select id="ref-gender">
+          <option value="mens">Men's</option>
+          <option value="womens">Women's</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ref-size">My size (US):</label>
+        <select id="ref-size" disabled>
+          <option value="">Size...</option>
+        </select>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="field">
+      <label for="comp-brand">Compare to brand:</label>
+      <select id="comp-brand">
+        <option value="">Select brand...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="comp-model">Model:</label>
+      <select id="comp-model" disabled>
+        <option value="">Select model...</option>
+      </select>
+    </div>
+
+    <button id="btn-compare" class="btn-primary" disabled>Compare Sizes</button>
+
+    <!-- Results area -->
+    <div id="compare-results" class="results hidden">
+      <h3>Size Comparison</h3>
+      <div id="size-conversion" class="result-card"></div>
+      <div id="fit-data" class="result-card"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <!-- Tab 2: Quick fit report -->
+  <!-- ================================================================== -->
+  <section id="tab-report" class="tab-content">
+    <p class="help-text">Report how a shoe fits compared to one you own.</p>
+
+    <div class="field">
+      <label for="report-ref-brand">My shoe brand:</label>
+      <select id="report-ref-brand">
+        <option value="">Select brand...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="report-ref-model">My shoe model:</label>
+      <select id="report-ref-model" disabled>
+        <option value="">Select model...</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="report-ref-gender">Gender:</label>
+        <select id="report-ref-gender">
+          <option value="mens">Men's</option>
+          <option value="womens">Women's</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="report-ref-size">My size (US):</label>
+        <select id="report-ref-size">
+          <option value="">Size...</option>
+        </select>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="field">
+      <label for="report-comp-brand">Compared shoe brand:</label>
+      <select id="report-comp-brand">
+        <option value="">Select brand...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="report-comp-model">Compared shoe model:</label>
+      <select id="report-comp-model" disabled>
+        <option value="">Select model...</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="report-comp-gender">Gender:</label>
+        <select id="report-comp-gender">
+          <option value="mens">Men's</option>
+          <option value="womens">Women's</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="report-comp-size">Size I bought (US):</label>
+        <select id="report-comp-size">
+          <option value="">Size...</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>How did it fit?</label>
+      <div class="fit-buttons">
+        <button class="fit-btn" data-fit="runs_small" data-offset="-0.5">Runs Small</button>
+        <button class="fit-btn selected" data-fit="true_to_size" data-offset="0">True to Size</button>
+        <button class="fit-btn" data-fit="runs_large" data-offset="0.5">Runs Large</button>
+      </div>
+    </div>
+
+    <button id="btn-submit-report" class="btn-primary">Submit Report</button>
+    <div id="report-status" class="status hidden"></div>
+  </section>
+
+  <!-- ================================================================== -->
+  <!-- Tab 3: User profile -->
+  <!-- ================================================================== -->
+  <section id="tab-profile" class="tab-content">
+    <p class="help-text">Optional info to help contextualize your fit reports.</p>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="profile-height">Height (cm):</label>
+        <input type="number" id="profile-height" placeholder="175">
+      </div>
+      <div class="field">
+        <label for="profile-weight">Weight (kg):</label>
+        <input type="number" id="profile-weight" placeholder="70">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="profile-foot-length">Foot length (cm):</label>
+        <input type="number" id="profile-foot-length" step="0.1" placeholder="27.0">
+      </div>
+      <div class="field">
+        <label for="profile-foot-width">Foot width:</label>
+        <select id="profile-foot-width">
+          <option value="">Not specified</option>
+          <option value="narrow">Narrow</option>
+          <option value="standard">Standard</option>
+          <option value="wide">Wide</option>
+          <option value="extra_wide">Extra Wide</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="btn-save-profile" class="btn-primary">Save Profile</button>
+    <div id="profile-status" class="status hidden"></div>
+
+    <hr>
+
+    <div id="db-stats" class="stats">
+      <h3>Database Stats</h3>
+      <div id="stats-content">Loading...</div>
+    </div>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

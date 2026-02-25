@@ -1,0 +1,324 @@
+/* SizeCompare Popup — Functional styling */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 380px;
+  min-height: 400px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: #333;
+  background: #fafafa;
+}
+
+header {
+  background: #2c3e50;
+  color: white;
+  padding: 12px 16px 8px;
+}
+
+header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+header .subtitle {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: #34495e;
+  border-bottom: 2px solid #2c3e50;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid #3498db;
+}
+
+/* Tab content */
+.tab-content {
+  display: none;
+  padding: 14px 16px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Form fields */
+.field {
+  margin-bottom: 10px;
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.field select,
+.field input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  background: white;
+  color: #333;
+}
+
+.field select:disabled {
+  background: #f0f0f0;
+  color: #999;
+}
+
+.field select:focus,
+.field input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
+}
+
+.field-row {
+  display: flex;
+  gap: 10px;
+}
+
+.field-row .field {
+  flex: 1;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 12px 0;
+}
+
+/* Buttons */
+.btn-primary {
+  width: 100%;
+  padding: 9px 16px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 8px;
+}
+
+.btn-primary:hover {
+  background: #2980b9;
+}
+
+.btn-primary:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Fit rating buttons */
+.fit-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.fit-btn {
+  flex: 1;
+  padding: 8px 6px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.fit-btn:hover {
+  border-color: #3498db;
+}
+
+.fit-btn.selected {
+  border-color: #3498db;
+  background: #ebf5fb;
+  color: #2980b9;
+}
+
+.fit-btn[data-fit="runs_small"].selected {
+  border-color: #e67e22;
+  background: #fef5e7;
+  color: #d35400;
+}
+
+.fit-btn[data-fit="runs_large"].selected {
+  border-color: #27ae60;
+  background: #eafaf1;
+  color: #1e8449;
+}
+
+/* Results */
+.results {
+  margin-top: 12px;
+}
+
+.results h3 {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+.result-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.result-card .label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.result-card .value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-top: 2px;
+}
+
+.result-card .detail {
+  font-size: 11px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Fit summary bars */
+.fit-bar-container {
+  margin-top: 8px;
+}
+
+.fit-bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.fit-bar-label {
+  width: 80px;
+  font-size: 11px;
+  color: #666;
+}
+
+.fit-bar {
+  flex: 1;
+  height: 16px;
+  background: #ecf0f1;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fit-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.fit-bar-fill.tts { background: #3498db; }
+.fit-bar-fill.small { background: #e67e22; }
+.fit-bar-fill.large { background: #27ae60; }
+
+.fit-bar-count {
+  width: 30px;
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+  margin-left: 6px;
+}
+
+/* Status messages */
+.status {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.status.success {
+  background: #eafaf1;
+  color: #1e8449;
+  border: 1px solid #a9dfbf;
+}
+
+.status.error {
+  background: #fdedec;
+  color: #c0392b;
+  border: 1px solid #f5b7b1;
+}
+
+/* Stats */
+.stats {
+  margin-top: 8px;
+}
+
+.stats h3 {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+#stats-content {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Help text */
+.help-text {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
