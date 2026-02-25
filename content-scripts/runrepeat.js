@@ -189,7 +189,8 @@
   // ---------------------------------------------------------------------------
 
   const KNOWN_BRANDS = ['Nike', 'Brooks', 'Saucony', 'Asics', 'ASICS', 'Adidas', 'adidas',
-    'New Balance', 'HOKA', 'Hoka', 'On', 'Mizuno', 'Altra', 'Salomon', 'Merrell'];
+    'New Balance', 'HOKA', 'Hoka', 'On', 'Under Armour', 'Puma', 'PUMA',
+    'Mizuno', 'Altra', 'Salomon', 'Merrell'];
 
   function parseBrandModel(title) {
     const cleaned = title

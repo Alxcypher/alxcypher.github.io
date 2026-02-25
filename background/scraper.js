@@ -109,6 +109,20 @@ const BRAND_ALIASES = {
   'asics running': 'Asics',
   adidas: 'Adidas',
   'adidas running': 'Adidas',
+  hoka: 'HOKA',
+  'hoka one one': 'HOKA',
+  'hoka running': 'HOKA',
+  on: 'On Running',
+  'on running': 'On Running',
+  'on-running': 'On Running',
+  'under armour': 'Under Armour',
+  'under armor': 'Under Armour',
+  ua: 'Under Armour',
+  'new balance': 'New Balance',
+  'new balance running': 'New Balance',
+  nb: 'New Balance',
+  puma: 'Puma',
+  'puma running': 'Puma',
 };
 
 function normalizeBrandName(raw) {

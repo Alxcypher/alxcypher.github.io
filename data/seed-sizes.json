@@ -341,6 +341,319 @@
           ]
         }
       ]
+    },
+    {
+      "name": "HOKA",
+      "website_url": "https://www.hoka.com",
+      "size_chart_url": "https://www.hoka.com/en/us/size-guide.html",
+      "models": [
+        { "name": "Clifton", "category": "road" },
+        { "name": "Bondi", "category": "road" },
+        { "name": "Mach", "category": "road" },
+        { "name": "Rincon", "category": "road" },
+        { "name": "Arahi", "category": "road" },
+        { "name": "Gaviota", "category": "road" },
+        { "name": "Rocket X", "category": "road" },
+        { "name": "Cielo X1", "category": "road" },
+        { "name": "Carbon X", "category": "road" },
+        { "name": "Speedgoat", "category": "trail" },
+        { "name": "Tecton X", "category": "trail" },
+        { "name": "Challenger", "category": "trail" },
+        { "name": "Torrent", "category": "trail" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 7, "uk": 6.5, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 7, "eu": 40.7, "cm": 25.4 },
+            { "us": 8, "uk": 7.5, "eu": 41.3, "cm": 26.0 },
+            { "us": 8.5, "uk": 8, "eu": 42, "cm": 26.4 },
+            { "us": 9, "uk": 8.5, "eu": 42.7, "cm": 27.0 },
+            { "us": 9.5, "uk": 9, "eu": 43.3, "cm": 27.4 },
+            { "us": 10, "uk": 9.5, "eu": 44, "cm": 28.0 },
+            { "us": 10.5, "uk": 10, "eu": 44.7, "cm": 28.4 },
+            { "us": 11, "uk": 10.5, "eu": 45.3, "cm": 29.0 },
+            { "us": 11.5, "uk": 11, "eu": 46, "cm": 29.4 },
+            { "us": 12, "uk": 11.5, "eu": 46.7, "cm": 30.0 },
+            { "us": 12.5, "uk": 12, "eu": 47.3, "cm": 30.4 },
+            { "us": 13, "uk": 12.5, "eu": 48, "cm": 31.0 },
+            { "us": 14, "uk": 13.5, "eu": 49.3, "cm": 32.0 },
+            { "us": 15, "uk": 14.5, "eu": 50.7, "cm": 33.0 },
+            { "us": 16, "uk": 15.5, "eu": 51.3, "cm": 34.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 3.5, "eu": 36, "cm": 22.0 },
+            { "us": 5.5, "uk": 4, "eu": 36.7, "cm": 22.4 },
+            { "us": 6, "uk": 4.5, "eu": 37.3, "cm": 23.0 },
+            { "us": 6.5, "uk": 5, "eu": 38, "cm": 23.4 },
+            { "us": 7, "uk": 5.5, "eu": 38.7, "cm": 24.0 },
+            { "us": 7.5, "uk": 6, "eu": 39.3, "cm": 24.4 },
+            { "us": 8, "uk": 6.5, "eu": 40, "cm": 25.0 },
+            { "us": 8.5, "uk": 7, "eu": 40.7, "cm": 25.4 },
+            { "us": 9, "uk": 7.5, "eu": 41.3, "cm": 26.0 },
+            { "us": 9.5, "uk": 8, "eu": 42, "cm": 26.4 },
+            { "us": 10, "uk": 8.5, "eu": 42.7, "cm": 27.0 },
+            { "us": 10.5, "uk": 9, "eu": 43.3, "cm": 27.4 },
+            { "us": 11, "uk": 9.5, "eu": 44, "cm": 28.0 },
+            { "us": 12, "uk": 10.5, "eu": 45.3, "cm": 29.0 },
+            { "us": 13, "uk": 11.5, "eu": 46.7, "cm": 30.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "On Running",
+      "website_url": "https://www.on-running.com",
+      "size_chart_url": "https://www.on-running.com/en-us/size-guide",
+      "models": [
+        { "name": "Cloudmonster", "category": "road" },
+        { "name": "Cloudrunner", "category": "road" },
+        { "name": "Cloudsurfer", "category": "road" },
+        { "name": "Cloudflow", "category": "road" },
+        { "name": "Cloudstratus", "category": "road" },
+        { "name": "Cloudswift", "category": "road" },
+        { "name": "Cloudeclipse", "category": "road" },
+        { "name": "Cloudboom Echo", "category": "road" },
+        { "name": "Cloud 5", "category": "road" },
+        { "name": "Cloudultra", "category": "trail" },
+        { "name": "Cloudventure", "category": "trail" },
+        { "name": "Cloudvista", "category": "trail" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 7, "uk": 6.5, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 7, "eu": 40.5, "cm": 25.4 },
+            { "us": 8, "uk": 7.5, "eu": 41, "cm": 26.0 },
+            { "us": 8.5, "uk": 8, "eu": 42, "cm": 26.4 },
+            { "us": 9, "uk": 8.5, "eu": 42.5, "cm": 27.0 },
+            { "us": 9.5, "uk": 9, "eu": 43, "cm": 27.4 },
+            { "us": 10, "uk": 9.5, "eu": 44, "cm": 28.0 },
+            { "us": 10.5, "uk": 10, "eu": 44.5, "cm": 28.4 },
+            { "us": 11, "uk": 10.5, "eu": 45, "cm": 29.0 },
+            { "us": 11.5, "uk": 11, "eu": 46, "cm": 29.4 },
+            { "us": 12, "uk": 11.5, "eu": 46.5, "cm": 30.0 },
+            { "us": 12.5, "uk": 12, "eu": 47, "cm": 30.4 },
+            { "us": 13, "uk": 12.5, "eu": 47.5, "cm": 31.0 },
+            { "us": 14, "uk": 13.5, "eu": 49, "cm": 32.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 3, "eu": 36, "cm": 22.0 },
+            { "us": 5.5, "uk": 3.5, "eu": 36.5, "cm": 22.4 },
+            { "us": 6, "uk": 4, "eu": 37, "cm": 23.0 },
+            { "us": 6.5, "uk": 4.5, "eu": 37.5, "cm": 23.4 },
+            { "us": 7, "uk": 5, "eu": 38, "cm": 24.0 },
+            { "us": 7.5, "uk": 5.5, "eu": 38.5, "cm": 24.4 },
+            { "us": 8, "uk": 6, "eu": 39, "cm": 25.0 },
+            { "us": 8.5, "uk": 6.5, "eu": 40, "cm": 25.4 },
+            { "us": 9, "uk": 7, "eu": 40.5, "cm": 26.0 },
+            { "us": 9.5, "uk": 7.5, "eu": 41, "cm": 26.4 },
+            { "us": 10, "uk": 8, "eu": 42, "cm": 27.0 },
+            { "us": 10.5, "uk": 8.5, "eu": 42.5, "cm": 27.4 },
+            { "us": 11, "uk": 9, "eu": 43, "cm": 28.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Under Armour",
+      "website_url": "https://www.underarmour.com",
+      "size_chart_url": "https://www.underarmour.com/en-us/size-charts",
+      "models": [
+        { "name": "HOVR Phantom", "category": "road" },
+        { "name": "HOVR Machina", "category": "road" },
+        { "name": "HOVR Sonic", "category": "road" },
+        { "name": "HOVR Infinite", "category": "road" },
+        { "name": "HOVR Mega", "category": "road" },
+        { "name": "Charged Pursuit", "category": "road" },
+        { "name": "Charged Assert", "category": "road" },
+        { "name": "Charged Breeze", "category": "road" },
+        { "name": "Velociti", "category": "road" },
+        { "name": "Charged Bandit Trail", "category": "trail" },
+        { "name": "HOVR Ridge Trail", "category": "trail" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 7, "uk": 6, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 6.5, "eu": 40.5, "cm": 25.5 },
+            { "us": 8, "uk": 7, "eu": 41, "cm": 26.0 },
+            { "us": 8.5, "uk": 7.5, "eu": 42, "cm": 26.5 },
+            { "us": 9, "uk": 8, "eu": 42.5, "cm": 27.0 },
+            { "us": 9.5, "uk": 8.5, "eu": 43, "cm": 27.5 },
+            { "us": 10, "uk": 9, "eu": 44, "cm": 28.0 },
+            { "us": 10.5, "uk": 9.5, "eu": 44.5, "cm": 28.5 },
+            { "us": 11, "uk": 10, "eu": 45, "cm": 29.0 },
+            { "us": 11.5, "uk": 10.5, "eu": 45.5, "cm": 29.5 },
+            { "us": 12, "uk": 11, "eu": 46, "cm": 30.0 },
+            { "us": 12.5, "uk": 11.5, "eu": 47, "cm": 30.5 },
+            { "us": 13, "uk": 12, "eu": 47.5, "cm": 31.0 },
+            { "us": 14, "uk": 13, "eu": 48.5, "cm": 32.0 },
+            { "us": 15, "uk": 14, "eu": 49.5, "cm": 33.0 },
+            { "us": 16, "uk": 15, "eu": 50.5, "cm": 34.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 2.5, "eu": 35.5, "cm": 22.0 },
+            { "us": 5.5, "uk": 3, "eu": 36, "cm": 22.5 },
+            { "us": 6, "uk": 3.5, "eu": 36.5, "cm": 23.0 },
+            { "us": 6.5, "uk": 4, "eu": 37.5, "cm": 23.5 },
+            { "us": 7, "uk": 4.5, "eu": 38, "cm": 24.0 },
+            { "us": 7.5, "uk": 5, "eu": 38.5, "cm": 24.5 },
+            { "us": 8, "uk": 5.5, "eu": 39, "cm": 25.0 },
+            { "us": 8.5, "uk": 6, "eu": 40, "cm": 25.5 },
+            { "us": 9, "uk": 6.5, "eu": 40.5, "cm": 26.0 },
+            { "us": 9.5, "uk": 7, "eu": 41, "cm": 26.5 },
+            { "us": 10, "uk": 7.5, "eu": 42, "cm": 27.0 },
+            { "us": 10.5, "uk": 8, "eu": 42.5, "cm": 27.5 },
+            { "us": 11, "uk": 8.5, "eu": 43, "cm": 28.0 },
+            { "us": 12, "uk": 9.5, "eu": 44.5, "cm": 29.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "New Balance",
+      "website_url": "https://www.newbalance.com",
+      "size_chart_url": "https://www.newbalance.com/size-guide",
+      "models": [
+        { "name": "Fresh Foam X 1080", "category": "road" },
+        { "name": "Fresh Foam X 880", "category": "road" },
+        { "name": "Fresh Foam X 860", "category": "road" },
+        { "name": "FuelCell Rebel", "category": "road" },
+        { "name": "FuelCell SuperComp Elite", "category": "road" },
+        { "name": "FuelCell SuperComp Trainer", "category": "road" },
+        { "name": "FuelCell Propel", "category": "road" },
+        { "name": "Fresh Foam X Vongo", "category": "road" },
+        { "name": "Fresh Foam X More", "category": "road" },
+        { "name": "DynaSoft Nitrel", "category": "trail" },
+        { "name": "Fresh Foam X Hierro", "category": "trail" },
+        { "name": "FuelCell Summit Unknown", "category": "trail" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 4, "uk": 3.5, "eu": 36, "cm": 22.0 },
+            { "us": 4.5, "uk": 4, "eu": 37, "cm": 22.5 },
+            { "us": 5, "uk": 4.5, "eu": 37.5, "cm": 23.0 },
+            { "us": 5.5, "uk": 5, "eu": 38, "cm": 23.5 },
+            { "us": 6, "uk": 5.5, "eu": 39, "cm": 24.0 },
+            { "us": 6.5, "uk": 6, "eu": 39.5, "cm": 24.3 },
+            { "us": 7, "uk": 6.5, "eu": 40, "cm": 25.0 },
+            { "us": 7.5, "uk": 7, "eu": 40.5, "cm": 25.3 },
+            { "us": 8, "uk": 7.5, "eu": 41.5, "cm": 26.0 },
+            { "us": 8.5, "uk": 8, "eu": 42, "cm": 26.3 },
+            { "us": 9, "uk": 8.5, "eu": 42.5, "cm": 27.0 },
+            { "us": 9.5, "uk": 9, "eu": 43, "cm": 27.3 },
+            { "us": 10, "uk": 9.5, "eu": 44, "cm": 28.0 },
+            { "us": 10.5, "uk": 10, "eu": 44.5, "cm": 28.3 },
+            { "us": 11, "uk": 10.5, "eu": 45, "cm": 29.0 },
+            { "us": 11.5, "uk": 11, "eu": 45.5, "cm": 29.3 },
+            { "us": 12, "uk": 11.5, "eu": 46.5, "cm": 30.0 },
+            { "us": 12.5, "uk": 12, "eu": 47, "cm": 30.3 },
+            { "us": 13, "uk": 12.5, "eu": 47.5, "cm": 31.0 },
+            { "us": 14, "uk": 13.5, "eu": 49, "cm": 32.0 },
+            { "us": 15, "uk": 14.5, "eu": 50, "cm": 33.0 },
+            { "us": 16, "uk": 15.5, "eu": 51, "cm": 34.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 3, "eu": 35, "cm": 22.0 },
+            { "us": 5.5, "uk": 3.5, "eu": 36, "cm": 22.5 },
+            { "us": 6, "uk": 4, "eu": 36.5, "cm": 23.0 },
+            { "us": 6.5, "uk": 4.5, "eu": 37, "cm": 23.3 },
+            { "us": 7, "uk": 5, "eu": 37.5, "cm": 24.0 },
+            { "us": 7.5, "uk": 5.5, "eu": 38, "cm": 24.3 },
+            { "us": 8, "uk": 6, "eu": 39, "cm": 25.0 },
+            { "us": 8.5, "uk": 6.5, "eu": 39.5, "cm": 25.3 },
+            { "us": 9, "uk": 7, "eu": 40.5, "cm": 26.0 },
+            { "us": 9.5, "uk": 7.5, "eu": 41, "cm": 26.3 },
+            { "us": 10, "uk": 8, "eu": 41.5, "cm": 27.0 },
+            { "us": 10.5, "uk": 8.5, "eu": 42, "cm": 27.3 },
+            { "us": 11, "uk": 9, "eu": 42.5, "cm": 28.0 },
+            { "us": 12, "uk": 10, "eu": 44, "cm": 29.0 },
+            { "us": 13, "uk": 11, "eu": 45, "cm": 30.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Puma",
+      "website_url": "https://us.puma.com",
+      "size_chart_url": "https://us.puma.com/us/en/size-chart",
+      "models": [
+        { "name": "Velocity Nitro", "category": "road" },
+        { "name": "Deviate Nitro", "category": "road" },
+        { "name": "Deviate Nitro Elite", "category": "road" },
+        { "name": "Magnify Nitro", "category": "road" },
+        { "name": "Electrify Nitro", "category": "road" },
+        { "name": "Liberate Nitro", "category": "road" },
+        { "name": "ForeverRun Nitro", "category": "road" },
+        { "name": "Fast-R Nitro Elite", "category": "road" },
+        { "name": "Voyage Nitro", "category": "trail" },
+        { "name": "Explore Nitro", "category": "trail" }
+      ],
+      "size_charts": [
+        {
+          "gender": "mens",
+          "sizes": [
+            { "us": 4, "uk": 3, "eu": 35.5, "cm": 22.0 },
+            { "us": 4.5, "uk": 3.5, "eu": 36, "cm": 22.5 },
+            { "us": 5, "uk": 4, "eu": 37, "cm": 23.0 },
+            { "us": 5.5, "uk": 4.5, "eu": 37.5, "cm": 23.5 },
+            { "us": 6, "uk": 5, "eu": 38, "cm": 24.0 },
+            { "us": 6.5, "uk": 5.5, "eu": 39, "cm": 24.5 },
+            { "us": 7, "uk": 6, "eu": 39.5, "cm": 25.0 },
+            { "us": 7.5, "uk": 6.5, "eu": 40, "cm": 25.5 },
+            { "us": 8, "uk": 7, "eu": 40.5, "cm": 26.0 },
+            { "us": 8.5, "uk": 7.5, "eu": 41, "cm": 26.5 },
+            { "us": 9, "uk": 8, "eu": 42, "cm": 27.0 },
+            { "us": 9.5, "uk": 8.5, "eu": 42.5, "cm": 27.5 },
+            { "us": 10, "uk": 9, "eu": 43, "cm": 28.0 },
+            { "us": 10.5, "uk": 9.5, "eu": 44, "cm": 28.5 },
+            { "us": 11, "uk": 10, "eu": 44.5, "cm": 29.0 },
+            { "us": 11.5, "uk": 10.5, "eu": 45, "cm": 29.5 },
+            { "us": 12, "uk": 11, "eu": 46, "cm": 30.0 },
+            { "us": 13, "uk": 12, "eu": 47, "cm": 31.0 },
+            { "us": 14, "uk": 13, "eu": 48.5, "cm": 32.0 },
+            { "us": 15, "uk": 14, "eu": 49.5, "cm": 33.0 },
+            { "us": 16, "uk": 15, "eu": 50.5, "cm": 34.0 }
+          ]
+        },
+        {
+          "gender": "womens",
+          "sizes": [
+            { "us": 5, "uk": 2.5, "eu": 35, "cm": 22.0 },
+            { "us": 5.5, "uk": 3, "eu": 35.5, "cm": 22.5 },
+            { "us": 6, "uk": 3.5, "eu": 36, "cm": 23.0 },
+            { "us": 6.5, "uk": 4, "eu": 37, "cm": 23.5 },
+            { "us": 7, "uk": 4.5, "eu": 37.5, "cm": 24.0 },
+            { "us": 7.5, "uk": 5, "eu": 38, "cm": 24.5 },
+            { "us": 8, "uk": 5.5, "eu": 39, "cm": 25.0 },
+            { "us": 8.5, "uk": 6, "eu": 39.5, "cm": 25.5 },
+            { "us": 9, "uk": 6.5, "eu": 40, "cm": 26.0 },
+            { "us": 9.5, "uk": 7, "eu": 40.5, "cm": 26.5 },
+            { "us": 10, "uk": 7.5, "eu": 41, "cm": 27.0 },
+            { "us": 10.5, "uk": 8, "eu": 42, "cm": 27.5 },
+            { "us": 11, "uk": 8.5, "eu": 42.5, "cm": 28.0 },
+            { "us": 12, "uk": 9.5, "eu": 44, "cm": 29.0 }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -13,6 +13,11 @@
     "https://www.saucony.com/*",
     "https://www.asics.com/*",
     "https://www.adidas.com/*",
+    "https://www.hoka.com/*",
+    "https://www.on-running.com/*",
+    "https://www.underarmour.com/*",
+    "https://www.newbalance.com/*",
+    "https://us.puma.com/*",
     "https://runrepeat.com/*"
   ],
   "background": {
@@ -50,6 +55,31 @@
     {
       "matches": ["https://www.adidas.com/*"],
       "js": ["content-scripts/adidas.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.hoka.com/*"],
+      "js": ["content-scripts/hoka.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.on-running.com/*"],
+      "js": ["content-scripts/on-running.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.underarmour.com/*"],
+      "js": ["content-scripts/under-armour.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.newbalance.com/*"],
+      "js": ["content-scripts/new-balance.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://us.puma.com/*"],
+      "js": ["content-scripts/puma.js"],
       "run_at": "document_idle"
     },
     {
