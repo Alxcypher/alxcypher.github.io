@@ -192,26 +192,51 @@
     'New Balance', 'HOKA', 'Hoka', 'On', 'Under Armour', 'Puma', 'PUMA',
     'Mizuno', 'Altra', 'Salomon', 'Merrell'];
 
+  function parseVersion(name) {
+    if (!name) return { family: name, version: null };
+    const match = name.trim().match(/^(.+?)\s+(\d+)$/);
+    if (match) return { family: match[1].trim(), version: match[2] };
+    return { family: name.trim(), version: null };
+  }
+
   function parseBrandModel(title) {
     const cleaned = title
       .replace(/\s+review$/i, '')
-      .replace(/\s+\d{4}$/i, '') // Remove year
       .trim();
 
+    // Extract trailing year (4-digit) separately — preserve version numbers
+    const yearMatch = cleaned.match(/\s+(\d{4})$/);
+    let withoutYear = cleaned;
+    let year = null;
+    if (yearMatch && parseInt(yearMatch[1]) >= 2015 && parseInt(yearMatch[1]) <= 2030) {
+      year = parseInt(yearMatch[1]);
+      withoutYear = cleaned.substring(0, cleaned.length - yearMatch[0].length).trim();
+    }
+
     for (const brand of KNOWN_BRANDS) {
-      if (cleaned.toLowerCase().startsWith(brand.toLowerCase())) {
+      if (withoutYear.toLowerCase().startsWith(brand.toLowerCase())) {
+        const model = withoutYear.substring(brand.length).trim();
+        const versionInfo = parseVersion(model);
         return {
           brand: brand.charAt(0).toUpperCase() + brand.slice(1).toLowerCase(),
-          model: cleaned.substring(brand.length).trim(),
+          model: model,
+          modelFamily: versionInfo.family,
+          version: versionInfo.version,
+          year: year,
         };
       }
     }
 
     // Fallback: first word is brand, rest is model
-    const parts = cleaned.split(/\s+/);
+    const parts = withoutYear.split(/\s+/);
+    const model = parts.slice(1).join(' ') || withoutYear;
+    const versionInfo = parseVersion(model);
     return {
       brand: parts[0] || '',
-      model: parts.slice(1).join(' ') || cleaned,
+      model: model,
+      modelFamily: versionInfo.family,
+      version: versionInfo.version,
+      year: year,
     };
   }
 

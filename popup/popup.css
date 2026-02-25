@@ -318,6 +318,15 @@ hr {
   margin-bottom: 12px;
 }
 
+/* Family fallback indicator */
+.fallback-note {
+  font-size: 10px;
+  color: #e67e22;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 /* Utility */
 .hidden {
   display: none !important;

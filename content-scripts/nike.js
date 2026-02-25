@@ -10,6 +10,12 @@
 
   const BRAND = 'Nike';
 
+  function parseVersion(name) {
+    const match = name.match(/^(.+?)\s+(\d+)$/);
+    if (match) return { family: match[1].trim(), version: match[2] };
+    return { family: name, version: null };
+  }
+
   // Detect if we're on a size chart / size guide page
   function isSizeChartPage() {
     return (
@@ -161,9 +167,14 @@
       document.querySelector('.product-info__subtitle')?.textContent ||
       '';
 
+    const modelName = title.trim();
+    const versionInfo = parseVersion(modelName);
+
     return {
       brandName: BRAND,
-      modelName: title.trim(),
+      modelName,
+      modelFamily: versionInfo.family,
+      version: versionInfo.version,
       category: subtitle.toLowerCase().includes('trail') ? 'trail' : 'road',
     };
   }

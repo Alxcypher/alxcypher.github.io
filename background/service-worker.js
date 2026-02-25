@@ -165,13 +165,38 @@ async function handleMessage(message, sender) {
     }
 
     case 'SCRAPE_MODEL': {
-      const brand = getBrandByName(message.brandName);
+      let brand = getBrandByName(message.brandName);
+      if (!brand) {
+        insertBrand(message.brandName, null, null);
+        await persist();
+        brand = getBrandByName(message.brandName);
+      }
       if (brand) {
-        insertModel(brand.id, message.modelName, message.category || null);
+        const versionInfo = parseModelVersion(message.modelName);
+        insertModel(
+          brand.id,
+          versionInfo.displayName,
+          message.category || null,
+          message.modelFamily || versionInfo.family,
+          message.version || versionInfo.version,
+          message.year || null
+        );
         await persist();
       }
       return { success: true };
     }
+
+    case 'GET_MODEL_FAMILY':
+      return { data: getModelsByFamily(message.brandId, message.modelFamily) };
+
+    case 'GET_FIT_SUMMARY_FAMILY':
+      return {
+        data: getFitSummaryForFamily(
+          message.referenceModelId,
+          message.comparedModelFamily,
+          message.comparedBrandId
+        ),
+      };
 
     case 'SCRAPE_FIT_DATA': {
       // From RunRepeat or similar — raw review data
@@ -182,10 +207,17 @@ async function handleMessage(message, sender) {
       if (reviewData.parsedFit && message.brandName && message.modelName) {
         const brand = getBrandByName(normalizeBrandName(message.brandName));
         if (brand) {
+          // Try exact match first, then family match
           const models = getModelsByBrand(brand.id);
-          const model = models.find(
+          let model = models.find(
             (m) => m.name.toLowerCase() === message.modelName.toLowerCase()
           );
+          if (!model) {
+            const vInfo = parseModelVersion(message.modelName);
+            model = models.find(
+              (m) => m.model_family && m.model_family.toLowerCase() === vInfo.family.toLowerCase()
+            );
+          }
           if (model) {
             insertFitReport({
               referenceModelId: model.id,

@@ -8,17 +8,7 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://www.nike.com/*",
-    "https://www.brooksrunning.com/*",
-    "https://www.saucony.com/*",
-    "https://www.asics.com/*",
-    "https://www.adidas.com/*",
-    "https://www.hoka.com/*",
-    "https://www.on-running.com/*",
-    "https://www.underarmour.com/*",
-    "https://www.newbalance.com/*",
-    "https://us.puma.com/*",
-    "https://runrepeat.com/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background/service-worker.js"
@@ -86,6 +76,24 @@
       "matches": ["https://runrepeat.com/*"],
       "js": ["content-scripts/runrepeat.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-scripts/retailer-generic.js"],
+      "run_at": "document_idle",
+      "exclude_matches": [
+        "https://www.nike.com/*",
+        "https://www.brooksrunning.com/*",
+        "https://www.saucony.com/*",
+        "https://www.asics.com/*",
+        "https://www.adidas.com/*",
+        "https://www.hoka.com/*",
+        "https://www.on-running.com/*",
+        "https://www.underarmour.com/*",
+        "https://www.newbalance.com/*",
+        "https://us.puma.com/*",
+        "https://runrepeat.com/*"
+      ]
     }
   ],
   "content_security_policy": {

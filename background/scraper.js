@@ -130,3 +130,29 @@ function normalizeBrandName(raw) {
   const lower = raw.trim().toLowerCase();
   return BRAND_ALIASES[lower] || raw.trim();
 }
+
+// ---------------------------------------------------------------------------
+// Model version parser
+// ---------------------------------------------------------------------------
+
+function parseModelVersion(fullName) {
+  if (!fullName) return { family: fullName, version: null, displayName: fullName };
+
+  const trimmed = fullName.trim();
+
+  // "Air Zoom Pegasus 41" → { family: "Air Zoom Pegasus", version: "41" }
+  // "Gel-Nimbus 26"       → { family: "Gel-Nimbus", version: "26" }
+  // "Ghost 16"            → { family: "Ghost", version: "16" }
+  // "Ghost"               → { family: "Ghost", version: null }
+  // "GT-2000 13"          → { family: "GT-2000", version: "13" }
+  const match = trimmed.match(/^(.+?)\s+(\d+)$/);
+  if (match) {
+    return {
+      family: match[1].trim(),
+      version: match[2],
+      displayName: trimmed,
+    };
+  }
+
+  return { family: trimmed, version: null, displayName: trimmed };
+}

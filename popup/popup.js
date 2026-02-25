@@ -103,7 +103,14 @@ async function populateModelSelect(selectId, brandId) {
   for (const model of models) {
     const opt = document.createElement('option');
     opt.value = model.id;
-    opt.textContent = model.name;
+    // Show version in dropdown label if available
+    let label = model.name;
+    if (model.version && model.model_family) {
+      label = `${model.model_family} v${model.version}`;
+    }
+    opt.textContent = label;
+    opt.dataset.family = model.model_family || model.name;
+    opt.dataset.brandId = brandId;
     select.appendChild(opt);
   }
   select.disabled = false;
@@ -187,19 +194,45 @@ $('#btn-compare').addEventListener('click', async () => {
       comparedModelId: compModelId,
     });
 
-    const fitData = fitResponse?.data || [];
-    if (fitData.length > 0) {
-      const total = fitData.reduce((sum, r) => sum + r.count, 0);
+    let fitData = fitResponse?.data || [];
+    let dataSource = 'version-specific';
+
+    // Auto-fallback: if fewer than 3 reports for this version, try family-level
+    const total = fitData.reduce((sum, r) => sum + r.count, 0);
+    if (total < 3) {
+      const compOpt = $('#comp-model').selectedOptions[0];
+      const compFamily = compOpt?.dataset?.family;
+      if (compFamily) {
+        const familyResponse = await sendMessage({
+          type: 'GET_FIT_SUMMARY_FAMILY',
+          referenceModelId: refModelId,
+          comparedModelFamily: compFamily,
+          comparedBrandId: compBrandId,
+        });
+        const familyData = familyResponse?.data || [];
+        const familyTotal = familyData.reduce((sum, r) => sum + r.count, 0);
+        if (familyTotal > total) {
+          fitData = familyData;
+          dataSource = 'family';
+        }
+      }
+    }
+
+    const displayTotal = fitData.reduce((sum, r) => sum + r.count, 0);
+    if (displayTotal > 0) {
       const tts = fitData.find((r) => r.fit_rating === 'true_to_size');
       const small = fitData.find((r) => r.fit_rating === 'runs_small');
       const large = fitData.find((r) => r.fit_rating === 'runs_large');
+      const sourceLabel = dataSource === 'family'
+        ? `<span class="fallback-note">(across all versions)</span>`
+        : '';
 
       fitDiv.innerHTML = `
-        <div class="label">Crowdsourced fit data (${total} reports)</div>
+        <div class="label">Crowdsourced fit data (${displayTotal} reports) ${sourceLabel}</div>
         <div class="fit-bar-container">
-          ${fitBarRow('True to size', tts?.count || 0, total, 'tts')}
-          ${fitBarRow('Runs small', small?.count || 0, total, 'small')}
-          ${fitBarRow('Runs large', large?.count || 0, total, 'large')}
+          ${fitBarRow('True to size', tts?.count || 0, displayTotal, 'tts')}
+          ${fitBarRow('Runs small', small?.count || 0, displayTotal, 'small')}
+          ${fitBarRow('Runs large', large?.count || 0, displayTotal, 'large')}
         </div>
         <div class="detail">
           Average offset: ${averageOffset(fitData)} sizes

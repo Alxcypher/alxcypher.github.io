@@ -9,6 +9,12 @@
 
   const BRAND = 'Adidas';
 
+  function parseVersion(name) {
+    const match = name.match(/^(.+?)\s+(\d+)$/);
+    if (match) return { family: match[1].trim(), version: match[2] };
+    return { family: name, version: null };
+  }
+
   function isSizeChartPage() {
     return (
       window.location.pathname.includes('size-chart') ||
@@ -97,9 +103,14 @@
     const trailModels = ['terrex', 'agravic', 'free hiker'];
     const category = trailModels.some((m) => title.toLowerCase().includes(m)) ? 'trail' : 'road';
 
+    const modelName = title.replace(/adidas\s*/i, '').trim();
+    const versionInfo = parseVersion(modelName);
+
     return {
       brandName: BRAND,
-      modelName: title.replace(/adidas\s*/i, '').trim(),
+      modelName,
+      modelFamily: versionInfo.family,
+      version: versionInfo.version,
       category,
     };
   }

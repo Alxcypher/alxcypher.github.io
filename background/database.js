@@ -133,6 +133,29 @@ const SCHEMA_SQL = `
 `;
 
 // ---------------------------------------------------------------------------
+// Schema migration — add version tracking columns
+// ---------------------------------------------------------------------------
+
+const MIGRATION_SQL = [
+  'ALTER TABLE models ADD COLUMN model_family TEXT',
+  'ALTER TABLE models ADD COLUMN version TEXT',
+  'ALTER TABLE models ADD COLUMN year INTEGER',
+  'CREATE INDEX IF NOT EXISTS idx_models_family ON models(brand_id, model_family)',
+];
+
+function runMigrations() {
+  for (const sql of MIGRATION_SQL) {
+    try {
+      db.run(sql);
+    } catch (e) {
+      // Column/index already exists — safe to ignore
+    }
+  }
+  // Backfill: set model_family = name for any rows that don't have it
+  db.run('UPDATE models SET model_family = name WHERE model_family IS NULL');
+}
+
+// ---------------------------------------------------------------------------
 // Initialization
 // ---------------------------------------------------------------------------
 
@@ -160,6 +183,7 @@ async function initDatabase() {
 
   // Ensure schema exists (IF NOT EXISTS makes this safe to run always)
   db.run(SCHEMA_SQL);
+  runMigrations();
   await saveToIDB();
 
   return db;
@@ -200,16 +224,18 @@ function getBrandByName(name) {
 // Model operations
 // ---------------------------------------------------------------------------
 
-function insertModel(brandId, name, category) {
+function insertModel(brandId, name, category, modelFamily, version, year) {
   db.run(
-    'INSERT OR IGNORE INTO models (brand_id, name, category) VALUES (?, ?, ?)',
-    [brandId, name, category || null]
+    `INSERT OR IGNORE INTO models (brand_id, name, category, model_family, version, year)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [brandId, name, category || null, modelFamily || name, version || null, year || null]
   );
 }
 
 function getModelsByBrand(brandId) {
   const stmt = db.prepare(
-    'SELECT id, brand_id, name, category, is_active FROM models WHERE brand_id = ? AND is_active = 1 ORDER BY name'
+    `SELECT id, brand_id, name, category, model_family, version, year, is_active
+     FROM models WHERE brand_id = ? AND is_active = 1 ORDER BY model_family, version DESC`
   );
   stmt.bind([brandId]);
   const results = [];
@@ -222,7 +248,9 @@ function getModelsByBrand(brandId) {
 
 function getModelById(modelId) {
   const stmt = db.prepare(
-    'SELECT m.id, m.brand_id, m.name, m.category, b.name as brand_name FROM models m JOIN brands b ON m.brand_id = b.id WHERE m.id = ?'
+    `SELECT m.id, m.brand_id, m.name, m.category, m.model_family, m.version, m.year,
+            b.name as brand_name
+     FROM models m JOIN brands b ON m.brand_id = b.id WHERE m.id = ?`
   );
   stmt.bind([modelId]);
   const result = stmt.step() ? stmt.getAsObject() : null;
@@ -230,14 +258,30 @@ function getModelById(modelId) {
   return result;
 }
 
+function getModelsByFamily(brandId, modelFamily) {
+  const stmt = db.prepare(
+    `SELECT id, brand_id, name, category, model_family, version, year
+     FROM models WHERE brand_id = ? AND model_family = ? AND is_active = 1
+     ORDER BY version DESC`
+  );
+  stmt.bind([brandId, modelFamily]);
+  const results = [];
+  while (stmt.step()) {
+    results.push(stmt.getAsObject());
+  }
+  stmt.free();
+  return results;
+}
+
 function searchModels(query) {
   const stmt = db.prepare(
-    `SELECT m.id, m.brand_id, m.name, m.category, b.name as brand_name
+    `SELECT m.id, m.brand_id, m.name, m.category, m.model_family, m.version, m.year,
+            b.name as brand_name
      FROM models m JOIN brands b ON m.brand_id = b.id
-     WHERE m.name LIKE ? AND m.is_active = 1
-     ORDER BY b.name, m.name LIMIT 50`
+     WHERE (m.name LIKE ? OR m.model_family LIKE ?) AND m.is_active = 1
+     ORDER BY b.name, m.model_family, m.version DESC LIMIT 50`
   );
-  stmt.bind(['%' + query + '%']);
+  stmt.bind(['%' + query + '%', '%' + query + '%']);
   const results = [];
   while (stmt.step()) {
     results.push(stmt.getAsObject());
@@ -363,6 +407,26 @@ function getFitSummary(referenceModelId, comparedModelId) {
   return results;
 }
 
+function getFitSummaryForFamily(referenceModelId, comparedModelFamily, comparedBrandId) {
+  // Aggregate fit reports across all versions of a model family
+  const stmt = db.prepare(
+    `SELECT fr.fit_rating, COUNT(*) as count, AVG(fr.fit_offset) as avg_offset
+     FROM fit_reports fr
+     JOIN models cm ON fr.compared_model_id = cm.id
+     WHERE fr.reference_model_id = ?
+       AND cm.model_family = ?
+       AND cm.brand_id = ?
+     GROUP BY fr.fit_rating`
+  );
+  stmt.bind([referenceModelId, comparedModelFamily, comparedBrandId]);
+  const results = [];
+  while (stmt.step()) {
+    results.push(stmt.getAsObject());
+  }
+  stmt.free();
+  return results;
+}
+
 function getCrossModelFitData(referenceModelId) {
   // Get all shoes compared against a reference model, with aggregated fit data
   const stmt = db.prepare(
@@ -458,7 +522,14 @@ async function seedFromJSON(seedData) {
     // Seed models
     if (brandData.models) {
       for (const model of brandData.models) {
-        insertModel(brand.id, model.name, model.category);
+        insertModel(
+          brand.id,
+          model.name,
+          model.category,
+          model.model_family || null,
+          model.version || null,
+          model.year || null
+        );
       }
     }
 

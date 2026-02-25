@@ -9,6 +9,12 @@
 
   const BRAND = 'On Running';
 
+  function parseVersion(name) {
+    const match = name.match(/^(.+?)\s+(\d+)$/);
+    if (match) return { family: match[1].trim(), version: match[2] };
+    return { family: name, version: null };
+  }
+
   function isSizeChartPage() {
     return (
       window.location.pathname.includes('size-guide') ||
@@ -94,9 +100,14 @@
     const trailModels = ['cloudultra', 'cloudventure', 'cloudvista', 'cloudtrax'];
     const category = trailModels.some((m) => title.toLowerCase().includes(m)) ? 'trail' : 'road';
 
+    const modelName = title.replace(/On\s*/i, '').trim();
+    const versionInfo = parseVersion(modelName);
+
     return {
       brandName: BRAND,
-      modelName: title.replace(/On\s*/i, '').trim(),
+      modelName,
+      modelFamily: versionInfo.family,
+      version: versionInfo.version,
       category,
     };
   }

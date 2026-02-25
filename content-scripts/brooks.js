@@ -10,6 +10,12 @@
 
   const BRAND = 'Brooks';
 
+  function parseVersion(name) {
+    const match = name.match(/^(.+?)\s+(\d+)$/);
+    if (match) return { family: match[1].trim(), version: match[2] };
+    return { family: name, version: null };
+  }
+
   function isSizeChartPage() {
     return (
       window.location.pathname.includes('size-chart') ||
@@ -123,9 +129,14 @@
       document.querySelector('h1')?.textContent ||
       '';
 
+    const modelName = title.replace(/Brooks\s*/i, '').trim();
+    const versionInfo = parseVersion(modelName);
+
     return {
       brandName: BRAND,
-      modelName: title.replace(/Brooks\s*/i, '').trim(),
+      modelName,
+      modelFamily: versionInfo.family,
+      version: versionInfo.version,
       category: inferCategory(title),
     };
   }
