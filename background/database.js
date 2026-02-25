@@ -316,15 +316,38 @@ function getSizeChart(brandId, gender) {
 }
 
 function convertSize(fromBrandId, toBrandId, gender, fromUsSize) {
-  // Find the cm_length for the source size, then find the closest size in the target brand
+  return convertSizeFromSystem(fromBrandId, toBrandId, gender, fromUsSize, 'us');
+}
+
+function convertSizeFromSystem(fromBrandId, toBrandId, gender, sizeValue, sizeSystem) {
+  // Map system name to column
+  const colMap = { us: 'us_size', uk: 'uk_size', eu: 'eu_size' };
+  const sizeCol = colMap[sizeSystem] || 'us_size';
+
+  // Find the cm_length for the source size in the given system
   const fromStmt = db.prepare(
-    'SELECT cm_length FROM size_charts WHERE brand_id = ? AND gender = ? AND us_size = ?'
+    `SELECT cm_length FROM size_charts WHERE brand_id = ? AND gender = ? AND ${sizeCol} = ?`
   );
-  fromStmt.bind([fromBrandId, gender, fromUsSize]);
+  fromStmt.bind([fromBrandId, gender, sizeValue]);
   const fromResult = fromStmt.step() ? fromStmt.getAsObject() : null;
   fromStmt.free();
 
-  if (!fromResult || !fromResult.cm_length) return null;
+  // If exact match not found for UK/EU (which can have odd values), find closest
+  let cmLength = fromResult?.cm_length;
+  if (!cmLength) {
+    const closestStmt = db.prepare(
+      `SELECT cm_length, ABS(${sizeCol} - ?) as diff
+       FROM size_charts
+       WHERE brand_id = ? AND gender = ? AND ${sizeCol} IS NOT NULL
+       ORDER BY diff ASC LIMIT 1`
+    );
+    closestStmt.bind([sizeValue, fromBrandId, gender]);
+    const closestResult = closestStmt.step() ? closestStmt.getAsObject() : null;
+    closestStmt.free();
+    cmLength = closestResult?.cm_length;
+  }
+
+  if (!cmLength) return null;
 
   const toStmt = db.prepare(
     `SELECT us_size, uk_size, eu_size, cm_length,
@@ -333,11 +356,30 @@ function convertSize(fromBrandId, toBrandId, gender, fromUsSize) {
      WHERE brand_id = ? AND gender = ?
      ORDER BY diff ASC LIMIT 1`
   );
-  toStmt.bind([fromResult.cm_length, toBrandId, gender]);
+  toStmt.bind([cmLength, toBrandId, gender]);
   const toResult = toStmt.step() ? toStmt.getAsObject() : null;
   toStmt.free();
 
   return toResult;
+}
+
+function getSizeOptions(brandId, gender, sizeSystem) {
+  // Return distinct size values for a given system, used to populate dropdowns
+  const colMap = { us: 'us_size', uk: 'uk_size', eu: 'eu_size' };
+  const sizeCol = colMap[sizeSystem] || 'us_size';
+
+  const stmt = db.prepare(
+    `SELECT DISTINCT ${sizeCol} as size_val FROM size_charts
+     WHERE brand_id = ? AND gender = ? AND ${sizeCol} IS NOT NULL
+     ORDER BY ${sizeCol} ASC`
+  );
+  stmt.bind([brandId, gender]);
+  const results = [];
+  while (stmt.step()) {
+    results.push(stmt.getAsObject().size_val);
+  }
+  stmt.free();
+  return results;
 }
 
 // ---------------------------------------------------------------------------

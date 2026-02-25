@@ -104,12 +104,18 @@ async function handleMessage(message, sender) {
 
     case 'CONVERT_SIZE':
       return {
-        data: convertSize(
+        data: convertSizeFromSystem(
           message.fromBrandId,
           message.toBrandId,
           message.gender,
-          message.fromUsSize
+          message.sizeValue ?? message.fromUsSize,
+          message.sizeSystem || 'us'
         ),
+      };
+
+    case 'GET_SIZE_OPTIONS':
+      return {
+        data: getSizeOptions(message.brandId, message.gender, message.sizeSystem || 'us'),
       };
 
     // --- Fit report operations ---

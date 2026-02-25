@@ -120,6 +120,10 @@ header .subtitle {
   flex: 1;
 }
 
+.field-row .field-size-system {
+  flex: 0 0 60px;
+}
+
 hr {
   border: none;
   border-top: 1px solid #eee;

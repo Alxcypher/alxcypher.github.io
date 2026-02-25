@@ -23,14 +23,46 @@ function $$(selector) {
   return document.querySelectorAll(selector);
 }
 
-// Generate US size options (4–16 with half sizes)
-function populateSizeSelect(select) {
+const SYSTEM_LABELS = { us: 'US', uk: 'UK', eu: 'EU' };
+
+// Fallback size ranges when no brand-specific data is available yet
+const FALLBACK_SIZES = {
+  us:  { min: 4, max: 16, step: 0.5 },
+  uk:  { min: 3, max: 15, step: 0.5 },
+  eu:  { min: 35.5, max: 51.5, step: 0.5 },
+};
+
+// Populate a size select — tries brand-specific sizes first, falls back to generic range
+async function populateSizeSelect(select, brandId, gender, system) {
   select.innerHTML = '<option value="">Size...</option>';
-  for (let s = 4; s <= 16; s += 0.5) {
-    const opt = document.createElement('option');
-    opt.value = s;
-    opt.textContent = s;
-    select.appendChild(opt);
+
+  let sizes = null;
+  if (brandId) {
+    const response = await sendMessage({
+      type: 'GET_SIZE_OPTIONS',
+      brandId: parseInt(brandId),
+      gender: gender || 'mens',
+      sizeSystem: system || 'us',
+    });
+    sizes = response?.data;
+  }
+
+  if (sizes && sizes.length > 0) {
+    for (const s of sizes) {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      select.appendChild(opt);
+    }
+  } else {
+    // Generic fallback
+    const range = FALLBACK_SIZES[system] || FALLBACK_SIZES.us;
+    for (let s = range.min; s <= range.max; s += range.step) {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = system === 'eu' ? s.toFixed(1).replace('.0', '') : s;
+      select.appendChild(opt);
+    }
   }
 }
 
@@ -117,23 +149,31 @@ async function populateModelSelect(selectId, brandId) {
 }
 
 // ---------------------------------------------------------------------------
+// Compare tab — size system refresh helper
+// ---------------------------------------------------------------------------
+
+async function refreshRefSizes() {
+  const brandId = $('#ref-brand').value;
+  const gender = $('#ref-gender').value;
+  const system = $('#ref-system').value;
+  await populateSizeSelect($('#ref-size'), brandId, gender, system);
+  $('#ref-size').disabled = !brandId;
+  updateCompareButton();
+}
+
+// ---------------------------------------------------------------------------
 // Compare tab logic
 // ---------------------------------------------------------------------------
 
 $('#ref-brand').addEventListener('change', async (e) => {
   await populateModelSelect('#ref-model', e.target.value);
-  updateCompareButton();
-  if (e.target.value) {
-    populateSizeSelect($('#ref-size'));
-    $('#ref-size').disabled = false;
-  } else {
-    $('#ref-size').disabled = true;
-  }
+  await refreshRefSizes();
 });
 
 $('#ref-model').addEventListener('change', updateCompareButton);
 $('#ref-size').addEventListener('change', updateCompareButton);
-$('#ref-gender').addEventListener('change', updateCompareButton);
+$('#ref-gender').addEventListener('change', refreshRefSizes);
+$('#ref-system').addEventListener('change', refreshRefSizes);
 
 $('#comp-brand').addEventListener('change', async (e) => {
   await populateModelSelect('#comp-model', e.target.value);
@@ -154,27 +194,34 @@ $('#btn-compare').addEventListener('click', async () => {
   const compBrandId = parseInt($('#comp-brand').value);
   const gender = $('#ref-gender').value;
   const refSize = parseFloat($('#ref-size').value);
+  const sizeSystem = $('#ref-system').value;
   const refModelId = $('#ref-model').value ? parseInt($('#ref-model').value) : null;
   const compModelId = $('#comp-model').value ? parseInt($('#comp-model').value) : null;
 
-  // 1. Size chart conversion
+  // 1. Size chart conversion — pass selected system
   const convResponse = await sendMessage({
     type: 'CONVERT_SIZE',
     fromBrandId: refBrandId,
     toBrandId: compBrandId,
     gender,
-    fromUsSize: refSize,
+    sizeValue: refSize,
+    sizeSystem,
   });
 
   const conversion = convResponse?.data;
   const sizeDiv = $('#size-conversion');
+  const sysLabel = SYSTEM_LABELS[sizeSystem] || 'US';
 
   if (conversion) {
+    // Highlight the user's chosen system as the primary result
+    const primarySize = conversion[sizeSystem === 'uk' ? 'uk_size' : sizeSystem === 'eu' ? 'eu_size' : 'us_size'];
+    const primaryLabel = sysLabel;
+
     sizeDiv.innerHTML = `
       <div class="label">Equivalent size (based on foot length)</div>
-      <div class="value">US ${conversion.us_size}</div>
+      <div class="value">${primaryLabel} ${primarySize}</div>
       <div class="detail">
-        UK ${conversion.uk_size || '—'} | EU ${conversion.eu_size || '—'} | ${conversion.cm_length || '—'} cm
+        US ${conversion.us_size} | UK ${conversion.uk_size || '—'} | EU ${conversion.eu_size || '—'} | ${conversion.cm_length || '—'} cm
       </div>
     `;
   } else {
@@ -276,16 +323,42 @@ function averageOffset(fitData) {
 }
 
 // ---------------------------------------------------------------------------
+// Report tab — size system refresh helpers
+// ---------------------------------------------------------------------------
+
+async function refreshReportRefSizes() {
+  const brandId = $('#report-ref-brand').value;
+  const gender = $('#report-ref-gender').value;
+  const system = $('#report-ref-system').value;
+  await populateSizeSelect($('#report-ref-size'), brandId, gender, system);
+}
+
+async function refreshReportCompSizes() {
+  const brandId = $('#report-comp-brand').value;
+  const gender = $('#report-comp-gender').value;
+  const system = $('#report-comp-system').value;
+  await populateSizeSelect($('#report-comp-size'), brandId, gender, system);
+}
+
+// ---------------------------------------------------------------------------
 // Report tab logic
 // ---------------------------------------------------------------------------
 
 $('#report-ref-brand').addEventListener('change', async (e) => {
   await populateModelSelect('#report-ref-model', e.target.value);
+  await refreshReportRefSizes();
 });
+
+$('#report-ref-gender').addEventListener('change', refreshReportRefSizes);
+$('#report-ref-system').addEventListener('change', refreshReportRefSizes);
 
 $('#report-comp-brand').addEventListener('change', async (e) => {
   await populateModelSelect('#report-comp-model', e.target.value);
+  await refreshReportCompSizes();
 });
+
+$('#report-comp-gender').addEventListener('change', refreshReportCompSizes);
+$('#report-comp-system').addEventListener('change', refreshReportCompSizes);
 
 // Fit buttons
 $$('.fit-btn').forEach((btn) => {
@@ -295,17 +368,21 @@ $$('.fit-btn').forEach((btn) => {
   });
 });
 
-// Populate size selects for report tab
-populateSizeSelect($('#report-ref-size'));
-populateSizeSelect($('#report-comp-size'));
+// Initial fallback size populations (will refresh when brand is chosen)
+populateSizeSelect($('#report-ref-size'), null, 'mens', 'us');
+populateSizeSelect($('#report-comp-size'), null, 'mens', 'us');
 
 $('#btn-submit-report').addEventListener('click', async () => {
   const refModelId = $('#report-ref-model').value;
   const refSize = $('#report-ref-size').value;
   const refGender = $('#report-ref-gender').value;
+  const refSystem = $('#report-ref-system').value;
+  const refBrandId = $('#report-ref-brand').value;
   const compModelId = $('#report-comp-model').value;
   const compSize = $('#report-comp-size').value;
   const compGender = $('#report-comp-gender').value;
+  const compSystem = $('#report-comp-system').value;
+  const compBrandId = $('#report-comp-brand').value;
   const fitBtn = $('.fit-btn.selected');
 
   if (!refModelId || !refSize || !compModelId || !compSize || !fitBtn) {
@@ -313,12 +390,39 @@ $('#btn-submit-report').addEventListener('click', async () => {
     return;
   }
 
+  // Convert sizes to US for storage if entered in a different system
+  let refSizeUs = parseFloat(refSize);
+  if (refSystem !== 'us' && refBrandId) {
+    const conv = await sendMessage({
+      type: 'CONVERT_SIZE',
+      fromBrandId: parseInt(refBrandId),
+      toBrandId: parseInt(refBrandId),
+      gender: refGender,
+      sizeValue: parseFloat(refSize),
+      sizeSystem: refSystem,
+    });
+    if (conv?.data?.us_size) refSizeUs = conv.data.us_size;
+  }
+
+  let compSizeUs = parseFloat(compSize);
+  if (compSystem !== 'us' && compBrandId) {
+    const conv = await sendMessage({
+      type: 'CONVERT_SIZE',
+      fromBrandId: parseInt(compBrandId),
+      toBrandId: parseInt(compBrandId),
+      gender: compGender,
+      sizeValue: parseFloat(compSize),
+      sizeSystem: compSystem,
+    });
+    if (conv?.data?.us_size) compSizeUs = conv.data.us_size;
+  }
+
   const report = {
     referenceModelId: parseInt(refModelId),
-    referenceSizeUs: parseFloat(refSize),
+    referenceSizeUs: refSizeUs,
     referenceGender: refGender,
     comparedModelId: parseInt(compModelId),
-    comparedSizeUs: parseFloat(compSize),
+    comparedSizeUs: compSizeUs,
     comparedGender: compGender,
     fitRating: fitBtn.dataset.fit,
     fitOffset: parseFloat(fitBtn.dataset.offset),
