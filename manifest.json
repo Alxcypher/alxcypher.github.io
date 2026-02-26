@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "SizeCompare",
+  "name": "FitShift",
   "version": "0.1.0",
-  "description": "Crowdsourced running shoe sizing data across brands",
+  "description": "Find your perfect fit across running shoe brands",
   "permissions": [
     "storage",
     "activeTab"

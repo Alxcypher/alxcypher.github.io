@@ -1,5 +1,5 @@
 /**
- * SizeCompare — Puma Content Script
+ * FitShift — Puma Content Script
  *
  * Scrapes size chart data from puma.com pages.
  */
@@ -110,7 +110,7 @@
           gender: detectGender(),
           data: sizeData,
         });
-        console.log(`[SizeCompare] Scraped ${sizeData.length} sizes from ${BRAND}`);
+        console.log(`[FitShift] Scraped ${sizeData.length} sizes from ${BRAND}`);
       }
     }
 
@@ -118,7 +118,7 @@
       const productInfo = scrapeProductInfo();
       if (productInfo.modelName) {
         chrome.runtime.sendMessage({ type: 'SCRAPE_MODEL', ...productInfo });
-        console.log(`[SizeCompare] Found ${BRAND} product: ${productInfo.modelName}`);
+        console.log(`[FitShift] Found ${BRAND} product: ${productInfo.modelName}`);
       }
     }
   }

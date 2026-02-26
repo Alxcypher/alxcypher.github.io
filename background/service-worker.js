@@ -1,5 +1,5 @@
 /**
- * SizeCompare — Background Service Worker
+ * FitShift — Background Service Worker
  *
  * Central coordinator: initializes the database, handles messages from
  * popup and content scripts, seeds data on install.
@@ -22,7 +22,7 @@ async function ensureDB() {
   if (!dbReadyPromise) {
     dbReadyPromise = initDatabase().then(() => {
       dbReady = true;
-      console.log('[SizeCompare] Database ready');
+      console.log('[FitShift] Database ready');
     });
   }
   return dbReadyPromise;
@@ -34,7 +34,7 @@ async function ensureDB() {
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install' || details.reason === 'update') {
-    console.log(`[SizeCompare] Extension ${details.reason}ed — seeding database`);
+    console.log(`[FitShift] Extension ${details.reason}ed — seeding database`);
     await ensureDB();
 
     // Load and apply seed size data
@@ -43,9 +43,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       const seedData = await response.json();
       await seedFromJSON(seedData);
       const stats = getStats();
-      console.log('[SizeCompare] Seed complete:', stats);
+      console.log('[FitShift] Seed complete:', stats);
     } catch (err) {
-      console.error('[SizeCompare] Failed to load seed data:', err);
+      console.error('[FitShift] Failed to load seed data:', err);
     }
 
     // Load brand registry to ensure all registered brands exist
@@ -56,9 +56,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
         insertBrand(brand.name, `https://${brand.domain}`, brand.sizeChartUrl || null);
       }
       await persist();
-      console.log('[SizeCompare] Brand registry loaded');
+      console.log('[FitShift] Brand registry loaded');
     } catch (err) {
-      console.error('[SizeCompare] Failed to load brand registry:', err);
+      console.error('[FitShift] Failed to load brand registry:', err);
     }
   }
 });
@@ -71,7 +71,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   handleMessage(message, sender)
     .then(sendResponse)
     .catch((err) => {
-      console.error('[SizeCompare] Message handler error:', err);
+      console.error('[FitShift] Message handler error:', err);
       sendResponse({ error: err.message });
     });
   return true; // Keep message channel open for async response
@@ -165,7 +165,7 @@ async function handleMessage(message, sender) {
       }
       await persist();
       console.log(
-        `[SizeCompare] Ingested ${normalized.length} size chart entries for ${message.brandName}`
+        `[FitShift] Ingested ${normalized.length} size chart entries for ${message.brandName}`
       );
       return { success: true, count: normalized.length };
     }
@@ -276,6 +276,6 @@ async function handleMessage(message, sender) {
 // ---------------------------------------------------------------------------
 
 self.addEventListener('activate', () => {
-  console.log('[SizeCompare] Service worker activated');
+  console.log('[FitShift] Service worker activated');
   ensureDB();
 });

@@ -1,11 +1,11 @@
 /**
- * SizeCompare — Database Layer
+ * FitShift — Database Layer
  *
  * Uses sql.js (SQLite compiled to WebAssembly) with IndexedDB persistence.
  * All database operations flow through this module.
  */
 
-const IDB_NAME = 'SizeCompareDB';
+const IDB_NAME = 'FitShiftDB';
 const IDB_STORE = 'sqlitedb';
 const IDB_KEY = 'main';
 
@@ -187,10 +187,10 @@ async function initDatabase() {
   const savedData = await loadFromIDB();
   if (savedData) {
     db = new SQL.Database(new Uint8Array(savedData));
-    console.log('[SizeCompare] Database loaded from IndexedDB');
+    console.log('[FitShift] Database loaded from IndexedDB');
   } else {
     db = new SQL.Database();
-    console.log('[SizeCompare] New database created');
+    console.log('[FitShift] New database created');
   }
 
   // Ensure schema exists (IF NOT EXISTS makes this safe to run always)
@@ -660,7 +660,7 @@ async function seedFromJSON(seedData) {
   }
 
   await saveToIDB();
-  console.log('[SizeCompare] Seed data loaded successfully');
+  console.log('[FitShift] Seed data loaded successfully');
 }
 
 // ---------------------------------------------------------------------------

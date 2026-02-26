@@ -1,5 +1,5 @@
 /**
- * SizeCompare — Generic Retailer Content Script
+ * FitShift — Generic Retailer Content Script
  *
  * Detects running shoe products on any non-brand website (retailers like
  * Amazon, Zappos, REI, Running Warehouse, etc.) using structured data,
@@ -233,7 +233,7 @@
         gender: detectGender(),
       });
       console.log(
-        `[SizeCompare] Detected ${result.brandName} ${result.modelName} on retailer (${result.source}, ${result.confidence} confidence)`
+        `[FitShift] Detected ${result.brandName} ${result.modelName} on retailer (${result.source}, ${result.confidence} confidence)`
       );
     }
   }

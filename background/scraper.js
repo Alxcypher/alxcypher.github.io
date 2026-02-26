@@ -1,5 +1,5 @@
 /**
- * SizeCompare — Scraper Coordinator
+ * FitShift — Scraper Coordinator
  *
  * Parses and normalizes scraped data received from content scripts.
  * Handles natural language fit descriptions → structured fit_rating + fit_offset.

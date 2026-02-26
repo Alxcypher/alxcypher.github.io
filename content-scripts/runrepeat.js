@@ -1,5 +1,5 @@
 /**
- * SizeCompare — RunRepeat Content Script
+ * FitShift — RunRepeat Content Script
  *
  * Scrapes shoe review data from runrepeat.com for sizing information.
  * Extracts: brand, model name, sizing verdict, and any size chart data.
@@ -264,7 +264,7 @@
     }
 
     if (scrapedItems.length > 0) {
-      console.log(`[SizeCompare] Scraped ${scrapedItems.length} sizing entries from RunRepeat`);
+      console.log(`[FitShift] Scraped ${scrapedItems.length} sizing entries from RunRepeat`);
     }
   }
 

@@ -1,4 +1,6 @@
-/* SizeCompare Popup — Modern UI */
+/* FitShift Popup — Brand UI */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
 
 * {
   margin: 0;
@@ -9,29 +11,30 @@
 body {
   width: 390px;
   min-height: 420px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
-  color: #1f2937;
-  background: #fff;
+  color: #1A1A1A;
+  background: #FFFFFF;
   line-height: 1.5;
 }
 
 /* Header */
 header {
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  background: linear-gradient(135deg, #7C3AED, #6D28D9);
   color: white;
   padding: 16px 20px 14px;
 }
 
 header h1 {
+  font-family: 'Outfit', sans-serif;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.4px;
 }
 
 header .subtitle {
   font-size: 12px;
-  opacity: 0.8;
+  opacity: 0.85;
   margin-top: 2px;
   font-weight: 400;
 }
@@ -41,8 +44,8 @@ header .subtitle {
   display: flex;
   gap: 4px;
   padding: 10px 16px;
-  background: #f9fafb;
-  border-bottom: 1px solid #f3f4f6;
+  background: #F5F3FF;
+  border-bottom: 1px solid #ede9fe;
 }
 
 .tab {
@@ -51,6 +54,7 @@ header .subtitle {
   border: none;
   background: transparent;
   color: #6b7280;
+  font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -59,13 +63,13 @@ header .subtitle {
 }
 
 .tab:hover {
-  color: #4f46e5;
-  background: #eef2ff;
+  color: #7C3AED;
+  background: rgba(124, 58, 237, 0.08);
 }
 
 .tab.active {
   color: white;
-  background: #4f46e5;
+  background: #6D28D9;
 }
 
 /* Tab content */
@@ -97,9 +101,10 @@ header .subtitle {
   padding: 10px 12px;
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   background: #fff;
-  color: #1f2937;
+  color: #1A1A1A;
   transition: all 0.2s;
   -webkit-appearance: none;
   appearance: none;
@@ -113,16 +118,16 @@ header .subtitle {
 }
 
 .field select:disabled {
-  background-color: #f9fafb;
+  background-color: #F5F3FF;
   color: #9ca3af;
-  border-color: #f3f4f6;
+  border-color: #ede9fe;
 }
 
 .field select:focus,
 .field input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: #7C3AED;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
 }
 
 .field-row {
@@ -148,10 +153,11 @@ hr {
 .btn-primary {
   width: 100%;
   padding: 10px 16px;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  background: #6D28D9;
   color: white;
   border: none;
   border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -160,7 +166,8 @@ hr {
 }
 
 .btn-primary:hover {
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  background: #5B21B6;
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
   transform: translateY(-1px);
 }
 
@@ -185,6 +192,7 @@ hr {
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
   background: white;
+  font-family: 'DM Sans', sans-serif;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -193,26 +201,26 @@ hr {
 }
 
 .fit-btn:hover {
-  border-color: #6366f1;
-  background: #f5f3ff;
+  border-color: #7C3AED;
+  background: #F5F3FF;
 }
 
 .fit-btn.selected {
-  border-color: #6366f1;
-  background: #eef2ff;
-  color: #4338ca;
+  border-color: #6D28D9;
+  background: #F5F3FF;
+  color: #6D28D9;
 }
 
 .fit-btn[data-fit="runs_small"].selected {
-  border-color: #f59e0b;
-  background: #fffbeb;
-  color: #b45309;
+  border-color: #FF4D4D;
+  background: #fff5f5;
+  color: #e03131;
 }
 
 .fit-btn[data-fit="runs_large"].selected {
-  border-color: #10b981;
-  background: #ecfdf5;
-  color: #047857;
+  border-color: #22C55E;
+  background: #f0fdf4;
+  color: #15803d;
 }
 
 /* Results */
@@ -221,10 +229,11 @@ hr {
 }
 
 .results h3 {
+  font-family: 'Outfit', sans-serif;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 10px;
-  color: #1f2937;
+  color: #1A1A1A;
 }
 
 .result-card {
@@ -245,9 +254,10 @@ hr {
 }
 
 .result-card .value {
+  font-family: 'Outfit', sans-serif;
   font-size: 22px;
-  font-weight: 700;
-  color: #1f2937;
+  font-weight: 800;
+  color: #1A1A1A;
   margin-top: 4px;
 }
 
@@ -289,9 +299,9 @@ hr {
   transition: width 0.4s ease;
 }
 
-.fit-bar-fill.tts { background: linear-gradient(90deg, #6366f1, #818cf8); }
-.fit-bar-fill.small { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-.fit-bar-fill.large { background: linear-gradient(90deg, #10b981, #34d399); }
+.fit-bar-fill.tts { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+.fit-bar-fill.small { background: linear-gradient(90deg, #FF4D4D, #ff7070); }
+.fit-bar-fill.large { background: linear-gradient(90deg, #22C55E, #4ade80); }
 
 .fit-bar-count {
   width: 32px;
@@ -312,13 +322,13 @@ hr {
 }
 
 .status.success {
-  background: #ecfdf5;
-  color: #047857;
+  background: #f0fdf4;
+  color: #15803d;
 }
 
 .status.error {
-  background: #fef2f2;
-  color: #dc2626;
+  background: #fff5f5;
+  color: #e03131;
 }
 
 /* Stats */
@@ -351,7 +361,7 @@ hr {
 /* Family fallback indicator */
 .fallback-note {
   font-size: 10px;
-  color: #f59e0b;
+  color: #FF4D4D;
   font-weight: 500;
   text-transform: none;
   letter-spacing: 0;
@@ -376,7 +386,8 @@ hr {
 }
 
 .shoe-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  border-color: #ede9fe;
 }
 
 .shoe-item-info {
@@ -387,7 +398,7 @@ hr {
 .shoe-item-name {
   font-size: 13px;
   font-weight: 500;
-  color: #1f2937;
+  color: #1A1A1A;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -397,7 +408,7 @@ hr {
 .btn-delete-shoe {
   background: none;
   border: none;
-  color: #ef4444;
+  color: #FF4D4D;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
@@ -411,13 +422,13 @@ hr {
 
 .btn-delete-shoe:hover {
   opacity: 1;
-  background: #fef2f2;
+  background: #fff5f5;
 }
 
 /* Add shoe form */
 .add-shoe-form {
-  background: #f9fafb;
-  border: 1px solid #f3f4f6;
+  background: #F5F3FF;
+  border: 1px solid #ede9fe;
   border-radius: 10px;
   padding: 14px;
   margin-bottom: 12px;
@@ -440,9 +451,10 @@ hr {
   width: 100%;
   padding: 10px 16px;
   background: white;
-  color: #4f46e5;
-  border: 1.5px solid #e0e7ff;
+  color: #6D28D9;
+  border: 1.5px solid #ddd6fe;
   border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -452,8 +464,8 @@ hr {
 }
 
 .btn-secondary:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
+  background: #F5F3FF;
+  border-color: #c4b5fd;
 }
 
 /* Add shoe link */
@@ -461,14 +473,14 @@ hr {
   display: inline-block;
   margin-top: 6px;
   font-size: 12px;
-  color: #6366f1;
+  color: #6D28D9;
   text-decoration: none;
   font-weight: 500;
 }
 
 .add-shoe-link:hover {
   text-decoration: underline;
-  color: #4338ca;
+  color: #5B21B6;
 }
 
 /* Empty state */
@@ -485,9 +497,10 @@ hr {
 
 /* My Shoes section header */
 #my-shoes-section h3 {
+  font-family: 'Outfit', sans-serif;
   font-size: 14px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #1A1A1A;
   margin-bottom: 10px;
 }
 

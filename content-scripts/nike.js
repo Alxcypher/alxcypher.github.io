@@ -1,5 +1,5 @@
 /**
- * SizeCompare — Nike Content Script
+ * FitShift — Nike Content Script
  *
  * Scrapes size chart data from nike.com pages.
  * Targets: /size-fit-guide pages and product page size selectors.
@@ -212,7 +212,7 @@
           gender: detectGender(),
           data: sizeData,
         });
-        console.log(`[SizeCompare] Scraped ${sizeData.length} sizes from ${BRAND} size chart`);
+        console.log(`[FitShift] Scraped ${sizeData.length} sizes from ${BRAND} size chart`);
       }
     }
 
@@ -223,7 +223,7 @@
           type: 'SCRAPE_MODEL',
           ...productInfo,
         });
-        console.log(`[SizeCompare] Found ${BRAND} product: ${productInfo.modelName}`);
+        console.log(`[FitShift] Found ${BRAND} product: ${productInfo.modelName}`);
       }
     }
   }

@@ -1,5 +1,5 @@
 /**
- * SizeCompare — Popup Logic
+ * FitShift — Popup Logic
  *
  * Handles all user interactions in the extension popup.
  * Communicates with the service worker via chrome.runtime.sendMessage.
