@@ -8,7 +8,7 @@
  */
 
 // Load sql.js WASM engine and extension modules (must be top-level in MV3)
-importScripts('../lib/sql-wasm.js', 'database.js', 'scraper.js');
+importScripts('../lib/sql-wasm.js', 'database.js', 'scraper.js', 'supabase-config.js', 'auth.js', 'sync.js');
 
 // ---------------------------------------------------------------------------
 // Initialization
@@ -64,6 +64,58 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     } catch (err) {
       console.error('[FitShift] Failed to load brand registry:', err);
     }
+
+    // Load and apply seed fit consensus data
+    try {
+      const fitResponse = await fetch(chrome.runtime.getURL('data/seed-fit-data.json'));
+      const fitData = await fitResponse.json();
+      await seedFitData(fitData);
+      console.log('[FitShift] Seed fit data loaded');
+    } catch (err) {
+      console.error('[FitShift] Failed to load seed fit data:', err);
+    }
+
+    // Detect old Firebase auth state and flag for migration
+    if (details.reason === 'update') {
+      try {
+        const stored = await chrome.storage.local.get('fitshift_auth');
+        const oldAuth = stored.fitshift_auth;
+        if (oldAuth && oldAuth.firebaseUid) {
+          await chrome.storage.local.set({ fitshift_firebase_migration: true });
+          await chrome.storage.local.remove('fitshift_auth');
+          console.log('[FitShift] Detected old Firebase auth — flagged for migration');
+        }
+      } catch (migErr) {
+        console.error('[FitShift] Migration detection failed:', migErr);
+      }
+    }
+
+    // Set up periodic reference data refresh alarm (every 24h)
+    chrome.alarms.create('fitshift_refresh_reference', { periodInMinutes: 24 * 60 });
+    console.log('[FitShift] Reference data refresh alarm set (24h interval)');
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Alarm handler — periodic reference data refresh
+// ---------------------------------------------------------------------------
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === 'fitshift_refresh_reference') {
+    const state = getCachedAuthState();
+    if (!state.signedIn) return;
+
+    try {
+      await ensureDB();
+      const token = await ensureValidToken();
+      if (token) {
+        await syncReferenceData(token);
+        await flushPendingSync();
+        console.log('[FitShift] Periodic reference data refresh complete');
+      }
+    } catch (e) {
+      console.error('[FitShift] Periodic refresh failed:', e);
+    }
   }
 });
 
@@ -85,6 +137,16 @@ async function handleMessage(message, sender) {
   await ensureDB();
 
   switch (message.type) {
+    // --- Auth ---
+    case 'SIGN_IN':
+      return await signIn();
+
+    case 'SIGN_OUT':
+      return await signOut();
+
+    case 'GET_AUTH_STATE':
+      return await getAuthState();
+
     // --- Brand queries ---
     case 'GET_BRANDS':
       return { data: getAllBrands() };
@@ -94,39 +156,56 @@ async function handleMessage(message, sender) {
 
     // --- Model queries ---
     case 'GET_MODELS':
+      if (!message.brandId) return { error: 'brandId is required' };
       return { data: getModelsByBrand(message.brandId) };
 
     case 'GET_MODEL':
+      if (!message.modelId) return { error: 'modelId is required' };
       return { data: getModelById(message.modelId) };
 
     case 'SEARCH_MODELS':
+      if (!message.query || typeof message.query !== 'string') return { error: 'query string is required' };
       return { data: searchModels(message.query) };
 
     // --- Size chart queries ---
     case 'GET_SIZE_CHART':
+      if (!message.brandId || !message.gender) return { error: 'brandId and gender are required' };
       return { data: getSizeChart(message.brandId, message.gender) };
 
-    case 'CONVERT_SIZE':
+    case 'CONVERT_SIZE': {
+      const sizeVal = message.sizeValue ?? message.fromUsSize;
+      if (!message.fromBrandId || !message.toBrandId || !message.gender || sizeVal == null) {
+        return { error: 'fromBrandId, toBrandId, gender, and sizeValue are required' };
+      }
       return {
         data: convertSizeFromSystem(
           message.fromBrandId,
           message.toBrandId,
           message.gender,
-          message.sizeValue ?? message.fromUsSize,
+          sizeVal,
           message.sizeSystem || 'us'
         ),
       };
+    }
 
     case 'GET_SIZE_OPTIONS':
+      if (!message.brandId || !message.gender) return { error: 'brandId and gender are required' };
       return {
         data: getSizeOptions(message.brandId, message.gender, message.sizeSystem || 'us'),
       };
 
     // --- Fit report operations ---
-    case 'SUBMIT_FIT_REPORT':
-      insertFitReport(message.report);
+    case 'SUBMIT_FIT_REPORT': {
+      if (!message.report) return { error: 'report object is required' };
+      const r = message.report;
+      if (!r.referenceModelId || !r.comparedModelId || !r.fitRating) {
+        return { error: 'referenceModelId, comparedModelId, and fitRating are required' };
+      }
+      insertFitReport(r);
       await persist();
+      triggerSyncIfSignedIn();
       return { success: true };
+    }
 
     case 'GET_FIT_REPORTS':
       return { data: getFitReportsForModel(message.modelId) };
@@ -139,6 +218,13 @@ async function handleMessage(message, sender) {
     case 'GET_CROSS_MODEL_FIT':
       return { data: getCrossModelFitData(message.referenceModelId) };
 
+    case 'GET_MODEL_FIT_CONSENSUS':
+      if (!message.modelId) return { error: 'modelId is required' };
+      return { data: getModelFitConsensus(message.modelId) };
+
+    case 'GET_VERSION_FIT_NOTES':
+      return { data: getVersionFitNotes(message.modelId) };
+
     // --- User profile ---
     case 'GET_PROFILE':
       return { data: getOrCreateProfile() };
@@ -146,6 +232,7 @@ async function handleMessage(message, sender) {
     case 'UPDATE_PROFILE':
       updateProfile(message.profile);
       await persist();
+      triggerSyncIfSignedIn();
       return { success: true };
 
     // --- Scraped data ingestion (from content scripts) ---
@@ -250,11 +337,15 @@ async function handleMessage(message, sender) {
 
     // --- User shoe collection ---
     case 'ADD_USER_SHOE': {
+      if (!message.brandId || message.sizeValue == null) {
+        return { error: 'brandId and sizeValue are required' };
+      }
       const shoeId = insertUserShoe(
         message.brandId, message.modelId, message.gender,
         message.sizeSystem, message.sizeValue, message.nickname
       );
       await persist();
+      triggerSyncIfSignedIn();
       return { success: true, shoeId };
     }
 
@@ -262,9 +353,25 @@ async function handleMessage(message, sender) {
       return { data: getUserShoes() };
 
     case 'DELETE_USER_SHOE':
+      if (!message.shoeId) return { error: 'shoeId is required' };
       deleteUserShoe(message.shoeId);
       await persist();
+      triggerSyncIfSignedIn();
       return { success: true };
+
+    // --- Data export/import ---
+    case 'EXPORT_USER_DATA':
+      return { data: exportUserData() };
+
+    case 'IMPORT_USER_DATA': {
+      if (!message.data) return { error: 'data object is required' };
+      const importResult = importUserData(message.data);
+      if (importResult.success) {
+        await persist();
+        triggerSyncIfSignedIn();
+      }
+      return importResult;
+    }
 
     // --- Stats ---
     case 'GET_STATS':
