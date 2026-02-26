@@ -242,6 +242,7 @@ async function refreshAllShoeUI() {
   const shoes = await loadUserShoes();
   renderShoeList(shoes);
   populateRefShoeDropdown(shoes);
+  populateReportRefShoeDropdown(shoes);
 }
 
 // ---------------------------------------------------------------------------
@@ -394,6 +395,67 @@ function averageOffset(fitData) {
   const avg = weighted / total;
   return avg > 0 ? `+${avg.toFixed(1)}` : avg.toFixed(1);
 }
+
+// ---------------------------------------------------------------------------
+// Report tab — saved shoe quick-select
+// ---------------------------------------------------------------------------
+
+function populateReportRefShoeDropdown(shoes) {
+  const select = $('#report-ref-shoe');
+  select.innerHTML = '<option value="">Select a saved shoe...</option>';
+
+  if (!shoes || shoes.length === 0) return;
+
+  for (const shoe of shoes) {
+    const opt = document.createElement('option');
+    opt.value = shoe.id;
+    opt.textContent = formatShoeLabel(shoe);
+    opt.dataset.brandId = shoe.brand_id;
+    opt.dataset.modelId = shoe.model_id || '';
+    opt.dataset.gender = shoe.gender;
+    opt.dataset.sizeSystem = shoe.size_system;
+    opt.dataset.sizeValue = shoe.size_value;
+    select.appendChild(opt);
+  }
+}
+
+$('#report-ref-shoe').addEventListener('change', async (e) => {
+  const opt = e.target.selectedOptions[0];
+  if (!opt || !opt.value) return;
+
+  const brandId = opt.dataset.brandId;
+  const modelId = opt.dataset.modelId;
+  const gender = opt.dataset.gender;
+  const sizeSystem = opt.dataset.sizeSystem;
+  const sizeValue = opt.dataset.sizeValue;
+
+  // Set brand and load its models
+  $('#report-ref-brand').value = brandId;
+  await populateModelSelect('#report-ref-model', brandId);
+
+  // Set model (if available)
+  if (modelId) {
+    $('#report-ref-model').value = modelId;
+  }
+
+  // Set gender and size system
+  $('#report-ref-gender').value = gender;
+  $('#report-ref-system').value = sizeSystem;
+
+  // Populate sizes for this brand/gender/system, then set the value
+  await populateSizeSelect($('#report-ref-size'), brandId, gender, sizeSystem);
+  $('#report-ref-size').value = sizeValue;
+});
+
+// Clear the saved shoe dropdown when the user manually changes reference fields
+['#report-ref-brand', '#report-ref-model', '#report-ref-gender', '#report-ref-system', '#report-ref-size'].forEach((sel) => {
+  $(sel).addEventListener('change', () => {
+    // Only clear if user is interacting with the manual fields directly
+    if (document.activeElement !== $('#report-ref-shoe')) {
+      $('#report-ref-shoe').value = '';
+    }
+  });
+});
 
 // ---------------------------------------------------------------------------
 // Report tab — size system refresh helpers

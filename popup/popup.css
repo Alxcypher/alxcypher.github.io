@@ -504,6 +504,31 @@ hr {
   margin-bottom: 10px;
 }
 
+/* Or-divider between saved-shoe dropdown and manual entry */
+.or-divider {
+  text-align: center;
+  margin: 10px 0;
+  position: relative;
+}
+
+.or-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.or-divider span {
+  position: relative;
+  background: #fff;
+  padding: 0 10px;
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
 /* Utility */
 .hidden {
   display: none !important;
