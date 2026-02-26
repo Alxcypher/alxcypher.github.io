@@ -16,17 +16,15 @@ const FIT_PATTERNS = [
   { pattern: /fits as expected/i, rating: 'true_to_size', offset: 0 },
   { pattern: /perfect fit/i, rating: 'true_to_size', offset: 0 },
 
-  // Runs small patterns
+  // Runs small patterns (length)
   { pattern: /runs?\s+(a\s+)?full\s+size\s+small/i, rating: 'runs_small', offset: -1.0 },
   { pattern: /runs?\s+(a\s+)?half\s+size\s+small/i, rating: 'runs_small', offset: -0.5 },
   { pattern: /runs?\s+small/i, rating: 'runs_small', offset: -0.5 },
   { pattern: /size\s+up/i, rating: 'runs_small', offset: -0.5 },
   { pattern: /go\s+(a\s+)?(half\s+)?size\s+up/i, rating: 'runs_small', offset: -0.5 },
-  { pattern: /narrow\s+fit/i, rating: 'runs_small', offset: -0.25 },
   { pattern: /tight\s+fit/i, rating: 'runs_small', offset: -0.5 },
-  { pattern: /snug/i, rating: 'runs_small', offset: -0.25 },
 
-  // Runs large patterns
+  // Runs large patterns (length)
   { pattern: /runs?\s+(a\s+)?full\s+size\s+large/i, rating: 'runs_large', offset: 1.0 },
   { pattern: /runs?\s+(a\s+)?half\s+size\s+large/i, rating: 'runs_large', offset: 0.5 },
   { pattern: /runs?\s+large/i, rating: 'runs_large', offset: 0.5 },
@@ -34,19 +32,41 @@ const FIT_PATTERNS = [
   { pattern: /size\s+down/i, rating: 'runs_large', offset: 0.5 },
   { pattern: /go\s+(a\s+)?(half\s+)?size\s+down/i, rating: 'runs_large', offset: 0.5 },
   { pattern: /loose\s+fit/i, rating: 'runs_large', offset: 0.25 },
-  { pattern: /roomy/i, rating: 'runs_large', offset: 0.25 },
+];
+
+// Width-specific patterns (separate from length)
+const WIDTH_PATTERNS = [
+  { pattern: /narrow\s+(fit|toe\s*box|width)?/i, widthRating: 'too_narrow' },
+  { pattern: /too\s+narrow/i, widthRating: 'too_narrow' },
+  { pattern: /snug/i, widthRating: 'too_narrow' },
+  { pattern: /wide\s+(fit|toe\s*box|width)?/i, widthRating: 'too_wide' },
+  { pattern: /too\s+wide/i, widthRating: 'too_wide' },
+  { pattern: /roomy/i, widthRating: 'too_wide' },
 ];
 
 function parseFitDescription(text) {
   if (!text) return null;
 
+  let result = null;
+
+  // Parse length fit
   for (const { pattern, rating, offset } of FIT_PATTERNS) {
     if (pattern.test(text)) {
-      return { rating, offset };
+      result = { rating, offset };
+      break;
     }
   }
 
-  return null;
+  // Parse width fit
+  for (const { pattern, widthRating } of WIDTH_PATTERNS) {
+    if (pattern.test(text)) {
+      if (!result) result = { rating: 'true_to_size', offset: 0 };
+      result.widthRating = widthRating;
+      break;
+    }
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------

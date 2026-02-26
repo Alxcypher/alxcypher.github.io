@@ -74,9 +74,10 @@
   <!-- Tab 2: Quick fit report -->
   <!-- ================================================================== -->
   <section id="tab-report" class="tab-content">
-    <p class="help-text">Report how a shoe fits compared to one you own.</p>
+    <p class="help-text">Compare how a shoe fits against one you own.</p>
 
-    <!-- Quick-select from saved shoes -->
+    <!-- Reference: shoe that fits -->
+    <div class="report-section-label">Shoe that fits me</div>
     <div class="field">
       <label for="report-ref-shoe">Pick from My Shoes:</label>
       <select id="report-ref-shoe">
@@ -88,14 +89,14 @@
 
     <div id="report-ref-manual">
       <div class="field">
-        <label for="report-ref-brand">My shoe brand:</label>
+        <label for="report-ref-brand">Brand:</label>
         <select id="report-ref-brand">
           <option value="">Select brand...</option>
         </select>
       </div>
 
       <div class="field">
-        <label for="report-ref-model">My shoe model:</label>
+        <label for="report-ref-model">Model:</label>
         <select id="report-ref-model" disabled>
           <option value="">Select model...</option>
         </select>
@@ -118,7 +119,7 @@
           </select>
         </div>
         <div class="field">
-          <label for="report-ref-size">My size:</label>
+          <label for="report-ref-size">Size:</label>
           <select id="report-ref-size">
             <option value="">Size...</option>
           </select>
@@ -128,50 +129,76 @@
 
     <hr>
 
+    <!-- Compared: shoe I tried -->
+    <div class="report-section-label">Shoe I tried</div>
     <div class="field">
-      <label for="report-comp-brand">Compared shoe brand:</label>
-      <select id="report-comp-brand">
-        <option value="">Select brand...</option>
+      <label for="report-comp-shoe">Pick from My Shoes:</label>
+      <select id="report-comp-shoe">
+        <option value="">Select a saved shoe...</option>
       </select>
     </div>
 
-    <div class="field">
-      <label for="report-comp-model">Compared shoe model:</label>
-      <select id="report-comp-model" disabled>
-        <option value="">Select model...</option>
-      </select>
+    <div class="or-divider"><span>or enter manually</span></div>
+
+    <div id="report-comp-manual">
+      <div class="field">
+        <label for="report-comp-brand">Brand:</label>
+        <select id="report-comp-brand">
+          <option value="">Select brand...</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="report-comp-model">Model:</label>
+        <select id="report-comp-model" disabled>
+          <option value="">Select model...</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="report-comp-gender">Gender:</label>
+          <select id="report-comp-gender">
+            <option value="mens">Men's</option>
+            <option value="womens">Women's</option>
+          </select>
+        </div>
+        <div class="field field-size-system">
+          <label for="report-comp-system">System:</label>
+          <select id="report-comp-system">
+            <option value="us">US</option>
+            <option value="uk">UK</option>
+            <option value="eu">EU</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="report-comp-size">Size I bought:</label>
+          <select id="report-comp-size">
+            <option value="">Size...</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div class="field-row">
-      <div class="field">
-        <label for="report-comp-gender">Gender:</label>
-        <select id="report-comp-gender">
-          <option value="mens">Men's</option>
-          <option value="womens">Women's</option>
-        </select>
-      </div>
-      <div class="field field-size-system">
-        <label for="report-comp-system">System:</label>
-        <select id="report-comp-system">
-          <option value="us">US</option>
-          <option value="uk">UK</option>
-          <option value="eu">EU</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="report-comp-size">Size I bought:</label>
-        <select id="report-comp-size">
-          <option value="">Size...</option>
-        </select>
+    <hr>
+
+    <!-- Fit feedback: length -->
+    <div class="field">
+      <label>Length</label>
+      <div class="fit-buttons" id="fit-length-buttons">
+        <button class="fit-btn length-btn" data-fit="runs_small" data-offset="-0.5">Too Small</button>
+        <button class="fit-btn length-btn selected" data-fit="true_to_size" data-offset="0">Good Fit</button>
+        <button class="fit-btn length-btn" data-fit="runs_large" data-offset="0.5">Too Large</button>
       </div>
     </div>
 
+    <!-- Fit feedback: width -->
     <div class="field">
-      <label>How did it fit?</label>
-      <div class="fit-buttons">
-        <button class="fit-btn" data-fit="runs_small" data-offset="-0.5">Runs Small</button>
-        <button class="fit-btn selected" data-fit="true_to_size" data-offset="0">True to Size</button>
-        <button class="fit-btn" data-fit="runs_large" data-offset="0.5">Runs Large</button>
+      <label>Width</label>
+      <div class="fit-buttons" id="fit-width-buttons">
+        <button class="fit-btn width-btn" data-width="too_narrow">Too Narrow</button>
+        <button class="fit-btn width-btn selected" data-width="true_to_width">Good Fit</button>
+        <button class="fit-btn width-btn" data-width="too_wide">Too Wide</button>
       </div>
     </div>
 

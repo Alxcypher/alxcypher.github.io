@@ -104,6 +104,7 @@ const SCHEMA_SQL = `
     compared_gender TEXT NOT NULL,
     fit_rating TEXT NOT NULL,
     fit_offset REAL DEFAULT 0,
+    width_rating TEXT DEFAULT 'true_to_width',
     user_height_cm REAL,
     user_weight_kg REAL,
     user_foot_length_cm REAL,
@@ -403,9 +404,9 @@ function insertFitReport(report) {
     `INSERT INTO fit_reports
        (reference_model_id, reference_size_us, reference_gender,
         compared_model_id, compared_size_us, compared_gender,
-        fit_rating, fit_offset,
+        fit_rating, fit_offset, width_rating,
         user_height_cm, user_weight_kg, user_foot_length_cm, source)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       report.referenceModelId,
       report.referenceSizeUs,
@@ -415,6 +416,7 @@ function insertFitReport(report) {
       report.comparedGender,
       report.fitRating,
       report.fitOffset || 0,
+      report.widthRating || 'true_to_width',
       report.userHeightCm || null,
       report.userWeightKg || null,
       report.userFootLengthCm || null,
@@ -446,6 +448,7 @@ function getFitReportsForModel(modelId) {
 }
 
 function getFitSummary(referenceModelId, comparedModelId) {
+  // Length fit summary
   const stmt = db.prepare(
     `SELECT fit_rating, COUNT(*) as count, AVG(fit_offset) as avg_offset
      FROM fit_reports
@@ -453,16 +456,32 @@ function getFitSummary(referenceModelId, comparedModelId) {
      GROUP BY fit_rating`
   );
   stmt.bind([referenceModelId, comparedModelId]);
-  const results = [];
+  const length = [];
   while (stmt.step()) {
-    results.push(stmt.getAsObject());
+    length.push(stmt.getAsObject());
   }
   stmt.free();
-  return results;
+
+  // Width fit summary
+  const wStmt = db.prepare(
+    `SELECT width_rating, COUNT(*) as count
+     FROM fit_reports
+     WHERE reference_model_id = ? AND compared_model_id = ?
+       AND width_rating IS NOT NULL
+     GROUP BY width_rating`
+  );
+  wStmt.bind([referenceModelId, comparedModelId]);
+  const width = [];
+  while (wStmt.step()) {
+    width.push(wStmt.getAsObject());
+  }
+  wStmt.free();
+
+  return { length, width };
 }
 
 function getFitSummaryForFamily(referenceModelId, comparedModelFamily, comparedBrandId) {
-  // Aggregate fit reports across all versions of a model family
+  // Length fit summary across all versions of a model family
   const stmt = db.prepare(
     `SELECT fr.fit_rating, COUNT(*) as count, AVG(fr.fit_offset) as avg_offset
      FROM fit_reports fr
@@ -473,12 +492,31 @@ function getFitSummaryForFamily(referenceModelId, comparedModelFamily, comparedB
      GROUP BY fr.fit_rating`
   );
   stmt.bind([referenceModelId, comparedModelFamily, comparedBrandId]);
-  const results = [];
+  const length = [];
   while (stmt.step()) {
-    results.push(stmt.getAsObject());
+    length.push(stmt.getAsObject());
   }
   stmt.free();
-  return results;
+
+  // Width fit summary across all versions
+  const wStmt = db.prepare(
+    `SELECT fr.width_rating, COUNT(*) as count
+     FROM fit_reports fr
+     JOIN models cm ON fr.compared_model_id = cm.id
+     WHERE fr.reference_model_id = ?
+       AND cm.model_family = ?
+       AND cm.brand_id = ?
+       AND fr.width_rating IS NOT NULL
+     GROUP BY fr.width_rating`
+  );
+  wStmt.bind([referenceModelId, comparedModelFamily, comparedBrandId]);
+  const width = [];
+  while (wStmt.step()) {
+    width.push(wStmt.getAsObject());
+  }
+  wStmt.free();
+
+  return { length, width };
 }
 
 function getCrossModelFitData(referenceModelId) {
@@ -492,6 +530,9 @@ function getCrossModelFitData(referenceModelId) {
        SUM(CASE WHEN fr.fit_rating = 'true_to_size' THEN 1 ELSE 0 END) as tts_count,
        SUM(CASE WHEN fr.fit_rating = 'runs_small' THEN 1 ELSE 0 END) as small_count,
        SUM(CASE WHEN fr.fit_rating = 'runs_large' THEN 1 ELSE 0 END) as large_count,
+       SUM(CASE WHEN fr.width_rating = 'true_to_width' THEN 1 ELSE 0 END) as ttw_count,
+       SUM(CASE WHEN fr.width_rating = 'too_narrow' THEN 1 ELSE 0 END) as narrow_count,
+       SUM(CASE WHEN fr.width_rating = 'too_wide' THEN 1 ELSE 0 END) as wide_count,
        AVG(fr.fit_offset) as avg_offset
      FROM fit_reports fr
      JOIN models cm ON fr.compared_model_id = cm.id

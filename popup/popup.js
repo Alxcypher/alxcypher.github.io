@@ -243,6 +243,7 @@ async function refreshAllShoeUI() {
   renderShoeList(shoes);
   populateRefShoeDropdown(shoes);
   populateReportRefShoeDropdown(shoes);
+  populateReportCompShoeDropdown(shoes);
 }
 
 // ---------------------------------------------------------------------------
@@ -315,7 +316,9 @@ $('#btn-compare').addEventListener('click', async () => {
       comparedModelId: compModelId,
     });
 
-    let fitData = fitResponse?.data || [];
+    let fitResult = fitResponse?.data || { length: [], width: [] };
+    let fitData = fitResult.length || [];
+    let widthData = fitResult.width || [];
     let dataSource = 'version-specific';
 
     // Auto-fallback: if fewer than 3 reports for this version, try family-level
@@ -330,10 +333,12 @@ $('#btn-compare').addEventListener('click', async () => {
           comparedModelFamily: compFamily,
           comparedBrandId: compBrandId,
         });
-        const familyData = familyResponse?.data || [];
+        const familyResult = familyResponse?.data || { length: [], width: [] };
+        const familyData = familyResult.length || [];
         const familyTotal = familyData.reduce((sum, r) => sum + r.count, 0);
         if (familyTotal > total) {
           fitData = familyData;
+          widthData = familyResult.width || [];
           dataSource = 'family';
         }
       }
@@ -348,16 +353,36 @@ $('#btn-compare').addEventListener('click', async () => {
         ? `<span class="fallback-note">(across all versions)</span>`
         : '';
 
+      // Width bars
+      const widthTotal = widthData.reduce((sum, r) => sum + r.count, 0);
+      const ttw = widthData.find((r) => r.width_rating === 'true_to_width');
+      const narrow = widthData.find((r) => r.width_rating === 'too_narrow');
+      const wide = widthData.find((r) => r.width_rating === 'too_wide');
+
+      let widthHtml = '';
+      if (widthTotal > 0) {
+        widthHtml = `
+          <div class="fit-section-heading">Width</div>
+          <div class="fit-bar-container">
+            ${fitBarRow('Good fit', ttw?.count || 0, widthTotal, 'ttw')}
+            ${fitBarRow('Too narrow', narrow?.count || 0, widthTotal, 'narrow')}
+            ${fitBarRow('Too wide', wide?.count || 0, widthTotal, 'wide')}
+          </div>
+        `;
+      }
+
       fitDiv.innerHTML = `
         <div class="label">Crowdsourced fit data (${displayTotal} reports) ${sourceLabel}</div>
+        <div class="fit-section-heading">Length</div>
         <div class="fit-bar-container">
-          ${fitBarRow('True to size', tts?.count || 0, displayTotal, 'tts')}
-          ${fitBarRow('Runs small', small?.count || 0, displayTotal, 'small')}
-          ${fitBarRow('Runs large', large?.count || 0, displayTotal, 'large')}
+          ${fitBarRow('Good fit', tts?.count || 0, displayTotal, 'tts')}
+          ${fitBarRow('Too small', small?.count || 0, displayTotal, 'small')}
+          ${fitBarRow('Too large', large?.count || 0, displayTotal, 'large')}
         </div>
         <div class="detail">
           Average offset: ${averageOffset(fitData)} sizes
         </div>
+        ${widthHtml}
       `;
     } else {
       fitDiv.innerHTML = `
@@ -397,11 +422,30 @@ function averageOffset(fitData) {
 }
 
 // ---------------------------------------------------------------------------
-// Report tab — saved shoe quick-select
+// Report tab — saved shoe quick-select (reference side)
 // ---------------------------------------------------------------------------
 
 function populateReportRefShoeDropdown(shoes) {
   const select = $('#report-ref-shoe');
+  select.innerHTML = '<option value="">Select a saved shoe...</option>';
+
+  if (!shoes || shoes.length === 0) return;
+
+  for (const shoe of shoes) {
+    const opt = document.createElement('option');
+    opt.value = shoe.id;
+    opt.textContent = formatShoeLabel(shoe);
+    opt.dataset.brandId = shoe.brand_id;
+    opt.dataset.modelId = shoe.model_id || '';
+    opt.dataset.gender = shoe.gender;
+    opt.dataset.sizeSystem = shoe.size_system;
+    opt.dataset.sizeValue = shoe.size_value;
+    select.appendChild(opt);
+  }
+}
+
+function populateReportCompShoeDropdown(shoes) {
+  const select = $('#report-comp-shoe');
   select.innerHTML = '<option value="">Select a saved shoe...</option>';
 
   if (!shoes || shoes.length === 0) return;
@@ -429,30 +473,47 @@ $('#report-ref-shoe').addEventListener('change', async (e) => {
   const sizeSystem = opt.dataset.sizeSystem;
   const sizeValue = opt.dataset.sizeValue;
 
-  // Set brand and load its models
   $('#report-ref-brand').value = brandId;
   await populateModelSelect('#report-ref-model', brandId);
-
-  // Set model (if available)
-  if (modelId) {
-    $('#report-ref-model').value = modelId;
-  }
-
-  // Set gender and size system
+  if (modelId) $('#report-ref-model').value = modelId;
   $('#report-ref-gender').value = gender;
   $('#report-ref-system').value = sizeSystem;
-
-  // Populate sizes for this brand/gender/system, then set the value
   await populateSizeSelect($('#report-ref-size'), brandId, gender, sizeSystem);
   $('#report-ref-size').value = sizeValue;
 });
 
-// Clear the saved shoe dropdown when the user manually changes reference fields
+$('#report-comp-shoe').addEventListener('change', async (e) => {
+  const opt = e.target.selectedOptions[0];
+  if (!opt || !opt.value) return;
+
+  const brandId = opt.dataset.brandId;
+  const modelId = opt.dataset.modelId;
+  const gender = opt.dataset.gender;
+  const sizeSystem = opt.dataset.sizeSystem;
+  const sizeValue = opt.dataset.sizeValue;
+
+  $('#report-comp-brand').value = brandId;
+  await populateModelSelect('#report-comp-model', brandId);
+  if (modelId) $('#report-comp-model').value = modelId;
+  $('#report-comp-gender').value = gender;
+  $('#report-comp-system').value = sizeSystem;
+  await populateSizeSelect($('#report-comp-size'), brandId, gender, sizeSystem);
+  $('#report-comp-size').value = sizeValue;
+});
+
+// Clear saved shoe dropdown when manual fields change
 ['#report-ref-brand', '#report-ref-model', '#report-ref-gender', '#report-ref-system', '#report-ref-size'].forEach((sel) => {
   $(sel).addEventListener('change', () => {
-    // Only clear if user is interacting with the manual fields directly
     if (document.activeElement !== $('#report-ref-shoe')) {
       $('#report-ref-shoe').value = '';
+    }
+  });
+});
+
+['#report-comp-brand', '#report-comp-model', '#report-comp-gender', '#report-comp-system', '#report-comp-size'].forEach((sel) => {
+  $(sel).addEventListener('change', () => {
+    if (document.activeElement !== $('#report-comp-shoe')) {
+      $('#report-comp-shoe').value = '';
     }
   });
 });
@@ -495,10 +556,18 @@ $('#report-comp-brand').addEventListener('change', async (e) => {
 $('#report-comp-gender').addEventListener('change', refreshReportCompSizes);
 $('#report-comp-system').addEventListener('change', refreshReportCompSizes);
 
-// Fit buttons
-$$('.fit-btn').forEach((btn) => {
+// Length fit buttons — only toggle within their own group
+$$('.length-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
-    $$('.fit-btn').forEach((b) => b.classList.remove('selected'));
+    $$('.length-btn').forEach((b) => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
+// Width fit buttons — only toggle within their own group
+$$('.width-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    $$('.width-btn').forEach((b) => b.classList.remove('selected'));
     btn.classList.add('selected');
   });
 });
@@ -518,9 +587,10 @@ $('#btn-submit-report').addEventListener('click', async () => {
   const compGender = $('#report-comp-gender').value;
   const compSystem = $('#report-comp-system').value;
   const compBrandId = $('#report-comp-brand').value;
-  const fitBtn = $('.fit-btn.selected');
+  const lengthBtn = $('.length-btn.selected');
+  const widthBtn = $('.width-btn.selected');
 
-  if (!refModelId || !refSize || !compModelId || !compSize || !fitBtn) {
+  if (!refModelId || !refSize || !compModelId || !compSize || !lengthBtn || !widthBtn) {
     showStatus('#report-status', 'Please fill in all fields.', 'error');
     return;
   }
@@ -559,8 +629,9 @@ $('#btn-submit-report').addEventListener('click', async () => {
     comparedModelId: parseInt(compModelId),
     comparedSizeUs: compSizeUs,
     comparedGender: compGender,
-    fitRating: fitBtn.dataset.fit,
-    fitOffset: parseFloat(fitBtn.dataset.offset),
+    fitRating: lengthBtn.dataset.fit,
+    fitOffset: parseFloat(lengthBtn.dataset.offset),
+    widthRating: widthBtn.dataset.width,
     source: 'user',
   };
 
