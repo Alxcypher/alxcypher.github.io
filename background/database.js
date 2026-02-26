@@ -934,6 +934,17 @@ async function seedFromJSON(seedData) {
           model.version || null,
           model.year || null
         );
+        // Update metadata for existing models (INSERT OR IGNORE skips existing rows)
+        if (model.model_family || model.version || model.year) {
+          try {
+            db.run(
+              `UPDATE models SET model_family = ?, version = ?, year = ?
+               WHERE brand_id = ? AND name = ?`,
+              [model.model_family || model.name, model.version || null, model.year || null,
+               brand.id, model.name]
+            );
+          } catch (e) { /* ignore */ }
+        }
       }
     }
 
