@@ -422,6 +422,26 @@ function averageOffset(fitData) {
 }
 
 // ---------------------------------------------------------------------------
+// Report tab — manual entry toggle
+// ---------------------------------------------------------------------------
+
+$$('.toggle-manual').forEach((divider) => {
+  divider.addEventListener('click', () => {
+    const target = $(`#${divider.dataset.target}`);
+    const isOpen = !target.classList.contains('hidden');
+    if (isOpen) {
+      target.classList.add('hidden');
+      divider.classList.remove('open');
+      divider.querySelector('span').innerHTML = 'or enter manually &#9662;';
+    } else {
+      target.classList.remove('hidden');
+      divider.classList.add('open');
+      divider.querySelector('span').innerHTML = 'or enter manually &#9652;';
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Report tab — saved shoe quick-select (reference side)
 // ---------------------------------------------------------------------------
 

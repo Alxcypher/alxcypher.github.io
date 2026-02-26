@@ -569,6 +569,18 @@ hr {
   font-weight: 500;
 }
 
+.or-divider.toggle-manual {
+  cursor: pointer;
+}
+
+.or-divider.toggle-manual:hover span {
+  color: #6D28D9;
+}
+
+.or-divider.toggle-manual.open span {
+  color: #6D28D9;
+}
+
 /* Utility */
 .hidden {
   display: none !important;
