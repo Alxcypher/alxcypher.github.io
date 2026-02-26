@@ -28,6 +28,10 @@ async function ensureDB() {
   return dbReadyPromise;
 }
 
+// Open the side panel when the extension icon is clicked
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error('[FitShift] Failed to set panel behavior:', error));
+
 // ---------------------------------------------------------------------------
 // Install handler — seed data on first install
 // ---------------------------------------------------------------------------
