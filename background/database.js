@@ -125,11 +125,25 @@ const SCHEMA_SQL = `
     scraped_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS user_shoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    brand_id INTEGER NOT NULL,
+    model_id INTEGER,
+    gender TEXT DEFAULT 'mens',
+    size_system TEXT DEFAULT 'us',
+    size_value REAL NOT NULL,
+    nickname TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (brand_id) REFERENCES brands(id),
+    FOREIGN KEY (model_id) REFERENCES models(id)
+  );
+
   CREATE INDEX IF NOT EXISTS idx_models_brand ON models(brand_id);
   CREATE INDEX IF NOT EXISTS idx_size_charts_brand_gender ON size_charts(brand_id, gender);
   CREATE INDEX IF NOT EXISTS idx_fit_reports_reference ON fit_reports(reference_model_id);
   CREATE INDEX IF NOT EXISTS idx_fit_reports_compared ON fit_reports(compared_model_id);
   CREATE INDEX IF NOT EXISTS idx_fit_reports_source ON fit_reports(source);
+  CREATE INDEX IF NOT EXISTS idx_user_shoes_brand ON user_shoes(brand_id);
 `;
 
 // ---------------------------------------------------------------------------
@@ -527,6 +541,61 @@ function updateProfile(profile) {
 }
 
 // ---------------------------------------------------------------------------
+// User shoe collection operations
+// ---------------------------------------------------------------------------
+
+function insertUserShoe(brandId, modelId, gender, sizeSystem, sizeValue, nickname) {
+  db.run(
+    `INSERT INTO user_shoes (brand_id, model_id, gender, size_system, size_value, nickname)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [brandId, modelId || null, gender || 'mens', sizeSystem || 'us', sizeValue, nickname || null]
+  );
+  // Return the new shoe's id
+  const result = db.exec('SELECT last_insert_rowid() as id');
+  return result[0]?.values[0][0] || null;
+}
+
+function getUserShoes() {
+  const stmt = db.prepare(
+    `SELECT us.id, us.brand_id, us.model_id, us.gender, us.size_system, us.size_value,
+            us.nickname, us.created_at,
+            b.name as brand_name,
+            m.name as model_name, m.model_family, m.version
+     FROM user_shoes us
+     JOIN brands b ON us.brand_id = b.id
+     LEFT JOIN models m ON us.model_id = m.id
+     ORDER BY us.created_at DESC`
+  );
+  const results = [];
+  while (stmt.step()) {
+    results.push(stmt.getAsObject());
+  }
+  stmt.free();
+  return results;
+}
+
+function getUserShoeById(id) {
+  const stmt = db.prepare(
+    `SELECT us.id, us.brand_id, us.model_id, us.gender, us.size_system, us.size_value,
+            us.nickname, us.created_at,
+            b.name as brand_name,
+            m.name as model_name, m.model_family, m.version
+     FROM user_shoes us
+     JOIN brands b ON us.brand_id = b.id
+     LEFT JOIN models m ON us.model_id = m.id
+     WHERE us.id = ?`
+  );
+  stmt.bind([id]);
+  const result = stmt.step() ? stmt.getAsObject() : null;
+  stmt.free();
+  return result;
+}
+
+function deleteUserShoe(id) {
+  db.run('DELETE FROM user_shoes WHERE id = ?', [id]);
+}
+
+// ---------------------------------------------------------------------------
 // Scraped review operations
 // ---------------------------------------------------------------------------
 
@@ -604,5 +673,6 @@ function getStats() {
   const sizeChartCount = db.exec('SELECT COUNT(*) FROM size_charts')[0]?.values[0][0] || 0;
   const fitReportCount = db.exec('SELECT COUNT(*) FROM fit_reports')[0]?.values[0][0] || 0;
   const scrapedCount = db.exec('SELECT COUNT(*) FROM scraped_reviews')[0]?.values[0][0] || 0;
-  return { brandCount, modelCount, sizeChartCount, fitReportCount, scrapedCount };
+  const userShoeCount = db.exec('SELECT COUNT(*) FROM user_shoes')[0]?.values[0][0] || 0;
+  return { brandCount, modelCount, sizeChartCount, fitReportCount, scrapedCount, userShoeCount };
 }

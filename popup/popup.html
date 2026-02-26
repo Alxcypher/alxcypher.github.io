@@ -23,43 +23,26 @@
   <!-- Tab 1: Compare sizes across brands -->
   <!-- ================================================================== -->
   <section id="tab-compare" class="tab-content active">
+    <!-- Current shoe selection (from saved shoes) -->
     <div class="field">
-      <label for="ref-brand">I wear this brand:</label>
-      <select id="ref-brand">
-        <option value="">Select brand...</option>
+      <label for="ref-shoe">Current shoe:</label>
+      <select id="ref-shoe">
+        <option value="">Select a saved shoe...</option>
       </select>
+      <a href="#" id="link-add-shoe" class="add-shoe-link">+ Add a shoe</a>
     </div>
 
-    <div class="field">
-      <label for="ref-model">Model:</label>
-      <select id="ref-model" disabled>
-        <option value="">Select model...</option>
-      </select>
+    <div id="ref-shoe-empty" class="empty-state hidden">
+      <p>You haven't saved any shoes yet.</p>
+      <a href="#" id="link-add-shoe-empty" class="add-shoe-link">Add your first shoe</a>
     </div>
 
-    <div class="field-row">
-      <div class="field">
-        <label for="ref-gender">Gender:</label>
-        <select id="ref-gender">
-          <option value="mens">Men's</option>
-          <option value="womens">Women's</option>
-        </select>
-      </div>
-      <div class="field field-size-system">
-        <label for="ref-system">System:</label>
-        <select id="ref-system">
-          <option value="us">US</option>
-          <option value="uk">UK</option>
-          <option value="eu">EU</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="ref-size">My size:</label>
-        <select id="ref-size" disabled>
-          <option value="">Size...</option>
-        </select>
-      </div>
-    </div>
+    <!-- Hidden fields to carry reference shoe data for comparison logic -->
+    <input type="hidden" id="ref-brand" value="">
+    <input type="hidden" id="ref-model" value="">
+    <input type="hidden" id="ref-gender" value="mens">
+    <input type="hidden" id="ref-system" value="us">
+    <input type="hidden" id="ref-size" value="">
 
     <hr>
 
@@ -220,6 +203,71 @@
 
     <button id="btn-save-profile" class="btn-primary">Save Profile</button>
     <div id="profile-status" class="status hidden"></div>
+
+    <hr>
+
+    <!-- My Shoes section -->
+    <div id="my-shoes-section">
+      <h3>My Shoes</h3>
+      <div id="my-shoes-list" class="shoe-list"></div>
+
+      <div id="my-shoes-empty" class="empty-state">
+        <p>No saved shoes yet. Add a shoe to speed up comparisons.</p>
+      </div>
+
+      <div id="add-shoe-form" class="add-shoe-form hidden">
+        <div class="field">
+          <label for="shoe-brand">Brand:</label>
+          <select id="shoe-brand">
+            <option value="">Select brand...</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="shoe-model">Model (optional):</label>
+          <select id="shoe-model" disabled>
+            <option value="">Select model...</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="shoe-gender">Gender:</label>
+            <select id="shoe-gender">
+              <option value="mens">Men's</option>
+              <option value="womens">Women's</option>
+            </select>
+          </div>
+          <div class="field field-size-system">
+            <label for="shoe-system">System:</label>
+            <select id="shoe-system">
+              <option value="us">US</option>
+              <option value="uk">UK</option>
+              <option value="eu">EU</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="shoe-size">Size:</label>
+            <select id="shoe-size" disabled>
+              <option value="">Size...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="shoe-nickname">Nickname (optional):</label>
+          <input type="text" id="shoe-nickname" placeholder="e.g., My daily runners">
+        </div>
+
+        <div class="add-shoe-actions">
+          <button id="btn-save-shoe" class="btn-primary">Save Shoe</button>
+          <button id="btn-cancel-shoe" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+
+      <button id="btn-show-add-shoe" class="btn-secondary">+ Add Shoe</button>
+      <div id="shoe-status" class="status hidden"></div>
+    </div>
 
     <hr>
 

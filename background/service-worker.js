@@ -244,6 +244,24 @@ async function handleMessage(message, sender) {
       return { success: true };
     }
 
+    // --- User shoe collection ---
+    case 'ADD_USER_SHOE': {
+      const shoeId = insertUserShoe(
+        message.brandId, message.modelId, message.gender,
+        message.sizeSystem, message.sizeValue, message.nickname
+      );
+      await persist();
+      return { success: true, shoeId };
+    }
+
+    case 'GET_USER_SHOES':
+      return { data: getUserShoes() };
+
+    case 'DELETE_USER_SHOE':
+      deleteUserShoe(message.shoeId);
+      await persist();
+      return { success: true };
+
     // --- Stats ---
     case 'GET_STATS':
       return { data: getStats() };

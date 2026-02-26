@@ -25,6 +25,22 @@ function $$(selector) {
 
 const SYSTEM_LABELS = { us: 'US', uk: 'UK', eu: 'EU' };
 
+// Format a saved shoe for dropdown display
+function formatShoeLabel(shoe) {
+  const sysLabel = SYSTEM_LABELS[shoe.size_system] || 'US';
+  const genderLabel = shoe.gender === 'womens' ? "Women's" : "Men's";
+  const sizeStr = `${sysLabel} ${shoe.size_value} ${genderLabel}`;
+
+  if (shoe.nickname) {
+    return `${shoe.nickname} (${shoe.brand_name} ${sizeStr})`;
+  }
+  const modelStr = shoe.model_name || '';
+  if (modelStr) {
+    return `${shoe.brand_name} ${modelStr} - ${sizeStr}`;
+  }
+  return `${shoe.brand_name} - ${sizeStr}`;
+}
+
 // Fallback size ranges when no brand-specific data is available yet
 const FALLBACK_SIZES = {
   us:  { min: 4, max: 16, step: 0.5 },
@@ -149,31 +165,88 @@ async function populateModelSelect(selectId, brandId) {
 }
 
 // ---------------------------------------------------------------------------
-// Compare tab — size system refresh helper
+// Compare tab — current shoe dropdown
 // ---------------------------------------------------------------------------
 
-async function refreshRefSizes() {
-  const brandId = $('#ref-brand').value;
-  const gender = $('#ref-gender').value;
-  const system = $('#ref-system').value;
-  await populateSizeSelect($('#ref-size'), brandId, gender, system);
-  $('#ref-size').disabled = !brandId;
+let userShoesCache = null;
+
+async function loadUserShoes() {
+  const response = await sendMessage({ type: 'GET_USER_SHOES' });
+  userShoesCache = response?.data || [];
+  return userShoesCache;
+}
+
+function populateRefShoeDropdown(shoes) {
+  const select = $('#ref-shoe');
+  const emptyState = $('#ref-shoe-empty');
+  select.innerHTML = '<option value="">Select a saved shoe...</option>';
+
+  if (!shoes || shoes.length === 0) {
+    select.classList.add('hidden');
+    emptyState.classList.remove('hidden');
+    $('#btn-compare').disabled = true;
+    return;
+  }
+
+  emptyState.classList.add('hidden');
+  select.classList.remove('hidden');
+
+  for (const shoe of shoes) {
+    const opt = document.createElement('option');
+    opt.value = shoe.id;
+    opt.textContent = formatShoeLabel(shoe);
+    opt.dataset.brandId = shoe.brand_id;
+    opt.dataset.modelId = shoe.model_id || '';
+    opt.dataset.gender = shoe.gender;
+    opt.dataset.sizeSystem = shoe.size_system;
+    opt.dataset.sizeValue = shoe.size_value;
+    opt.dataset.modelFamily = shoe.model_family || shoe.model_name || '';
+    select.appendChild(opt);
+  }
+}
+
+$('#ref-shoe').addEventListener('change', (e) => {
+  const opt = e.target.selectedOptions[0];
+  if (!opt || !opt.value) {
+    $('#ref-brand').value = '';
+    $('#ref-model').value = '';
+    $('#ref-gender').value = 'mens';
+    $('#ref-system').value = 'us';
+    $('#ref-size').value = '';
+    updateCompareButton();
+    return;
+  }
+  $('#ref-brand').value = opt.dataset.brandId;
+  $('#ref-model').value = opt.dataset.modelId;
+  $('#ref-gender').value = opt.dataset.gender;
+  $('#ref-system').value = opt.dataset.sizeSystem;
+  $('#ref-size').value = opt.dataset.sizeValue;
   updateCompareButton();
+});
+
+// "Add shoe" links navigate to Profile tab and open the add form
+function handleAddShoeLink(e) {
+  e.preventDefault();
+  $$('.tab').forEach((t) => t.classList.remove('active'));
+  $$('.tab-content').forEach((c) => c.classList.remove('active'));
+  $('[data-tab="profile"]').classList.add('active');
+  $('#tab-profile').classList.add('active');
+  $('#add-shoe-form').classList.remove('hidden');
+  $('#btn-show-add-shoe').classList.add('hidden');
+}
+
+$('#link-add-shoe').addEventListener('click', handleAddShoeLink);
+$('#link-add-shoe-empty').addEventListener('click', handleAddShoeLink);
+
+async function refreshAllShoeUI() {
+  const shoes = await loadUserShoes();
+  renderShoeList(shoes);
+  populateRefShoeDropdown(shoes);
 }
 
 // ---------------------------------------------------------------------------
 // Compare tab logic
 // ---------------------------------------------------------------------------
-
-$('#ref-brand').addEventListener('change', async (e) => {
-  await populateModelSelect('#ref-model', e.target.value);
-  await refreshRefSizes();
-});
-
-$('#ref-model').addEventListener('change', updateCompareButton);
-$('#ref-size').addEventListener('change', updateCompareButton);
-$('#ref-gender').addEventListener('change', refreshRefSizes);
-$('#ref-system').addEventListener('change', refreshRefSizes);
 
 $('#comp-brand').addEventListener('change', async (e) => {
   await populateModelSelect('#comp-model', e.target.value);
@@ -487,10 +560,119 @@ async function loadStats() {
       Models: ${s.modelCount}<br>
       Size chart entries: ${s.sizeChartCount}<br>
       Fit reports: ${s.fitReportCount}<br>
-      Scraped reviews: ${s.scrapedCount}
+      Scraped reviews: ${s.scrapedCount}<br>
+      Saved shoes: ${s.userShoeCount}
     `;
   }
 }
+
+// ---------------------------------------------------------------------------
+// My Shoes — Profile tab shoe management
+// ---------------------------------------------------------------------------
+
+function renderShoeList(shoes) {
+  const listEl = $('#my-shoes-list');
+  const emptyEl = $('#my-shoes-empty');
+
+  if (!shoes || shoes.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+
+  emptyEl.classList.add('hidden');
+  listEl.innerHTML = shoes.map((shoe) => `
+    <div class="shoe-item" data-shoe-id="${shoe.id}">
+      <div class="shoe-item-info">
+        <span class="shoe-item-name">${formatShoeLabel(shoe)}</span>
+      </div>
+      <button class="btn-delete-shoe" data-shoe-id="${shoe.id}" title="Remove shoe">&times;</button>
+    </div>
+  `).join('');
+
+  listEl.querySelectorAll('.btn-delete-shoe').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const shoeId = parseInt(e.target.dataset.shoeId);
+      await sendMessage({ type: 'DELETE_USER_SHOE', shoeId });
+      await refreshAllShoeUI();
+    });
+  });
+}
+
+// Add shoe form toggle
+$('#btn-show-add-shoe').addEventListener('click', () => {
+  $('#add-shoe-form').classList.remove('hidden');
+  $('#btn-show-add-shoe').classList.add('hidden');
+});
+
+$('#btn-cancel-shoe').addEventListener('click', () => {
+  $('#add-shoe-form').classList.add('hidden');
+  $('#btn-show-add-shoe').classList.remove('hidden');
+  resetAddShoeForm();
+});
+
+function resetAddShoeForm() {
+  $('#shoe-brand').value = '';
+  $('#shoe-model').innerHTML = '<option value="">Select model...</option>';
+  $('#shoe-model').disabled = true;
+  $('#shoe-gender').value = 'mens';
+  $('#shoe-system').value = 'us';
+  $('#shoe-size').innerHTML = '<option value="">Size...</option>';
+  $('#shoe-size').disabled = true;
+  $('#shoe-nickname').value = '';
+}
+
+// Add shoe form — brand/model/size population
+$('#shoe-brand').addEventListener('change', async (e) => {
+  await populateModelSelect('#shoe-model', e.target.value);
+  await refreshAddShoeSizes();
+});
+
+$('#shoe-gender').addEventListener('change', refreshAddShoeSizes);
+$('#shoe-system').addEventListener('change', refreshAddShoeSizes);
+
+async function refreshAddShoeSizes() {
+  const brandId = $('#shoe-brand').value;
+  const gender = $('#shoe-gender').value;
+  const system = $('#shoe-system').value;
+  await populateSizeSelect($('#shoe-size'), brandId, gender, system);
+  $('#shoe-size').disabled = !brandId;
+}
+
+// Save shoe
+$('#btn-save-shoe').addEventListener('click', async () => {
+  const brandId = $('#shoe-brand').value;
+  const modelId = $('#shoe-model').value;
+  const gender = $('#shoe-gender').value;
+  const sizeSystem = $('#shoe-system').value;
+  const sizeValue = $('#shoe-size').value;
+  const nickname = $('#shoe-nickname').value.trim();
+
+  if (!brandId || !sizeValue) {
+    showStatus('#shoe-status', 'Please select a brand and size.', 'error');
+    return;
+  }
+
+  const response = await sendMessage({
+    type: 'ADD_USER_SHOE',
+    brandId: parseInt(brandId),
+    modelId: modelId ? parseInt(modelId) : null,
+    gender,
+    sizeSystem,
+    sizeValue: parseFloat(sizeValue),
+    nickname: nickname || null,
+  });
+
+  if (response?.success) {
+    showStatus('#shoe-status', 'Shoe saved!', 'success');
+    $('#add-shoe-form').classList.add('hidden');
+    $('#btn-show-add-shoe').classList.remove('hidden');
+    resetAddShoeForm();
+    await refreshAllShoeUI();
+  } else {
+    showStatus('#shoe-status', 'Error saving shoe.', 'error');
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Initialization
@@ -499,15 +681,16 @@ async function loadStats() {
 async function init() {
   // Populate all brand selects
   await Promise.all([
-    populateBrandSelect('#ref-brand'),
     populateBrandSelect('#comp-brand'),
     populateBrandSelect('#report-ref-brand'),
     populateBrandSelect('#report-comp-brand'),
+    populateBrandSelect('#shoe-brand'),
   ]);
 
-  // Load profile and stats
+  // Load profile, stats, and user shoes
   await loadProfile();
   await loadStats();
+  await refreshAllShoeUI();
 }
 
 init();
