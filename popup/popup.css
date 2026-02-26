@@ -371,24 +371,18 @@ hr {
   color: #e03131;
 }
 
-/* Stats */
-.stats {
-  margin-top: 8px;
-}
-
-.stats h3 {
-  font-size: 12px;
+/* Community stats */
+.community-stats {
+  text-align: center;
+  padding: 12px 16px;
   color: #9ca3af;
-  font-weight: 600;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  font-size: 13px;
 }
 
-#stats-content {
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.7;
+.stats-count {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  color: #6D28D9;
 }
 
 /* Help text */

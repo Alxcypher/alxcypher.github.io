@@ -707,15 +707,8 @@ $('#btn-save-profile').addEventListener('click', async () => {
 async function loadStats() {
   const response = await sendMessage({ type: 'GET_STATS' });
   if (response?.data) {
-    const s = response.data;
-    $('#stats-content').innerHTML = `
-      Brands: ${s.brandCount}<br>
-      Models: ${s.modelCount}<br>
-      Size chart entries: ${s.sizeChartCount}<br>
-      Fit reports: ${s.fitReportCount}<br>
-      Scraped reviews: ${s.scrapedCount}<br>
-      Saved shoes: ${s.userShoeCount}
-    `;
+    const count = response.data.fitReportCount || 0;
+    $('#stats-content').innerHTML = `<span class="stats-count">${count.toLocaleString()}</span> shoes compared by the community`;
   }
 }
 
