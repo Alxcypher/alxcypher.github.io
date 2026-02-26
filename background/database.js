@@ -162,10 +162,8 @@ function runMigrations() {
 async function initDatabase() {
   if (db) return db;
 
-  // Load sql.js WASM
+  // Initialize sql.js WASM (already loaded via top-level importScripts)
   if (!SQL) {
-    // importScripts approach for service worker context
-    importScripts(chrome.runtime.getURL('lib/sql-wasm.js'));
     SQL = await initSqlJs({
       locateFile: () => chrome.runtime.getURL('lib/sql-wasm.wasm'),
     });

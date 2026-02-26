@@ -7,8 +7,8 @@
  * Uses importScripts (not ES modules) for compatibility with sql.js WASM.
  */
 
-// Load database and scraper modules (they define functions in global scope)
-importScripts('database.js', 'scraper.js');
+// Load sql.js WASM engine and extension modules (must be top-level in MV3)
+importScripts('../lib/sql-wasm.js', 'database.js', 'scraper.js');
 
 // ---------------------------------------------------------------------------
 // Initialization
