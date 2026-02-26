@@ -242,9 +242,53 @@ async function refreshAllShoeUI() {
   const shoes = await loadUserShoes();
   renderShoeList(shoes);
   populateRefShoeDropdown(shoes);
+  populateCompShoeDropdown(shoes);
   populateReportRefShoeDropdown(shoes);
   populateReportCompShoeDropdown(shoes);
 }
+
+// ---------------------------------------------------------------------------
+// Compare tab — compared shoe quick-select
+// ---------------------------------------------------------------------------
+
+function populateCompShoeDropdown(shoes) {
+  const select = $('#comp-shoe');
+  select.innerHTML = '<option value="">Select a saved shoe...</option>';
+
+  if (!shoes || shoes.length === 0) return;
+
+  for (const shoe of shoes) {
+    const opt = document.createElement('option');
+    opt.value = shoe.id;
+    opt.textContent = formatShoeLabel(shoe);
+    opt.dataset.brandId = shoe.brand_id;
+    opt.dataset.modelId = shoe.model_id || '';
+    opt.dataset.gender = shoe.gender;
+    opt.dataset.sizeSystem = shoe.size_system;
+    opt.dataset.sizeValue = shoe.size_value;
+    opt.dataset.modelFamily = shoe.model_family || shoe.model_name || '';
+    select.appendChild(opt);
+  }
+}
+
+$('#comp-shoe').addEventListener('change', async (e) => {
+  const opt = e.target.selectedOptions[0];
+  if (!opt || !opt.value) {
+    $('#comp-brand').value = '';
+    $('#comp-model').innerHTML = '<option value="">Select model...</option>';
+    $('#comp-model').disabled = true;
+    updateCompareButton();
+    return;
+  }
+
+  const brandId = opt.dataset.brandId;
+  const modelId = opt.dataset.modelId;
+
+  $('#comp-brand').value = brandId;
+  await populateModelSelect('#comp-model', brandId);
+  if (modelId) $('#comp-model').value = modelId;
+  updateCompareButton();
+});
 
 // ---------------------------------------------------------------------------
 // Compare tab logic
@@ -252,10 +296,15 @@ async function refreshAllShoeUI() {
 
 $('#comp-brand').addEventListener('change', async (e) => {
   await populateModelSelect('#comp-model', e.target.value);
+  // Clear My Shoes picker when manual fields change
+  $('#comp-shoe').value = '';
   updateCompareButton();
 });
 
-$('#comp-model').addEventListener('change', updateCompareButton);
+$('#comp-model').addEventListener('change', () => {
+  $('#comp-shoe').value = '';
+  updateCompareButton();
+});
 
 function updateCompareButton() {
   const refBrand = $('#ref-brand').value;
@@ -426,17 +475,18 @@ function averageOffset(fitData) {
 // ---------------------------------------------------------------------------
 
 $$('.toggle-manual').forEach((divider) => {
+  const label = divider.dataset.label || 'or enter manually';
   divider.addEventListener('click', () => {
     const target = $(`#${divider.dataset.target}`);
     const isOpen = !target.classList.contains('hidden');
     if (isOpen) {
       target.classList.add('hidden');
       divider.classList.remove('open');
-      divider.querySelector('span').innerHTML = 'or enter manually &#9662;';
+      divider.querySelector('span').innerHTML = `${label} &#9662;`;
     } else {
       target.classList.remove('hidden');
       divider.classList.add('open');
-      divider.querySelector('span').innerHTML = 'or enter manually &#9652;';
+      divider.querySelector('span').innerHTML = `${label} &#9652;`;
     }
   });
 });

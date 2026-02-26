@@ -47,17 +47,28 @@
     <hr>
 
     <div class="field">
-      <label for="comp-brand">Compare to</label>
-      <select id="comp-brand">
-        <option value="">Select brand...</option>
+      <label for="comp-shoe">Compare to</label>
+      <select id="comp-shoe">
+        <option value="">Select a saved shoe...</option>
       </select>
     </div>
 
-    <div class="field">
-      <label for="comp-model">Model</label>
-      <select id="comp-model" disabled>
-        <option value="">Select model...</option>
-      </select>
+    <div class="or-divider toggle-manual" data-target="comp-manual" data-label="or pick any shoe"><span>or pick any shoe &#9662;</span></div>
+
+    <div id="comp-manual" class="hidden">
+      <div class="field">
+        <label for="comp-brand">Brand</label>
+        <select id="comp-brand">
+          <option value="">Select brand...</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="comp-model">Model</label>
+        <select id="comp-model" disabled>
+          <option value="">Select model...</option>
+        </select>
+      </div>
     </div>
 
     <button id="btn-compare" class="btn-primary" disabled>Compare Sizes</button>
@@ -85,7 +96,7 @@
       </select>
     </div>
 
-    <div class="or-divider toggle-manual" data-target="report-ref-manual"><span>or enter manually &#9662;</span></div>
+    <div class="or-divider toggle-manual" data-target="report-ref-manual" data-label="or enter manually"><span>or enter manually &#9662;</span></div>
 
     <div id="report-ref-manual" class="hidden">
       <div class="field">
@@ -138,7 +149,7 @@
       </select>
     </div>
 
-    <div class="or-divider toggle-manual" data-target="report-comp-manual"><span>or enter manually &#9662;</span></div>
+    <div class="or-divider toggle-manual" data-target="report-comp-manual" data-label="or enter manually"><span>or enter manually &#9662;</span></div>
 
     <div id="report-comp-manual" class="hidden">
       <div class="field">
