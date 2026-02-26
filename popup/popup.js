@@ -221,8 +221,64 @@ $('#ref-shoe').addEventListener('change', (e) => {
   $('#ref-gender').value = opt.dataset.gender;
   $('#ref-system').value = opt.dataset.sizeSystem;
   $('#ref-size').value = opt.dataset.sizeValue;
+  // Clear manual fields when a saved shoe is selected
+  $('#ref-manual-brand').value = '';
+  $('#ref-manual-model').innerHTML = '<option value="">Select model...</option>';
+  $('#ref-manual-model').disabled = true;
+  $('#ref-manual-gender').value = 'mens';
+  $('#ref-manual-system').value = 'us';
+  $('#ref-manual-size').innerHTML = '<option value="">Size...</option>';
   updateCompareButton();
 });
+
+// ---------------------------------------------------------------------------
+// Compare tab — current shoe manual entry
+// ---------------------------------------------------------------------------
+
+$('#ref-manual-brand').addEventListener('change', async (e) => {
+  await populateModelSelect('#ref-manual-model', e.target.value);
+  await refreshRefManualSizes();
+  syncRefManualToHidden();
+  $('#ref-shoe').value = '';
+});
+
+$('#ref-manual-model').addEventListener('change', () => {
+  syncRefManualToHidden();
+  $('#ref-shoe').value = '';
+});
+
+$('#ref-manual-gender').addEventListener('change', async () => {
+  await refreshRefManualSizes();
+  syncRefManualToHidden();
+  $('#ref-shoe').value = '';
+});
+
+$('#ref-manual-system').addEventListener('change', async () => {
+  await refreshRefManualSizes();
+  syncRefManualToHidden();
+  $('#ref-shoe').value = '';
+});
+
+$('#ref-manual-size').addEventListener('change', () => {
+  syncRefManualToHidden();
+  $('#ref-shoe').value = '';
+});
+
+async function refreshRefManualSizes() {
+  const brandId = $('#ref-manual-brand').value;
+  const gender = $('#ref-manual-gender').value;
+  const system = $('#ref-manual-system').value;
+  await populateSizeSelect($('#ref-manual-size'), brandId, gender, system);
+}
+
+function syncRefManualToHidden() {
+  $('#ref-brand').value = $('#ref-manual-brand').value;
+  $('#ref-model').value = $('#ref-manual-model').value;
+  $('#ref-gender').value = $('#ref-manual-gender').value;
+  $('#ref-system').value = $('#ref-manual-system').value;
+  $('#ref-size').value = $('#ref-manual-size').value;
+  updateCompareButton();
+}
 
 // "Add shoe" links navigate to Profile tab and open the add form
 function handleAddShoeLink(e) {
@@ -877,6 +933,7 @@ $('#btn-save-shoe').addEventListener('click', async () => {
 async function init() {
   // Populate all brand selects
   await Promise.all([
+    populateBrandSelect('#ref-manual-brand'),
     populateBrandSelect('#comp-brand'),
     populateBrandSelect('#report-ref-brand'),
     populateBrandSelect('#report-comp-brand'),

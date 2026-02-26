@@ -37,6 +37,48 @@
       <a href="#" id="link-add-shoe-empty" class="add-shoe-link">Add your first shoe</a>
     </div>
 
+    <div class="or-divider toggle-manual" data-target="ref-manual" data-label="or enter shoe details manually"><span>or enter shoe details manually &#9662;</span></div>
+
+    <div id="ref-manual" class="hidden">
+      <div class="field">
+        <label for="ref-manual-brand">Brand</label>
+        <select id="ref-manual-brand">
+          <option value="">Select brand...</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="ref-manual-model">Model</label>
+        <select id="ref-manual-model" disabled>
+          <option value="">Select model...</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="ref-manual-gender">Gender</label>
+          <select id="ref-manual-gender">
+            <option value="mens">Men's</option>
+            <option value="womens">Women's</option>
+          </select>
+        </div>
+        <div class="field field-size-system">
+          <label for="ref-manual-system">System</label>
+          <select id="ref-manual-system">
+            <option value="us">US</option>
+            <option value="uk">UK</option>
+            <option value="eu">EU</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="ref-manual-size">Size</label>
+          <select id="ref-manual-size">
+            <option value="">Size...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <!-- Hidden fields to carry reference shoe data for comparison logic -->
     <input type="hidden" id="ref-brand" value="">
     <input type="hidden" id="ref-model" value="">
