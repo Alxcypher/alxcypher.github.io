@@ -4,11 +4,617 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shelfie — What should I read next?</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+  overflow: hidden;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  overflow-y: auto;
+  background: #ffffff;
+  z-index: 1;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+  z-index: 10;
+}
+
+/* ===== LANDING ===== */
+.landing-content {
+  text-align: center;
+  padding: 2rem;
+  max-width: 520px;
+}
+
+.logo-mark {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.landing-content h1 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+}
+
+.hint {
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  color: #aaa;
+  font-weight: 400;
+}
+
+/* ===== CTA BUTTON ===== */
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.cta-btn:hover {
+  background: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+
+.cta-btn:active {
+  transform: translateY(0);
+}
+
+.cta-btn .arrow {
+  transition: transform 0.2s ease;
+}
+
+.cta-btn:hover .arrow {
+  transform: translateX(3px);
+}
+
+.cta-btn.secondary {
+  background: #f5f5f5;
+  color: #1a1a1a;
+}
+
+.cta-btn.secondary:hover {
+  background: #eee;
+}
+
+/* ===== FILTER FLOW ===== */
+.flow-container {
+  text-align: center;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 300px;
+  height: 3px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  margin: 0 auto 3rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #1a1a1a;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+.flow-question {
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.5s ease;
+}
+
+.flow-question.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== PILLS ===== */
+.pills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  min-height: 60px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: inherit;
+  border: 2px solid transparent;
+  border-radius: 100px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(15px) scale(0.9);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  user-select: none;
+  animation: pill-drift 4s ease-in-out infinite;
+  animation-play-state: running;
+}
+
+.pill.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.pill:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.pill.selected {
+  border-color: #1a1a1a;
+  transform: scale(1.05);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  animation: none;
+}
+
+.pill.fading-out {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.8);
+  pointer-events: none;
+}
+
+@keyframes pill-drift {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1); }
+}
+
+/* Pill color palette */
+.pill[data-color="coral"]    { background: #FFE5E5; color: #C94040; }
+.pill[data-color="sky"]      { background: #E5F0FF; color: #3B7DD8; }
+.pill[data-color="mint"]     { background: #E5FFF0; color: #2E8B57; }
+.pill[data-color="lavender"] { background: #F0E5FF; color: #7B4FCF; }
+.pill[data-color="peach"]    { background: #FFF0E5; color: #D97706; }
+.pill[data-color="lemon"]    { background: #FEFCE8; color: #A16207; }
+.pill[data-color="rose"]     { background: #FFF1F2; color: #BE185D; }
+.pill[data-color="teal"]     { background: #E6FFFA; color: #0D9488; }
+
+.skip-btn {
+  margin-top: 2.5rem;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.skip-btn:hover {
+  color: #666;
+}
+
+/* ===== BOOK CARDS (Suggestions) ===== */
+.suggestions-container {
+  text-align: center;
+  padding: 2rem;
+  max-width: 700px;
+  width: 100%;
+}
+
+.suggestions-label {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.book-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.book-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: left;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.book-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.book-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border-color: #e0e0e0;
+}
+
+.book-cover {
+  width: 70px;
+  height: 100px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.book-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.book-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.01em;
+}
+
+.book-author {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.book-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #666;
+  background: #f7f7f7;
+  padding: 0.25rem 0.6rem;
+  border-radius: 100px;
+}
+
+.book-reactions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.reaction-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #f0f0f0;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reaction-btn:hover {
+  background: #f7f7f7;
+  transform: scale(1.1);
+}
+
+.reaction-btn.active {
+  border-color: #1a1a1a;
+  background: #f0f0f0;
+}
+
+/* ===== RESULTS PAGE ===== */
+.results-container {
+  padding: 3rem 2rem;
+  max-width: 650px;
+  width: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.results-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.4rem;
+}
+
+.results-subtitle {
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 2.5rem;
+}
+
+.results-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.result-card {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.4s ease;
+}
+
+.result-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.result-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.result-info {
+  flex: 1;
+}
+
+.result-info .book-title {
+  margin-bottom: 0.15rem;
+}
+
+.result-reason {
+  font-size: 0.82rem;
+  color: #888;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.result-tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 100px;
+  background: #f7f7f7;
+  color: #666;
+}
+
+.results-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== PROFILE PAGE ===== */
+.profile-container {
+  padding: 3rem 2rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1rem;
+}
+
+.profile-header h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.profile-subtitle {
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+.profile-section {
+  margin-bottom: 2rem;
+}
+
+.profile-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.preference-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pref-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 100px;
+  background: #f5f5f5;
+  color: #555;
+}
+
+.queue-list, .history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.queue-item, .history-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  background: #fafafa;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.queue-item:hover, .history-item:hover {
+  background: #f0f0f0;
+}
+
+.queue-cover, .history-cover {
+  width: 36px;
+  height: 50px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: #eee;
+  flex-shrink: 0;
+}
+
+.queue-info, .history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-info .book-title, .history-info .book-title {
+  font-size: 0.9rem;
+}
+
+.queue-info .book-author, .history-info .book-author {
+  font-size: 0.78rem;
+}
+
+.history-item .history-tags {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.history-tag {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 100px;
+  background: #e8e8e8;
+  color: #777;
+}
+
+.profile-actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 500px) {
+  .book-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .book-reactions {
+    align-self: flex-end;
+  }
+
+  .result-card {
+    flex-direction: column;
+  }
+
+  .results-actions {
+    flex-direction: column;
+  }
+
+  .cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+  </style>
 </head>
 <body>
 
@@ -20,7 +626,7 @@
       <p class="subtitle">We'll help you find your perfect book in under a minute.</p>
       <button class="cta-btn" onclick="app.startFlow()">
         Let's find out
-        <span class="arrow">→</span>
+        <span class="arrow">&rarr;</span>
       </button>
       <p class="hint">No sign-up required. Just vibes.</p>
     </div>
@@ -34,18 +640,18 @@
       </div>
       <p class="flow-question" id="flow-question"></p>
       <div class="pills-container" id="pills-container"></div>
-      <button class="skip-btn" id="skip-btn" onclick="app.skipFilter()">Skip this one →</button>
+      <button class="skip-btn" id="skip-btn" onclick="app.skipFilter()">Skip this one &rarr;</button>
     </div>
   </section>
 
   <!-- ===== BOOK SUGGESTIONS (inline) ===== -->
   <section id="suggestions" class="screen">
     <div class="suggestions-container">
-      <p class="suggestions-label">Based on your picks, you might love…</p>
+      <p class="suggestions-label">Based on your picks, you might love&hellip;</p>
       <div class="book-cards" id="book-cards"></div>
       <button class="cta-btn" onclick="app.showResults()">
         See all recommendations
-        <span class="arrow">→</span>
+        <span class="arrow">&rarr;</span>
       </button>
     </div>
   </section>
@@ -54,11 +660,11 @@
   <section id="results" class="screen">
     <div class="results-container">
       <h2 class="results-title">Your reading list</h2>
-      <p class="results-subtitle">Curated from your choices — here's what we think you'll love.</p>
+      <p class="results-subtitle">Curated from your choices &mdash; here's what we think you'll love.</p>
       <div class="results-stack" id="results-stack"></div>
       <div class="results-actions">
         <button class="cta-btn secondary" onclick="app.restart()">Start over</button>
-        <button class="cta-btn" onclick="app.showProfile()">Save & create profile →</button>
+        <button class="cta-btn" onclick="app.showProfile()">Save &amp; create profile &rarr;</button>
       </div>
     </div>
   </section>
@@ -93,6 +699,425 @@
     </div>
   </section>
 
-  <script src="app.js"></script>
+  <script>
+// ===== DATA =====
+
+var FILTERS = [
+  {
+    question: "What are you in the mood for?",
+    type: "single",
+    options: [
+      { emoji: "\u{1F4D6}", label: "Fiction", color: "coral" },
+      { emoji: "\u{1F4DA}", label: "Nonfiction", color: "sky" }
+    ]
+  },
+  {
+    question: "Pick a vibe.",
+    type: "multi",
+    options: [
+      { emoji: "\u{1F319}", label: "Dark & moody", color: "lavender" },
+      { emoji: "\u2600\uFE0F", label: "Feel-good", color: "lemon" },
+      { emoji: "\u{1F9E0}", label: "Mind-bending", color: "teal" },
+      { emoji: "\u{1F494}", label: "Emotionally wrecked", color: "rose" },
+      { emoji: "\u{1F602}", label: "Laugh out loud", color: "peach" }
+    ]
+  },
+  {
+    question: "How much time do you have?",
+    type: "single",
+    options: [
+      { emoji: "\u26A1", label: "Quick read (under 250 pages)", color: "peach" },
+      { emoji: "\u{1F4D6}", label: "Medium (250\u2013400 pages)", color: "mint" },
+      { emoji: "\u{1F3D4}\uFE0F", label: "I want an epic", color: "lavender" }
+    ]
+  },
+  {
+    question: "When are you reading?",
+    type: "multi",
+    options: [
+      { emoji: "\u2615", label: "Morning commute", color: "peach" },
+      { emoji: "\u{1F334}", label: "Vacation", color: "mint" },
+      { emoji: "\u{1F6CF}\uFE0F", label: "Before bed", color: "lavender" },
+      { emoji: "\u{1F3A7}", label: "Background listening", color: "sky" }
+    ]
+  },
+  {
+    question: "Any topics that pull you in?",
+    type: "multi",
+    options: [
+      { emoji: "\u{1F680}", label: "Space & sci-fi", color: "sky" },
+      { emoji: "\u{1F5E1}\uFE0F", label: "Fantasy worlds", color: "lavender" },
+      { emoji: "\u{1F50D}", label: "Mystery & thriller", color: "coral" },
+      { emoji: "\u{1F495}", label: "Love stories", color: "rose" },
+      { emoji: "\u{1F4DC}", label: "History & memoir", color: "peach" },
+      { emoji: "\u{1F9EC}", label: "Science & ideas", color: "teal" }
+    ]
+  }
+];
+
+var BOOKS = [
+  {
+    title: "Project Hail Mary",
+    author: "Andy Weir",
+    coverEmoji: "\u{1F680}",
+    tag: "\u2615 Perfect commute read",
+    reason: "You're into sci-fi and wanted something mind-bending \u2014 this nails both.",
+    tags: ["Sci-fi", "Mind-bending", "Medium length"]
+  },
+  {
+    title: "The House in the Cerulean Sea",
+    author: "TJ Klune",
+    coverEmoji: "\u{1F3E0}",
+    tag: "\u{1F334} Great vacation pick",
+    reason: "Feel-good fiction with heart \u2014 fits your vacation reading vibe perfectly.",
+    tags: ["Feel-good", "Fiction", "Quick read"]
+  },
+  {
+    title: "Piranesi",
+    author: "Susanna Clarke",
+    coverEmoji: "\u{1F3DB}\uFE0F",
+    tag: "\u{1F6CF}\uFE0F Beautiful bedtime read",
+    reason: "Short, dreamy, and mysterious \u2014 the perfect wind-down book.",
+    tags: ["Fantasy", "Dark & moody", "Quick read"]
+  },
+  {
+    title: "Klara and the Sun",
+    author: "Kazuo Ishiguro",
+    coverEmoji: "\u2600\uFE0F",
+    tag: "\u{1F9E0} Quietly devastating",
+    reason: "Sci-fi meets emotional depth \u2014 you asked to be emotionally wrecked.",
+    tags: ["Sci-fi", "Emotionally wrecked", "Medium length"]
+  },
+  {
+    title: "The Seven Husbands of Evelyn Hugo",
+    author: "Taylor Jenkins Reid",
+    coverEmoji: "\u{1F483}",
+    tag: "\u{1F494} You will cry",
+    reason: "Love stories and emotional gut punches \u2014 this book delivers both.",
+    tags: ["Love story", "Emotionally wrecked", "Medium length"]
+  },
+  {
+    title: "Sapiens",
+    author: "Yuval Noah Harari",
+    coverEmoji: "\u{1F30D}",
+    tag: "\u{1F3A7} Great on audio",
+    reason: "Big ideas about humanity \u2014 perfect for your background listening sessions.",
+    tags: ["Science & ideas", "Nonfiction", "Epic"]
+  },
+  {
+    title: "The Thursday Murder Club",
+    author: "Richard Osman",
+    coverEmoji: "\u{1F50D}",
+    tag: "\u{1F602} Cozy & clever",
+    reason: "Mystery with real laughs \u2014 matches your want for humor and intrigue.",
+    tags: ["Mystery", "Laugh out loud", "Medium length"]
+  },
+  {
+    title: "Educated",
+    author: "Tara Westover",
+    coverEmoji: "\u{1F4DD}",
+    tag: "\u26A1 Can't put it down",
+    reason: "Powerful memoir that fits your love for real stories and history.",
+    tags: ["Memoir", "Nonfiction", "Mind-bending"]
+  }
+];
+
+// ===== APP STATE =====
+
+var app = {
+  currentFilter: 0,
+  selections: [],
+  savedBooks: [],
+  likedBooks: [],
+
+  showScreen: function(id) {
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) {
+      screens[i].classList.remove('active');
+    }
+    document.getElementById(id).classList.add('active');
+  },
+
+  startFlow: function() {
+    this.currentFilter = 0;
+    this.selections = [];
+    this.showScreen('filter-flow');
+    var self = this;
+    setTimeout(function() { self.renderFilter(); }, 100);
+  },
+
+  renderFilter: function() {
+    var self = this;
+    var filter = FILTERS[this.currentFilter];
+    var question = document.getElementById('flow-question');
+    var container = document.getElementById('pills-container');
+    var progress = document.getElementById('progress-fill');
+    var skipBtn = document.getElementById('skip-btn');
+
+    var pct = ((this.currentFilter) / FILTERS.length) * 100;
+    progress.style.width = pct + '%';
+
+    question.classList.remove('visible');
+    container.innerHTML = '';
+    question.textContent = filter.question;
+
+    setTimeout(function() { question.classList.add('visible'); }, 50);
+
+    skipBtn.style.display = 'block';
+
+    filter.options.forEach(function(opt, i) {
+      var pill = document.createElement('button');
+      pill.className = 'pill';
+      pill.setAttribute('data-color', opt.color);
+      pill.innerHTML = '<span>' + opt.emoji + '</span> ' + opt.label;
+      pill.style.animationDelay = (i * 0.3) + 's';
+
+      pill.addEventListener('click', function() {
+        if (filter.type === 'single') {
+          self.handleSingleSelect(pill, container, opt);
+        } else {
+          self.handleMultiSelect(pill, opt);
+        }
+      });
+
+      container.appendChild(pill);
+
+      setTimeout(function() { pill.classList.add('visible'); }, 150 + i * 100);
+    });
+
+    if (filter.type === 'multi') {
+      var doneBtn = document.createElement('button');
+      doneBtn.className = 'pill';
+      doneBtn.setAttribute('data-color', 'mint');
+      doneBtn.innerHTML = '\u2713 Done';
+      doneBtn.style.marginTop = '0.5rem';
+
+      doneBtn.addEventListener('click', function() {
+        var selectedPills = container.querySelectorAll('.pill.selected');
+        var selectedLabels = [];
+        for (var j = 0; j < selectedPills.length; j++) {
+          selectedLabels.push(selectedPills[j].textContent.trim());
+        }
+        self.selections.push({ question: filter.question, answers: selectedLabels });
+        self.advanceFilter(container);
+      });
+
+      container.appendChild(doneBtn);
+      setTimeout(function() { doneBtn.classList.add('visible'); }, 150 + filter.options.length * 100 + 200);
+    }
+  },
+
+  handleSingleSelect: function(pill, container, opt) {
+    var self = this;
+    pill.classList.add('selected');
+
+    var filter = FILTERS[this.currentFilter];
+    this.selections.push({ question: filter.question, answers: [opt.label] });
+
+    var allPills = container.querySelectorAll('.pill');
+    for (var i = 0; i < allPills.length; i++) {
+      if (allPills[i] !== pill) allPills[i].classList.add('fading-out');
+    }
+
+    setTimeout(function() { self.advanceFilter(container); }, 500);
+  },
+
+  handleMultiSelect: function(pill, opt) {
+    if (pill.textContent.trim() === '\u2713 Done') return;
+    pill.classList.toggle('selected');
+  },
+
+  advanceFilter: function(container) {
+    var self = this;
+    this.currentFilter++;
+
+    if (this.currentFilter >= FILTERS.length) {
+      this.showSuggestions();
+    } else {
+      var pills = container.querySelectorAll('.pill');
+      for (var i = 0; i < pills.length; i++) {
+        pills[i].classList.add('fading-out');
+      }
+      document.getElementById('flow-question').classList.remove('visible');
+
+      setTimeout(function() { self.renderFilter(); }, 400);
+    }
+  },
+
+  skipFilter: function() {
+    var container = document.getElementById('pills-container');
+    this.selections.push({ question: FILTERS[this.currentFilter].question, answers: ['Skipped'] });
+    this.advanceFilter(container);
+  },
+
+  showSuggestions: function() {
+    var self = this;
+    document.getElementById('progress-fill').style.width = '100%';
+
+    var shuffled = BOOKS.slice().sort(function() { return 0.5 - Math.random(); });
+    var picks = shuffled.slice(0, 3);
+
+    var cardsContainer = document.getElementById('book-cards');
+    cardsContainer.innerHTML = '';
+
+    picks.forEach(function(book, i) {
+      var card = self.createBookCard(book, i);
+      cardsContainer.appendChild(card);
+    });
+
+    this.showScreen('suggestions');
+
+    setTimeout(function() {
+      var cards = cardsContainer.querySelectorAll('.book-card');
+      for (var i = 0; i < cards.length; i++) {
+        (function(idx) {
+          setTimeout(function() { cards[idx].classList.add('visible'); }, idx * 200);
+        })(i);
+      }
+    }, 200);
+  },
+
+  createBookCard: function(book, index) {
+    var self = this;
+    var card = document.createElement('div');
+    card.className = 'book-card';
+    card.innerHTML =
+      '<div class="book-cover">' + book.coverEmoji + '</div>' +
+      '<div class="book-info">' +
+        '<div class="book-title">' + book.title + '</div>' +
+        '<div class="book-author">' + book.author + '</div>' +
+        '<span class="book-tag">' + book.tag + '</span>' +
+      '</div>' +
+      '<div class="book-reactions">' +
+        '<button class="reaction-btn" data-action="like" title="Like">\u{1F44D}</button>' +
+        '<button class="reaction-btn" data-action="dislike" title="Dislike">\u{1F44E}</button>' +
+        '<button class="reaction-btn" data-action="save" title="Save for later">\u{1F516}</button>' +
+      '</div>';
+
+    var btns = card.querySelectorAll('.reaction-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener('click', function(e) {
+        e.stopPropagation();
+        var action = this.getAttribute('data-action');
+        var allBtns = card.querySelectorAll('.reaction-btn');
+        for (var j = 0; j < allBtns.length; j++) allBtns[j].classList.remove('active');
+        this.classList.add('active');
+
+        if (action === 'like') {
+          self.likedBooks.push(book);
+        } else if (action === 'save') {
+          self.savedBooks.push(book);
+        }
+      });
+    }
+
+    return card;
+  },
+
+  showResults: function() {
+    var stack = document.getElementById('results-stack');
+    stack.innerHTML = '';
+
+    BOOKS.forEach(function(book, i) {
+      var card = document.createElement('div');
+      card.className = 'result-card';
+      var tagsHtml = '';
+      for (var j = 0; j < book.tags.length; j++) {
+        tagsHtml += '<span class="result-tag">' + book.tags[j] + '</span>';
+      }
+      card.innerHTML =
+        '<div class="book-cover">' + book.coverEmoji + '</div>' +
+        '<div class="result-info">' +
+          '<div class="book-title">' + book.title + '</div>' +
+          '<div class="book-author">' + book.author + '</div>' +
+          '<div class="result-reason">"' + book.reason + '"</div>' +
+          '<div class="result-tags">' + tagsHtml + '</div>' +
+        '</div>';
+      stack.appendChild(card);
+
+      setTimeout(function() { card.classList.add('visible'); }, 100 + i * 120);
+    });
+
+    this.showScreen('results');
+  },
+
+  showProfile: function() {
+    var prefContainer = document.getElementById('preference-tags');
+    prefContainer.innerHTML = '';
+
+    var allAnswers = [];
+    for (var i = 0; i < this.selections.length; i++) {
+      var answers = this.selections[i].answers;
+      for (var j = 0; j < answers.length; j++) {
+        if (answers[j] !== 'Skipped') allAnswers.push(answers[j]);
+      }
+    }
+
+    if (allAnswers.length === 0) {
+      allAnswers = ['Fiction lover', 'Mind-bending', 'Sci-fi', 'Quick reads'];
+    }
+
+    allAnswers.forEach(function(answer) {
+      var tag = document.createElement('span');
+      tag.className = 'pref-tag';
+      tag.textContent = answer;
+      prefContainer.appendChild(tag);
+    });
+
+    var queueContainer = document.getElementById('queue-list');
+    queueContainer.innerHTML = '';
+
+    var queueBooks = this.savedBooks.length > 0 ? this.savedBooks : BOOKS.slice(0, 3);
+
+    queueBooks.forEach(function(book) {
+      var item = document.createElement('div');
+      item.className = 'queue-item';
+      item.innerHTML =
+        '<div class="queue-cover">' + book.coverEmoji + '</div>' +
+        '<div class="queue-info">' +
+          '<div class="book-title">' + book.title + '</div>' +
+          '<div class="book-author">' + book.author + '</div>' +
+        '</div>';
+      queueContainer.appendChild(item);
+    });
+
+    var historyContainer = document.getElementById('history-list');
+    historyContainer.innerHTML = '';
+
+    var historyBooks = [
+      { title: "Dune", author: "Frank Herbert", emoji: "\u{1F3DC}\uFE0F", tags: ["Epic", "Sci-fi"] },
+      { title: "Normal People", author: "Sally Rooney", emoji: "\u{1F4AC}", tags: ["Love story", "Quick read"] },
+      { title: "Atomic Habits", author: "James Clear", emoji: "\u26A1", tags: ["Nonfiction", "Self-help"] }
+    ];
+
+    historyBooks.forEach(function(book) {
+      var tagsHtml = '';
+      for (var k = 0; k < book.tags.length; k++) {
+        tagsHtml += '<span class="history-tag">' + book.tags[k] + '</span>';
+      }
+      var item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML =
+        '<div class="history-cover">' + book.emoji + '</div>' +
+        '<div class="history-info">' +
+          '<div class="book-title">' + book.title + '</div>' +
+          '<div class="book-author">' + book.author + '</div>' +
+        '</div>' +
+        '<div class="history-tags">' + tagsHtml + '</div>';
+      historyContainer.appendChild(item);
+    });
+
+    this.showScreen('profile');
+  },
+
+  restart: function() {
+    this.currentFilter = 0;
+    this.selections = [];
+    this.savedBooks = [];
+    this.likedBooks = [];
+    this.showScreen('landing');
+  }
+};
+  </script>
 </body>
 </html>
