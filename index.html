@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shelfie — What should I read next?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== LANDING PAGE ===== -->
+  <section id="landing" class="screen active">
+    <div class="landing-content">
+      <div class="logo-mark">📚</div>
+      <h1>What should I read next?</h1>
+      <p class="subtitle">We'll help you find your perfect book in under a minute.</p>
+      <button class="cta-btn" onclick="app.startFlow()">
+        Let's find out
+        <span class="arrow">→</span>
+      </button>
+      <p class="hint">No sign-up required. Just vibes.</p>
+    </div>
+  </section>
+
+  <!-- ===== FILTER FLOW ===== -->
+  <section id="filter-flow" class="screen">
+    <div class="flow-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <p class="flow-question" id="flow-question"></p>
+      <div class="pills-container" id="pills-container"></div>
+      <button class="skip-btn" id="skip-btn" onclick="app.skipFilter()">Skip this one →</button>
+    </div>
+  </section>
+
+  <!-- ===== BOOK SUGGESTIONS (inline) ===== -->
+  <section id="suggestions" class="screen">
+    <div class="suggestions-container">
+      <p class="suggestions-label">Based on your picks, you might love…</p>
+      <div class="book-cards" id="book-cards"></div>
+      <button class="cta-btn" onclick="app.showResults()">
+        See all recommendations
+        <span class="arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== RESULTS PAGE ===== -->
+  <section id="results" class="screen">
+    <div class="results-container">
+      <h2 class="results-title">Your reading list</h2>
+      <p class="results-subtitle">Curated from your choices — here's what we think you'll love.</p>
+      <div class="results-stack" id="results-stack"></div>
+      <div class="results-actions">
+        <button class="cta-btn secondary" onclick="app.restart()">Start over</button>
+        <button class="cta-btn" onclick="app.showProfile()">Save & create profile →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROFILE PAGE ===== -->
+  <section id="profile" class="screen">
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="avatar">📖</div>
+        <h2>Your Reading Profile</h2>
+        <p class="profile-subtitle">Here's what the algorithm knows about you so far.</p>
+      </div>
+
+      <div class="profile-section">
+        <h3>🧠 Preference Summary</h3>
+        <div class="preference-tags" id="preference-tags"></div>
+      </div>
+
+      <div class="profile-section">
+        <h3>📋 Read Next Queue</h3>
+        <div class="queue-list" id="queue-list"></div>
+      </div>
+
+      <div class="profile-section">
+        <h3>📜 Reading History</h3>
+        <div class="history-list" id="history-list"></div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="cta-btn secondary" onclick="app.restart()">Find more books</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
