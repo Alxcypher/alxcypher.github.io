@@ -2341,23 +2341,43 @@ function showWelcome() {
     </div>
   `;
 
+  // Topic chips — each maps to keywords matched against skill descriptions & filenames
+  const topicChips = [
+    { label: 'Cost', keywords: ['cost', 'estimate', 'rate', 'quantity', 'take-off', 'pricing', 'budget', 'valuation', 'tender'] },
+    { label: 'Legal', keywords: ['contract', 'special conditions', 'entitlement', 'claim', 'compliance', 'risk register', 'standard form'] },
+    { label: 'Safety', keywords: ['safety', 'swms', 'whs', 'incident', 'hazard', 'audit', 'safe work'] },
+    { label: 'Program', keywords: ['program', 'schedule', 'delay', 'eot', 'extension of time', 'critical path', 'float'] },
+    { label: 'Design', keywords: ['drawing', 'structural', 'clash', 'coordination', 'bim', 'constructability'] },
+    { label: 'Quality', keywords: ['specification', 'compliance', 'submittal', 'material', 'inspection', 'defect'] },
+    { label: 'Procurement', keywords: ['tender', 'prequalification', 'subcontractor', 'submittal', 'procurement'] },
+    { label: 'Reporting', keywords: ['minutes', 'meeting', 'incident report', 'report', 'register'] },
+  ];
+
   const qs = document.getElementById('quickStart');
-  const categories = Object.keys(skills);
-  categories.forEach(cat => {
+  topicChips.forEach(topic => {
     const chip = document.createElement('span');
     chip.className = 'quick-chip';
-    chip.textContent = cat;
+    chip.textContent = topic.label;
     chip.onclick = () => {
-      const firstFile = Object.keys(skills[cat].children)[0];
-      document.querySelectorAll('.tree-item.depth-2').forEach(el => {
-        if (el.textContent.includes(cat)) {
-          const children = el.nextElementSibling;
-          if (children && !children.classList.contains('open')) {
-            toggleFolder(el);
+      // Find the first skill matching any keyword
+      for (const [folderKey, folder] of Object.entries(skills)) {
+        for (const [fileKey, file] of Object.entries(folder.children)) {
+          const haystack = (file.description + ' ' + fileKey + ' ' + folderKey).toLowerCase();
+          if (topic.keywords.some(kw => haystack.includes(kw))) {
+            // Expand folder
+            document.querySelectorAll('.tree-item.depth-2').forEach(el => {
+              if (el.textContent.includes(folderKey)) {
+                const children = el.nextElementSibling;
+                if (children && !children.classList.contains('open')) {
+                  toggleFolder(el);
+                }
+              }
+            });
+            selectSkill(folderKey, fileKey);
+            return;
           }
         }
-      });
-      selectSkill(cat, firstFile);
+      }
     };
     qs.appendChild(chip);
   });
