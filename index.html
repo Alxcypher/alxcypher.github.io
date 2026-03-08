@@ -124,12 +124,37 @@
   /* Sidebar */
   .sidebar {
     width: 280px;
-    min-width: 280px;
+    min-width: 140px;
+    max-width: 600px;
     background: var(--bg-sidebar);
-    border-right: 1px solid var(--border);
+    border-right: none;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .resize-handle {
+    width: 5px;
+    cursor: col-resize;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.2s;
+    position: relative;
+  }
+
+  .resize-handle:hover,
+  .resize-handle.dragging {
+    background: var(--accent-purple);
+  }
+
+  .resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -3px;
+    right: -3px;
+    bottom: 0;
   }
 
   .sidebar-header {
@@ -176,6 +201,8 @@
     transition: background 0.15s;
     user-select: none;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .tree-item:hover { background: var(--bg-hover); }
@@ -576,6 +603,9 @@
     </div>
     <div class="file-tree" id="fileTree"></div>
   </div>
+
+  <!-- Resize Handle -->
+  <div class="resize-handle" id="resizeHandle"></div>
 
   <!-- Content -->
   <div class="content">
@@ -1960,6 +1990,36 @@ function filterTree(query) {
 // Initialize
 buildTree();
 showWelcome();
+
+// Resizable sidebar
+const resizeHandle = document.getElementById('resizeHandle');
+const sidebar = document.querySelector('.sidebar');
+let isResizing = false;
+
+resizeHandle.addEventListener('mousedown', (e) => {
+  isResizing = true;
+  resizeHandle.classList.add('dragging');
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isResizing) return;
+  const newWidth = e.clientX;
+  const min = parseInt(getComputedStyle(sidebar).minWidth);
+  const max = parseInt(getComputedStyle(sidebar).maxWidth);
+  sidebar.style.width = Math.max(min, Math.min(max, newWidth)) + 'px';
+});
+
+document.addEventListener('mouseup', () => {
+  if (isResizing) {
+    isResizing = false;
+    resizeHandle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }
+});
 
 // Count skills
 let totalSkills = 0;
