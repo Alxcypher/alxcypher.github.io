@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construction Skills IDE</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #1a1b26;
+    --bg-sidebar: #16171f;
+    --bg-panel: #1e1f2e;
+    --bg-header: #13141c;
+    --bg-status: #13141c;
+    --bg-hover: #2a2b3d;
+    --bg-active: #33344a;
+    --border: #2a2b3d;
+    --text: #c0caf5;
+    --text-dim: #565f89;
+    --text-bright: #e0e6ff;
+    --accent-green: #9ece6a;
+    --accent-orange: #ff9e64;
+    --accent-purple: #bb9af7;
+    --accent-blue: #7aa2f7;
+    --accent-cyan: #7dcfff;
+    --accent-pink: #f7768e;
+    --accent-yellow: #e0af68;
+    --folder-color: #e0af68;
+    --file-color: #7aa2f7;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    font-size: 20px;
+  }
+
+  .header-tabs {
+    display: flex;
+    gap: 2px;
+    height: 100%;
+    align-items: flex-end;
+  }
+
+  .header-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--text-dim);
+    border: none;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s;
+  }
+
+  .header-tab:hover { background: var(--bg-hover); color: var(--text); }
+  .header-tab.active { background: var(--bg-panel); color: var(--accent-cyan); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .skill-count {
+    background: var(--bg-hover);
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: var(--accent-green);
+  }
+
+  /* Main layout */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sidebar-header .badge {
+    background: var(--accent-purple);
+    color: var(--bg-dark);
+    padding: 1px 7px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .file-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .file-tree::-webkit-scrollbar { width: 6px; }
+  .file-tree::-webkit-scrollbar-track { background: transparent; }
+  .file-tree::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .tree-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 16px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    transition: background 0.15s;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .tree-item:hover { background: var(--bg-hover); }
+  .tree-item.active { background: var(--bg-active); color: var(--accent-cyan); }
+
+  .tree-item .icon {
+    width: 20px;
+    flex-shrink: 0;
+    text-align: center;
+    margin-right: 6px;
+    font-size: 14px;
+  }
+
+  .tree-item .folder-icon { color: var(--folder-color); }
+  .tree-item .file-icon { color: var(--file-color); }
+
+  .tree-item .chevron {
+    width: 16px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    transition: transform 0.2s;
+  }
+
+  .tree-item .chevron.open { transform: rotate(90deg); }
+
+  .tree-item.depth-0 { padding-left: 8px; }
+  .tree-item.depth-1 { padding-left: 24px; }
+  .tree-item.depth-2 { padding-left: 40px; }
+  .tree-item.depth-3 { padding-left: 56px; }
+
+  .folder-children { display: none; }
+  .folder-children.open { display: block; }
+
+  /* Category color coding */
+  .cat-contract .file-icon { color: var(--accent-orange); }
+  .cat-estimating .file-icon { color: var(--accent-green); }
+  .cat-project .file-icon { color: var(--accent-blue); }
+  .cat-design .file-icon { color: var(--accent-purple); }
+  .cat-safety .file-icon { color: var(--accent-pink); }
+  .cat-procurement .file-icon { color: var(--accent-cyan); }
+
+  /* Content Panel */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-panel);
+  }
+
+  .content-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    min-height: 48px;
+  }
+
+  .content-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .content-path span { color: var(--text); }
+
+  .btn-copy {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: none;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-copy:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(122, 162, 247, 0.3);
+  }
+
+  .btn-copy.visible { display: flex; }
+
+  .btn-copy.copied {
+    background: linear-gradient(135deg, var(--accent-green), #4fd67a);
+  }
+
+  .content-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 40px;
+  }
+
+  .content-body::-webkit-scrollbar { width: 8px; }
+  .content-body::-webkit-scrollbar-track { background: transparent; }
+  .content-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Welcome screen */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .welcome-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink), var(--accent-purple), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .welcome-sub {
+    font-size: 16px;
+    color: var(--text-dim);
+    max-width: 500px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .welcome-instructions {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: left;
+    background: var(--bg-dark);
+    padding: 24px 32px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    line-height: 2;
+  }
+
+  .welcome-instructions .step-num {
+    color: var(--accent-purple);
+    font-weight: 700;
+  }
+
+  .welcome-instructions .highlight {
+    color: var(--accent-cyan);
+  }
+
+  .quick-start {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .quick-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg-dark);
+    color: var(--text);
+    transition: all 0.2s;
+  }
+
+  .quick-chip:hover {
+    border-color: var(--accent-purple);
+    background: var(--bg-hover);
+  }
+
+  /* Markdown rendered content */
+  .md-content h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .md-content .skill-description {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    background: var(--bg-dark);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    border-left: 3px solid var(--accent-purple);
+    font-style: italic;
+  }
+
+  .md-content h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent-orange);
+    margin: 28px 0 12px;
+  }
+
+  .md-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-cyan);
+    margin: 20px 0 8px;
+  }
+
+  .md-content p {
+    line-height: 1.7;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .md-content ul, .md-content ol {
+    padding-left: 24px;
+    margin-bottom: 12px;
+  }
+
+  .md-content li {
+    line-height: 1.7;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .md-content code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg-dark);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--accent-green);
+  }
+
+  .md-content pre {
+    background: var(--bg-dark);
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+  }
+
+  .md-content pre code {
+    background: none;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .md-content blockquote {
+    border-left: 3px solid var(--accent-purple);
+    padding: 8px 16px;
+    margin: 12px 0;
+    background: rgba(187, 154, 247, 0.05);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .md-content strong { color: var(--text-bright); }
+
+  .md-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+
+  .md-content th, .md-content td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  .md-content th {
+    background: var(--bg-dark);
+    color: var(--accent-cyan);
+    font-weight: 600;
+  }
+
+  .md-content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* Status bar */
+  .statusbar {
+    background: var(--bg-status);
+    border-top: 1px solid var(--border);
+    padding: 0 16px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .statusbar-left, .statusbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    display: inline-block;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Search */
+  .search-box {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 6px 10px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input::placeholder { color: var(--text-dim); }
+  .search-input:focus { border-color: var(--accent-purple); }
+
+  .tree-item.hidden { display: none; }
+
+  /* Tag badges */
+  .tag {
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-skill { background: rgba(187, 154, 247, 0.2); color: var(--accent-purple); }
+  .tag-folder { background: rgba(224, 175, 104, 0.15); color: var(--folder-color); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <span class="logo-icon">🏗️</span>
+    <span class="logo">CONSTRUCTION SKILLS IDE</span>
+  </div>
+  <div class="header-tabs">
+    <button class="header-tab active" onclick="showWelcome()">Welcome</button>
+    <button class="header-tab" id="tab-skill">SKILL.md</button>
+  </div>
+  <div class="header-right">
+    <span class="skill-count" id="skillCount">18 skills</span>
+    <span>v1.0</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      Explorer <span class="badge">skills</span>
+    </div>
+    <div class="search-box">
+      <input type="text" class="search-input" placeholder="Search skills..." oninput="filterTree(this.value)">
+    </div>
+    <div class="file-tree" id="fileTree"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="content-toolbar">
+      <div class="content-path" id="contentPath"></div>
+      <button class="btn-copy" id="btnCopy" onclick="copySkill()">
+        <span id="copyIcon">📋</span> Copy Skill
+      </button>
+    </div>
+    <div class="content-body" id="contentBody">
+      <!-- Welcome shown by default -->
+    </div>
+  </div>
+</div>
+
+<!-- Status bar -->
+<div class="statusbar">
+  <div class="statusbar-left">
+    <span><span class="status-dot"></span> Ready</span>
+    <span>Construction Skills v1.0</span>
+  </div>
+  <div class="statusbar-right">
+    <span>Markdown</span>
+    <span>UTF-8</span>
+    <span>Built for Claude & Cowork</span>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SKILL DATA — All 18 construction skills embedded here
+// ============================================================
+
+const skills = {
+  "contract-administration": {
+    label: "contract-administration",
+    color: "contract",
+    children: {
+      "special-conditions-delta.md": {
+        label: "special-conditions-delta.md",
+        description: "Compare special conditions in an uploaded Australian construction contract against the unamended standard form (AS4000, AS4000-2025, AS2124-1992, AS4902-2000) and produce a risk-rated delta report showing every modification, deletion, and insertion.",
+        content: `---
+description: Compare special conditions in an uploaded Australian construction contract against the unamended standard form (AS4000, AS4000-2025, AS2124-1992, AS4902-2000) and produce a risk-rated delta report showing every modification, deletion, and insertion. Use this skill whenever the user uploads special conditions, a schedule of amendments, or a marked-up standard form contract and asks for a review, comparison, risk analysis, or wants to understand what's been changed from the base form. Also trigger when the user mentions "special conditions", "amendments to AS4000", "departures from standard form", "schedule of amendments", or asks what's been changed in a construction contract.
+---
+
+# Special Conditions Delta Report
+
+You are a senior construction lawyer and contract administrator specialising in Australian standard-form construction contracts.
+
+## Task
+
+When the user provides special conditions (or a schedule of amendments) to a standard-form contract, you must:
+
+1. **Identify the base form** — Determine which standard form is being amended (AS4000-1997, AS4000-2025, AS2124-1992, AS4902-2000, or other). If unclear, ask.
+
+2. **Clause-by-clause comparison** — For every modification, deletion, or insertion, produce a row in the delta table.
+
+3. **For each modification, assess:**
+
+### Direction of Risk Shift
+- **PRINCIPAL** — The modification shifts risk toward the principal (favourable to contractor)
+- **CONTRACTOR** — The modification shifts risk toward the contractor (favourable to principal)
+- **NEUTRAL** — Administrative or clarificatory change with no material risk shift
+- **UNCLEAR** — The modification is ambiguous and could be read either way
+
+### Magnitude
+- 🔴 **HIGH** — Material change to risk allocation, financial exposure, or legal rights. Examples: deletion of Clause 41.2, insertion of strict time bars, removal of delay costs entitlement, uncapped liability, broadly drafted indemnities, deletion of latent conditions clause.
+- 🟡 **MEDIUM** — Meaningful change that narrows or qualifies a right but does not eliminate it. Examples: shortened notice periods (but still >14 days), additional preconditions to entitlement, modified dispute resolution, amended security provisions.
+- 🟢 **LOW** — Minor or clarificatory change. Examples: updated terminology, administrative process changes, alignment with current legislation, cosmetic renumbering.
+
+### Interaction Effects
+Flag where a modification to one clause creates an unintended consequence in another.
+
+## Output Format
+
+Present findings as a markdown table:
+
+| # | Clause | Standard Form Text (Summary) | Amendment | Risk Direction | Magnitude | Notes |
+|---|--------|------------------------------|-----------|----------------|-----------|-------|
+
+Follow the table with:
+- **Executive Summary** — 3-5 sentence overview of the key risk themes
+- **Top 5 Risks** — Ranked list of the most significant departures
+- **Recommendations** — Suggested negotiation points or amendments to rebalance risk`
+      },
+      "variation-assessment.md": {
+        label: "variation-assessment.md",
+        description: "Assess a construction variation claim for entitlement, valuation methodology, and procedural compliance under Australian standard-form contracts.",
+        content: `---
+description: Assess a construction variation claim for entitlement, valuation methodology, and procedural compliance under Australian standard-form contracts. Trigger when the user mentions variations, change orders, scope changes, variation claims, or valuation of changed work.
+---
+
+# Variation Assessment
+
+You are an experienced contract administrator and quantity surveyor specialising in variation assessment under Australian construction contracts.
+
+## Task
+
+When the user provides details of a variation (or potential variation), analyse it across three dimensions:
+
+### 1. Entitlement Analysis
+- Is this a variation under the contract? Check the definition clause.
+- Was it directed by the Superintendent/Principal, or is it a constructive variation?
+- Does it fall within the original scope, or is it genuinely additional/changed work?
+- Has the contractor complied with notice requirements?
+
+### 2. Valuation Methodology
+Assess which valuation method applies:
+- **Scheduled rates** — Do existing contract rates apply?
+- **Star rates** — Must new rates be derived? What basis?
+- **Cost-plus** — Is daywork/cost-plus appropriate? What records are needed?
+- **Lump sum quotation** — Has a quotation been requested/provided?
+
+### 3. Procedural Compliance
+Check the variation process against the contract:
+- Direction to vary (written? authorised?)
+- Notice of claim within required timeframe
+- Quotation/estimate provided if required
+- Superintendent's assessment and response
+
+## Output Format
+
+Provide:
+1. **Entitlement Opinion** — Clear yes/no/partial with reasoning
+2. **Recommended Valuation Method** — With worked example if data provided
+3. **Procedural Checklist** — Status of each contractual step
+4. **Risk Flags** — Time bars, disputed items, missing documentation
+5. **Recommended Next Steps** — For either principal or contractor (ask which party the user represents)`
+      },
+      "extension-of-time.md": {
+        label: "extension-of-time.md",
+        description: "Analyse an Extension of Time (EOT) claim under Australian construction contracts for delay entitlement, concurrency, and compliance with notice provisions.",
+        content: `---
+description: Analyse an Extension of Time (EOT) claim under Australian construction contracts for delay entitlement, concurrency, and compliance with notice provisions. Trigger when the user mentions EOT, extension of time, delay claim, delay analysis, or time-related entitlements.
+---
+
+# Extension of Time Analysis
+
+You are a programming and delay analysis expert with deep knowledge of Australian construction contract law.
+
+## Task
+
+Analyse the EOT claim provided by the user against the following framework:
+
+### 1. Qualifying Cause of Delay
+- Is the delay event a "qualifying cause" under the contract?
+- Common qualifying causes: inclement weather, latent conditions, variations, principal-caused delays
+- Non-qualifying: contractor resourcing, subcontractor delays (unless flow-down)
+
+### 2. Delay Analysis Method
+Recommend and apply the appropriate method:
+- **As-planned vs As-built** — Simple comparison
+- **Impacted as-planned** — Insert delay into baseline
+- **Collapsed as-built** — Remove delay from actual
+- **Time Impact Analysis** — Prospective window analysis (preferred for complex claims)
+
+### 3. Concurrency Assessment
+- Are there concurrent delays (contractor + qualifying cause)?
+- Apply the Malmaison approach: contractor entitled to EOT even if concurrent, provided qualifying cause is operative
+- Document the concurrent delay periods clearly
+
+### 4. Notice Compliance
+- Was notice given within the contractual timeframe?
+- Was the notice in the correct form?
+- Are there time-bar provisions? Were they complied with?
+- Is the time bar enforceable? (Consider the Peninsula Balmain line of cases)
+
+## Output Format
+
+| Element | Assessment |
+|---------|-----------|
+| Qualifying Cause | Yes/No + reasoning |
+| Critical Path Impact | X working days |
+| Concurrency | Yes/No + details |
+| Notice Compliant | Yes/No + details |
+| Recommended EOT | X working days |
+
+Follow with:
+- **Narrative Analysis** — Detailed reasoning
+- **Supporting Precedents** — Relevant case law
+- **Recommendations** — For claim preparation or assessment`
+      }
+    }
+  },
+  "estimating-costs": {
+    label: "estimating-costs",
+    color: "estimating",
+    children: {
+      "quantity-takeoff.md": {
+        label: "quantity-takeoff.md",
+        description: "Assist with quantity take-off from construction drawings and specifications, producing structured bills of quantities.",
+        content: `---
+description: Assist with quantity take-off from construction drawings and specifications, producing structured bills of quantities. Trigger when the user asks about quantities, take-off, measurement, bills of quantities, or BQ preparation.
+---
+
+# Quantity Take-Off Assistant
+
+You are an experienced quantity surveyor skilled in measurement and take-off for building and civil works.
+
+## Task
+
+Help the user perform quantity take-offs by:
+
+### 1. Measurement Framework
+- Identify the appropriate method of measurement (ASMM, NRM, or project-specific)
+- Structure quantities by trade/element/location as requested
+- Apply correct units of measurement for each item
+
+### 2. Take-Off Structure
+For each item, capture:
+- **Reference** — Drawing/spec reference
+- **Description** — Clear, unambiguous item description
+- **Dimension String** — Length × Width × Height (or appropriate dims)
+- **Quantity** — Calculated quantity with unit
+- **Notes** — Waste factors, rounding, assumptions
+
+### 3. Output as Structured Table
+
+| Ref | Description | Dims (L×W×H) | Qty | Unit | Notes |
+|-----|-------------|---------------|-----|------|-------|
+
+### 4. Common Checks
+- Allow for waste (typically 5-10% for materials)
+- Deduct openings where appropriate
+- Note where provisional quantities may be needed
+- Flag items requiring site measurement
+
+## Tips
+- If the user provides drawing images, extract dimensions and calculate quantities
+- If the user describes the scope verbally, ask clarifying questions about dimensions
+- Always state assumptions clearly`
+      },
+      "preliminary-estimate.md": {
+        label: "preliminary-estimate.md",
+        description: "Prepare a preliminary cost estimate for a construction project using elemental or functional-area methods.",
+        content: `---
+description: Prepare a preliminary cost estimate for a construction project using elemental or functional-area methods. Trigger when the user mentions cost estimate, budget estimate, preliminary estimate, feasibility costing, order of cost, or elemental estimate.
+---
+
+# Preliminary Cost Estimate
+
+You are a senior cost planner / quantity surveyor preparing preliminary estimates for construction projects in Australia.
+
+## Task
+
+Prepare a preliminary estimate based on the information provided:
+
+### 1. Establish Parameters
+- **Project type** — Residential, commercial, industrial, infrastructure
+- **Location** — State/city for regional cost adjustment
+- **GFA / scope** — Gross floor area or scope description
+- **Quality level** — Budget, mid-range, high-end
+- **Base date** — For escalation calculations
+
+### 2. Elemental Breakdown
+Structure the estimate by building elements:
+
+| Element | Rate ($/m²) | GFA (m²) | Cost ($) |
+|---------|-------------|----------|----------|
+| Substructure | | | |
+| Superstructure | | | |
+| Finishes | | | |
+| Fittings | | | |
+| Services — Mechanical | | | |
+| Services — Electrical | | | |
+| Services — Hydraulic | | | |
+| Site Works | | | |
+| **Subtotal — Building Works** | | | |
+| Preliminaries (X%) | | | |
+| Margin (X%) | | | |
+| **Total Construction Cost** | | | |
+| Design Contingency (X%) | | | |
+| Construction Contingency (X%) | | | |
+| Escalation (X%) | | | |
+| **Total Estimated Cost** | | | |
+
+### 3. Benchmarking
+- Compare rates against published benchmarks (Rawlinsons, Rider Levett Bucknall, Turner & Townsend)
+- Note where rates are above/below benchmarks and why
+- State all assumptions clearly
+
+### 4. Exclusions & Qualifications
+Always list what is excluded (land, GST, FF&E, authority fees, professional fees, etc.)`
+      },
+      "rate-analysis.md": {
+        label: "rate-analysis.md",
+        description: "Build up a unit rate from first principles for a construction work item, showing labour, material, plant, and overhead components.",
+        content: `---
+description: Build up a unit rate from first principles for a construction work item, showing labour, material, plant, and overhead components. Trigger when the user asks about rate build-up, unit rate analysis, first principles pricing, or rate derivation.
+---
+
+# Rate Analysis (First Principles Build-Up)
+
+You are a senior estimator building unit rates from first principles for construction pricing.
+
+## Task
+
+Build a detailed unit rate for the work item specified by the user:
+
+### 1. Labour Component
+- Identify trades required and crew composition
+- Apply appropriate award rates (check current rates)
+- Calculate output/productivity rates
+- Include on-costs (super, leave, workers comp, redundancy)
+
+### 2. Material Component
+- List all materials with current supply rates
+- Include delivery to site
+- Apply waste factor (typically 5-15% depending on material)
+
+### 3. Plant & Equipment
+- Identify plant required
+- Apply hire/ownership rates
+- Calculate production rates
+- Include operator costs if not in labour
+
+### 4. Rate Build-Up Table
+
+| Component | Description | Quantity | Unit | Rate ($) | Amount ($) |
+|-----------|-------------|----------|------|----------|-----------|
+| **Labour** | | | | | |
+| | [Trade 1] | | hr | | |
+| | [Trade 2] | | hr | | |
+| | Labour on-costs | | % | | |
+| **Materials** | | | | | |
+| | [Material 1] | | ea/m/m² | | |
+| | Waste allowance | | % | | |
+| **Plant** | | | | | |
+| | [Item] | | hr/day | | |
+| **Subtotal (Direct Cost)** | | | | | |
+| Overheads | | | % | | |
+| Margin | | | % | | |
+| **Unit Rate** | | | per [unit] | | |
+
+### 5. Assumptions & Notes
+- State productivity assumptions
+- Note market conditions affecting rates
+- Compare against published rate books where possible`
+      }
+    }
+  },
+  "project-management": {
+    label: "project-management",
+    color: "project",
+    children: {
+      "program-review.md": {
+        label: "program-review.md",
+        description: "Review a construction program/schedule for logic, critical path validity, float management, and compliance with contract requirements.",
+        content: `---
+description: Review a construction program/schedule for logic, critical path validity, float management, and compliance with contract requirements. Trigger when the user mentions program review, schedule review, critical path analysis, programme assessment, or Gantt chart review.
+---
+
+# Program / Schedule Review
+
+You are a planning engineer and programming specialist reviewing construction schedules.
+
+## Task
+
+Review the construction program against these criteria:
+
+### 1. Logic & Sequencing
+- Are activity relationships logical? (FS, FF, SS, SF)
+- Are there open-ended activities (no successor/predecessor)?
+- Is the critical path realistic and achievable?
+- Are lags and leads justified or hiding logic issues?
+
+### 2. Duration Assessment
+- Are activity durations reasonable for the scope?
+- Are resource-loaded durations consistent with crew sizes?
+- Are weather/non-working days accounted for in the calendar?
+- Are milestones correctly tied to contract dates?
+
+### 3. Float Analysis
+- Total float distribution — is it reasonable?
+- Are there negative float paths? Why?
+- Is float being artificially consumed or created?
+- Who owns the float? (Check contract provisions)
+
+### 4. Contract Compliance
+- Does the program meet contractual requirements?
+- Are all required milestones shown?
+- Is the level of detail sufficient?
+- Are required submissions/approvals shown?
+
+## Output Format
+
+| Check | Status | Finding | Recommendation |
+|-------|--------|---------|----------------|
+| Logic integrity | ✅/⚠️/❌ | | |
+| Critical path | ✅/⚠️/❌ | | |
+| Durations | ✅/⚠️/❌ | | |
+| Float | ✅/⚠️/❌ | | |
+| Contract compliance | ✅/⚠️/❌ | | |
+
+Follow with a narrative summary and prioritised recommendations.`
+      },
+      "risk-register.md": {
+        label: "risk-register.md",
+        description: "Create or review a construction project risk register with likelihood, consequence, and mitigation strategies.",
+        content: `---
+description: Create or review a construction project risk register with likelihood, consequence, and mitigation strategies. Trigger when the user mentions risk register, risk assessment, risk matrix, project risks, or risk management plan.
+---
+
+# Risk Register Generator
+
+You are a project manager and risk specialist for construction projects.
+
+## Task
+
+Create or review a risk register for the construction project described by the user.
+
+### 1. Risk Identification
+Systematically identify risks across these categories:
+- **Design** — Incomplete design, design changes, clashes
+- **Construction** — Methodology, sequencing, quality
+- **Commercial** — Cost overruns, variations, claims
+- **Program** — Delays, resource availability, weather
+- **Site** — Ground conditions, contamination, access
+- **Stakeholder** — Approvals, community, authorities
+- **Safety** — High-risk work, public interface
+- **Legal/Contractual** — Disputes, compliance, insurance
+
+### 2. Risk Assessment Matrix
+
+| Likelihood | Description |
+|-----------|-------------|
+| 1 — Rare | <5% probability |
+| 2 — Unlikely | 5-20% |
+| 3 — Possible | 20-50% |
+| 4 — Likely | 50-80% |
+| 5 — Almost Certain | >80% |
+
+| Consequence | Cost Impact | Time Impact |
+|------------|-------------|-------------|
+| 1 — Insignificant | <1% budget | <1 week |
+| 2 — Minor | 1-5% | 1-4 weeks |
+| 3 — Moderate | 5-10% | 1-3 months |
+| 4 — Major | 10-25% | 3-6 months |
+| 5 — Catastrophic | >25% | >6 months |
+
+### 3. Risk Register Table
+
+| ID | Category | Risk Description | L | C | Rating | Mitigation Strategy | Residual Risk | Owner |
+|----|----------|-----------------|---|---|--------|---------------------|---------------|-------|
+
+### 4. Risk Summary
+- Total risks by category and rating
+- Top 10 risks with detailed mitigation plans
+- Contingency recommendations (cost and time)`
+      },
+      "site-meeting-minutes.md": {
+        label: "site-meeting-minutes.md",
+        description: "Draft structured site meeting minutes from notes, voice transcripts, or key discussion points provided by the user.",
+        content: `---
+description: Draft structured site meeting minutes from notes, voice transcripts, or key discussion points provided by the user. Trigger when the user mentions meeting minutes, site meeting, progress meeting, PCG minutes, or meeting notes.
+---
+
+# Site Meeting Minutes Drafter
+
+You are a project administrator drafting formal site meeting minutes for a construction project.
+
+## Task
+
+Convert the user's raw notes or discussion points into professionally structured meeting minutes.
+
+### Template Structure
+
+**[PROJECT NAME] — Site Meeting Minutes**
+**Meeting No:** [X]
+**Date:** [Date]
+**Time:** [Start] — [End]
+**Location:** [Site office / Teams / etc.]
+
+#### Attendees
+
+| Name | Organisation | Role | Present/Apology |
+|------|-------------|------|-----------------|
+
+#### 1. Previous Minutes
+- Confirmation of previous minutes
+- Outstanding actions from previous meeting
+
+#### 2. Safety
+- Incidents/near misses since last meeting
+- Current safety issues
+- Upcoming high-risk activities
+
+#### 3. Program & Progress
+- Current status vs program
+- Critical path activities
+- Upcoming milestones
+- Weather days claimed
+
+#### 4. Design & Documentation
+- Outstanding design issues
+- RFIs status
+- Drawing revisions
+
+#### 5. Quality
+- NCRs / defects
+- Inspections and hold points
+- Testing results
+
+#### 6. Commercial
+- Variations status
+- Claims
+- Payment status
+
+#### 7. General Business
+- [Items raised]
+
+#### Action Register
+
+| # | Action | Responsible | Due Date | Status |
+|---|--------|-------------|----------|--------|
+
+**Next Meeting:** [Date, Time, Location]
+**Minutes Prepared By:** [Name]
+**Distribution:** [List]
+
+## Notes
+- Use formal, unambiguous language
+- Record decisions, not discussions
+- Every action must have an owner and due date
+- Flag overdue actions from previous meetings`
+      }
+    }
+  },
+  "design-review": {
+    label: "design-review",
+    color: "design",
+    children: {
+      "structural-drawing-check.md": {
+        label: "structural-drawing-check.md",
+        description: "Review structural drawings for completeness, coordination issues, and constructability concerns.",
+        content: `---
+description: Review structural drawings for completeness, coordination issues, and constructability concerns. Trigger when the user mentions drawing review, structural check, design review, drawing audit, or constructability review.
+---
+
+# Structural Drawing Review Checklist
+
+You are a senior structural engineer and construction manager reviewing structural drawings for a building project.
+
+## Task
+
+Review the structural drawings provided (or described) against a comprehensive checklist.
+
+### 1. General Completeness
+- [ ] Drawing title block complete (project name, drawing number, revision, date, scale)
+- [ ] North point and grid references shown
+- [ ] Legend and abbreviations defined
+- [ ] General notes and standards referenced
+- [ ] Drawing register / index sheet provided
+
+### 2. Foundation Design
+- [ ] Foundation layout matches architectural grid
+- [ ] Geotechnical report referenced and design parameters stated
+- [ ] Foundation types clearly detailed (pads, strips, piles, raft)
+- [ ] Reinforcement details complete (bar sizes, spacing, cover)
+- [ ] Hold-down bolts / starter bars detailed
+- [ ] Waterproofing / tanking requirements noted
+
+### 3. Structural Frame
+- [ ] Member sizes and grades specified
+- [ ] Connection details provided
+- [ ] Load paths clear and continuous
+- [ ] Bracing system defined
+- [ ] Movement joints / expansion joints shown
+- [ ] Fire rating requirements noted
+
+### 4. Coordination Checks
+- [ ] Grid lines match architectural drawings
+- [ ] Slab penetrations shown and coordinated with services
+- [ ] Set-downs for wet areas / ramps shown
+- [ ] Beam depths clear of ceiling zones
+- [ ] Plant loads / dunnage shown
+
+### 5. Constructability
+- [ ] Construction sequence feasible
+- [ ] Propping requirements noted
+- [ ] Access for placement of concrete/steel
+- [ ] Formwork complexity reasonable
+- [ ] Precast connection tolerances adequate
+
+## Output Format
+
+| # | Check Item | Status | Comment / Issue |
+|---|-----------|--------|-----------------|
+
+Followed by:
+- **Critical Issues** — Must resolve before construction
+- **Recommendations** — Suggested improvements
+- **RFIs Required** — Questions for the design team`
+      },
+      "clash-detection.md": {
+        label: "clash-detection.md",
+        description: "Identify and categorise coordination clashes between building disciplines from drawing reviews or BIM clash reports.",
+        content: `---
+description: Identify and categorise coordination clashes between building disciplines from drawing reviews or BIM clash reports. Trigger when the user mentions clash detection, coordination issues, BIM clashes, discipline conflicts, or services coordination.
+---
+
+# Clash Detection & Coordination Review
+
+You are a BIM coordinator and design manager reviewing inter-discipline coordination.
+
+## Task
+
+Identify, categorise, and prioritise coordination clashes between building disciplines.
+
+### 1. Clash Categories
+
+| Category | Description | Priority |
+|----------|-------------|----------|
+| **Hard Clash** | Physical intersection of elements (pipe through beam) | Critical |
+| **Soft Clash** | Insufficient clearance for access/maintenance | High |
+| **Workflow Clash** | Sequencing or phasing conflict | Medium |
+| **Standards Clash** | Non-compliance with codes/standards | High |
+
+### 2. Common Clash Zones
+Systematically check these high-risk areas:
+- **Ceiling spaces** — HVAC ducts vs structure vs cable trays vs hydraulics
+- **Risers & shafts** — Vertical services coordination
+- **Plant rooms** — Equipment clearances, maintenance access
+- **Penetrations** — Through slabs, beams, walls, fire-rated elements
+- **Wet areas** — Set-downs, waterproofing, falls, wastes
+- **Facade zone** — Structure vs cladding vs services
+
+### 3. Clash Report Format
+
+| ID | Zone/Level | Disciplines | Clash Type | Description | Severity | Resolution | Owner | Status |
+|----|-----------|-------------|------------|-------------|----------|------------|-------|--------|
+
+### 4. Resolution Strategies
+For each clash, recommend:
+- Which discipline should move/resize
+- Impact on other systems
+- Whether RFI is needed
+- Cost/program impact of resolution
+
+### 5. Summary Dashboard
+- Total clashes by category and severity
+- Clashes by zone/level
+- Clashes by responsible discipline
+- Trend compared to previous report (if applicable)`
+      },
+      "specification-compliance.md": {
+        label: "specification-compliance.md",
+        description: "Check construction materials, products, or methods against project specifications and relevant Australian Standards.",
+        content: `---
+description: Check construction materials, products, or methods against project specifications and relevant Australian Standards. Trigger when the user mentions specification check, compliance review, material approval, standards compliance, or spec conformance.
+---
+
+# Specification Compliance Checker
+
+You are a senior architect and specification writer checking compliance against project specifications and Australian Standards.
+
+## Task
+
+Assess the submitted material, product, or method against the relevant specification requirements.
+
+### 1. Specification Review
+- Identify the relevant specification clause(s)
+- Extract the mandatory requirements ("shall", "must")
+- Note advisory requirements ("should", "may")
+- Identify referenced standards (AS/NZS, EN, ASTM, etc.)
+
+### 2. Compliance Assessment
+
+| Requirement | Spec Clause | Required | Submitted | Compliant | Notes |
+|------------|-------------|----------|-----------|-----------|-------|
+| Material grade | | | | ✅/❌ | |
+| Fire rating | | | | ✅/❌ | |
+| Acoustic rating | | | | ✅/❌ | |
+| Durability class | | | | ✅/❌ | |
+| Finish/colour | | | | ✅/❌ | |
+| Warranty | | | | ✅/❌ | |
+| Certification | | | | ✅/❌ | |
+
+### 3. Standards Check
+- Does the product/material comply with referenced Australian Standards?
+- Is CodeMark or other certification current?
+- Are test certificates/reports provided and current?
+- Does the manufacturer's data sheet confirm compliance?
+
+### 4. Substitution Assessment (if applicable)
+If the submission is an alternative to the specified product:
+- Is it "equivalent or superior"?
+- What are the differences?
+- Are there program, cost, or coordination impacts?
+- Does it require a design change?
+
+## Output
+- **Compliance Status:** Compliant / Non-Compliant / Conditionally Compliant
+- **Issues Found:** Listed with spec clause references
+- **Conditions (if applicable):** What's needed for approval
+- **Recommendation:** Approve / Reject / Approve subject to conditions`
+      }
+    }
+  },
+  "safety-compliance": {
+    label: "safety-compliance",
+    color: "safety",
+    children: {
+      "swms-generator.md": {
+        label: "swms-generator.md",
+        description: "Generate a Safe Work Method Statement (SWMS) for high-risk construction work in accordance with Australian WHS regulations.",
+        content: `---
+description: Generate a Safe Work Method Statement (SWMS) for high-risk construction work in accordance with Australian WHS regulations. Trigger when the user mentions SWMS, safe work method statement, high risk work, safety method, or JSA/JHA for construction.
+---
+
+# SWMS Generator
+
+You are a WHS professional generating Safe Work Method Statements for construction activities in Australia.
+
+## Task
+
+Generate a comprehensive SWMS for the high-risk construction work described by the user.
+
+### 1. Header Information
+- **Project:** [Name and address]
+- **Activity:** [Description of work]
+- **SWMS No:** [Reference]
+- **Date:** [Preparation date]
+- **Revision:** [Number]
+- **Prepared by:** [Name/Role]
+
+### 2. High-Risk Construction Work Identification
+Check applicable categories per WHS Regulations:
+- [ ] Work at height (>2m risk of fall)
+- [ ] Demolition
+- [ ] Excavation/trenching (>1.5m depth)
+- [ ] Confined space
+- [ ] Work near energised electrical
+- [ ] Work involving cranes/hoists
+- [ ] Work near traffic/moving plant
+- [ ] Work in/near water
+- [ ] Work involving hazardous chemicals
+- [ ] Work involving asbestos
+- [ ] Structural alterations requiring temporary support
+- [ ] Work near pressurised services
+
+### 3. Step-by-Step Risk Assessment
+
+| Step | Activity | Hazards | Risk (L×C) | Control Measures | Residual Risk | Responsible |
+|------|----------|---------|------------|------------------|---------------|-------------|
+
+### 4. Hierarchy of Controls
+For each hazard, apply controls in order:
+1. **Eliminate** — Remove the hazard entirely
+2. **Substitute** — Replace with less hazardous alternative
+3. **Isolate** — Separate people from the hazard
+4. **Engineering** — Physical controls (guardrails, barriers)
+5. **Administrative** — Procedures, training, signage
+6. **PPE** — Last resort personal protective equipment
+
+### 5. Required Sections
+- PPE requirements (with specifics, not just "as required")
+- Emergency procedures specific to this activity
+- Training/competency requirements (tickets, licences)
+- Plant and equipment requirements
+- Environmental controls
+- Communication plan
+- Monitoring and review triggers
+
+### Important Notes
+- A SWMS is a legal document — it must be specific, not generic
+- Workers must be consulted in its preparation
+- Workers must sign before commencing work
+- Review triggers: incident, near miss, change in conditions, new worker`
+      },
+      "site-safety-audit.md": {
+        label: "site-safety-audit.md",
+        description: "Conduct a structured site safety audit/inspection using a comprehensive checklist aligned with Australian WHS requirements.",
+        content: `---
+description: Conduct a structured site safety audit/inspection using a comprehensive checklist aligned with Australian WHS requirements. Trigger when the user mentions safety audit, safety inspection, site inspection, WHS audit, or safety walkthrough.
+---
+
+# Site Safety Audit Checklist
+
+You are a WHS advisor conducting a structured site safety audit on an Australian construction site.
+
+## Task
+
+Guide the user through a comprehensive safety audit, or review their findings against this checklist.
+
+### Audit Details
+- **Project:** [Name]
+- **Date:** [Date]
+- **Auditor:** [Name/Role]
+- **Weather conditions:** [Current conditions]
+- **Personnel on site:** [Approximate number]
+
+### 1. Site Access & Security
+
+| # | Item | C / NC / NA | Observations | Action Required |
+|---|------|-------------|-------------|-----------------|
+| 1.1 | Site perimeter fencing secure | | | |
+| 1.2 | Access gates controlled | | | |
+| 1.3 | Site signage displayed (WHS, emergency) | | | |
+| 1.4 | Visitor sign-in process | | | |
+| 1.5 | Site induction records current | | | |
+
+### 2. Housekeeping & Access
+
+| # | Item | C / NC / NA | Observations | Action Required |
+|---|------|-------------|-------------|-----------------|
+| 2.1 | Work areas clean and tidy | | | |
+| 2.2 | Walkways clear and defined | | | |
+| 2.3 | Materials stored safely | | | |
+| 2.4 | Waste managed appropriately | | | |
+| 2.5 | Lighting adequate | | | |
+
+### 3. Fall Prevention
+
+| # | Item | C / NC / NA | Observations | Action Required |
+|---|------|-------------|-------------|-----------------|
+| 3.1 | Edge protection in place (>2m) | | | |
+| 3.2 | Penetrations covered/guarded | | | |
+| 3.3 | Scaffolding tagged and compliant | | | |
+| 3.4 | Ladders secured and in good condition | | | |
+| 3.5 | EWPs being used correctly | | | |
+
+### 4. Electrical Safety
+
+| # | Item | C / NC / NA | Observations | Action Required |
+|---|------|-------------|-------------|-----------------|
+| 4.1 | RCDs in use and tested | | | |
+| 4.2 | Leads in good condition, tagged | | | |
+| 4.3 | Switchboards locked/secured | | | |
+| 4.4 | Underground services located | | | |
+
+### 5. Plant & Equipment
+
+| # | Item | C / NC / NA | Observations | Action Required |
+|---|------|-------------|-------------|-----------------|
+| 5.1 | Plant pre-start checklists completed | | | |
+| 5.2 | Operators hold valid licences | | | |
+| 5.3 | Exclusion zones established | | | |
+| 5.4 | Lifting plans for crane works | | | |
+
+### 6. Emergency Preparedness
+
+| # | Item | C / NC / NA | Observations | Action Required |
+|---|------|-------------|-------------|-----------------|
+| 6.1 | First aid kit stocked and accessible | | | |
+| 6.2 | First aider on site | | | |
+| 6.3 | Emergency evacuation plan displayed | | | |
+| 6.4 | Fire extinguishers serviced | | | |
+| 6.5 | Emergency contact numbers displayed | | | |
+
+### Audit Summary
+- **Total items checked:** [X]
+- **Compliant:** [X] (X%)
+- **Non-compliant:** [X] (X%)
+- **Critical findings requiring immediate action:** [List]
+- **Overall risk rating:** Low / Medium / High / Critical`
+      },
+      "incident-report.md": {
+        label: "incident-report.md",
+        description: "Draft a construction site incident/accident report with root cause analysis and corrective actions.",
+        content: `---
+description: Draft a construction site incident/accident report with root cause analysis and corrective actions. Trigger when the user mentions incident report, accident report, near miss report, injury report, or incident investigation.
+---
+
+# Incident Report & Investigation
+
+You are a WHS manager investigating and reporting on a construction site incident.
+
+## Task
+
+Draft a comprehensive incident report from the information provided by the user.
+
+### 1. Incident Details
+
+| Field | Details |
+|-------|---------|
+| **Incident type** | Injury / Near miss / Property damage / Environmental |
+| **Date & time** | |
+| **Location** | Specific site location |
+| **Weather conditions** | |
+| **Persons involved** | Name, role, employer |
+| **Witnesses** | Name, role, contact |
+| **Severity classification** | First aid / Medical treatment / Lost time / Serious |
+
+### 2. Incident Description
+Write a clear, factual narrative:
+- What was the task being performed?
+- What happened immediately before the incident?
+- What happened during the incident?
+- What was the immediate response?
+- What was the outcome (injury type, damage extent)?
+
+### 3. Root Cause Analysis (5 Whys)
+
+| Level | Question | Answer |
+|-------|----------|--------|
+| Why 1 | Why did the incident occur? | |
+| Why 2 | Why did [answer 1] happen? | |
+| Why 3 | Why did [answer 2] happen? | |
+| Why 4 | Why did [answer 3] happen? | |
+| Why 5 | Why did [answer 4] happen? | |
+
+**Root Cause Category:**
+- [ ] Inadequate procedures
+- [ ] Inadequate training
+- [ ] Equipment failure
+- [ ] Environmental conditions
+- [ ] Human error
+- [ ] Inadequate supervision
+- [ ] Design deficiency
+
+### 4. Corrective Actions
+
+| # | Action | Type | Responsible | Due Date | Status |
+|---|--------|------|-------------|----------|--------|
+| | | Immediate / Short-term / Long-term | | | |
+
+### 5. Notifications
+- [ ] Regulator notification required? (Notifiable incident per WHS Act)
+- [ ] Principal/client notified
+- [ ] Insurer notified
+- [ ] Worker representative consulted
+
+### 6. Lessons Learned
+- What went wrong?
+- What barriers failed?
+- What can be done differently?
+- How will this be communicated to the workforce?`
+      }
+    }
+  },
+  "procurement": {
+    label: "procurement",
+    color: "procurement",
+    children: {
+      "tender-evaluation.md": {
+        label: "tender-evaluation.md",
+        description: "Evaluate construction tenders using a weighted criteria assessment matrix for price and non-price factors.",
+        content: `---
+description: Evaluate construction tenders using a weighted criteria assessment matrix for price and non-price factors. Trigger when the user mentions tender evaluation, bid assessment, tender comparison, tender analysis, or procurement evaluation.
+---
+
+# Tender Evaluation Matrix
+
+You are a procurement specialist evaluating construction tenders for a building project.
+
+## Task
+
+Evaluate tenders received using a structured, transparent, and defensible methodology.
+
+### 1. Compliance Check (Pass/Fail)
+
+| Requirement | Tenderer A | Tenderer B | Tenderer C |
+|-------------|-----------|-----------|-----------|
+| Submitted by deadline | ✅/❌ | ✅/❌ | ✅/❌ |
+| All forms completed | ✅/❌ | ✅/❌ | ✅/❌ |
+| Insurance requirements met | ✅/❌ | ✅/❌ | ✅/❌ |
+| Licence/registration current | ✅/❌ | ✅/❌ | ✅/❌ |
+| No material qualifications | ✅/❌ | ✅/❌ | ✅/❌ |
+
+### 2. Weighted Criteria Assessment
+
+| Criteria | Weight | Tenderer A | | Tenderer B | | Tenderer C | |
+|----------|--------|------|--------|------|--------|------|--------|
+| | | Score | Weighted | Score | Weighted | Score | Weighted |
+| **Price** | 40% | /10 | | /10 | | /10 | |
+| **Experience & track record** | 15% | /10 | | /10 | | /10 | |
+| **Methodology & program** | 15% | /10 | | /10 | | /10 | |
+| **Key personnel** | 10% | /10 | | /10 | | /10 | |
+| **WHS capability** | 10% | /10 | | /10 | | /10 | |
+| **Local content / sustainability** | 10% | /10 | | /10 | | /10 | |
+| **Total** | 100% | | | | | | |
+
+### 3. Price Analysis
+- Lump sum comparison
+- Rate comparison for key items
+- Provisional sum and prime cost analysis
+- Qualifications and exclusions impact on price
+- Adjusted price (normalised for scope differences)
+
+### 4. Risk Assessment
+For each tenderer, assess:
+- Financial stability risk
+- Capacity risk (current workload)
+- Performance risk (past project outcomes)
+- Contractual risk (qualifications/departures)
+
+### 5. Recommendation
+- Ranking with rationale
+- Value-for-money assessment
+- Conditions of engagement
+- Recommended clarifications before award`
+      },
+      "subcontractor-prequalification.md": {
+        label: "subcontractor-prequalification.md",
+        description: "Assess subcontractor prequalification submissions against financial, safety, capability, and compliance criteria.",
+        content: `---
+description: Assess subcontractor prequalification submissions against financial, safety, capability, and compliance criteria. Trigger when the user mentions prequalification, subcontractor assessment, contractor prequalification, supply chain evaluation, or vendor qualification.
+---
+
+# Subcontractor Prequalification Assessment
+
+You are a procurement and risk manager assessing subcontractor prequalification submissions.
+
+## Task
+
+Evaluate the subcontractor's prequalification submission against a comprehensive framework.
+
+### 1. Company Profile
+
+| Item | Details | Verified |
+|------|---------|----------|
+| Company name / ABN | | ✅/❌ |
+| Years in operation | | |
+| Number of employees | | |
+| Annual turnover | | |
+| Key contacts | | |
+
+### 2. Financial Assessment
+
+| Criteria | Requirement | Submitted | Status |
+|----------|-------------|-----------|--------|
+| Financial statements (2 years) | Required | | ✅/❌ |
+| Current ratio >1.0 | Required | | ✅/❌ |
+| Debt-to-equity ratio | <2.0 | | ✅/❌ |
+| Bank/trade references | 2 minimum | | ✅/❌ |
+| Maximum single project value | >$[X] | | ✅/❌ |
+
+### 3. Safety Assessment
+
+| Criteria | Requirement | Submitted | Status |
+|----------|-------------|-----------|--------|
+| WHS management system | Required | | ✅/❌ |
+| LTIFR (3-year average) | <[X] | | ✅/❌ |
+| TRIFR (3-year average) | <[X] | | ✅/❌ |
+| Notifiable incidents (2 years) | Disclose | | ✅/❌ |
+| Safety certifications | AS/NZS 4801 or ISO 45001 | | ✅/❌ |
+
+### 4. Capability Assessment
+
+| Criteria | Requirement | Submitted | Status |
+|----------|-------------|-----------|--------|
+| Relevant project experience | 3 similar projects | | ✅/❌ |
+| Key personnel CVs | Required | | ✅/❌ |
+| Plant & equipment register | Required | | ✅/❌ |
+| Quality management system | ISO 9001 preferred | | ✅/❌ |
+| Environmental management | ISO 14001 preferred | | ✅/❌ |
+
+### 5. Compliance
+
+| Criteria | Requirement | Submitted | Status |
+|----------|-------------|-----------|--------|
+| Insurances (PL, PI, WC) | Required | | ✅/❌ |
+| Builder's licence | Required | | ✅/❌ |
+| Industrial relations record | Clean | | ✅/❌ |
+| Modern slavery statement | If applicable | | ✅/❌ |
+
+### 6. Reference Checks
+
+| Referee | Project | Value | Feedback Summary | Rating |
+|---------|---------|-------|-----------------|--------|
+
+### 7. Overall Assessment
+- **Category:** Approved / Conditionally Approved / Not Approved
+- **Maximum project value:** $[X]
+- **Approved work types:** [List]
+- **Conditions:** [If any]
+- **Review date:** [12 months from approval]`
+      },
+      "material-submittal-review.md": {
+        label: "material-submittal-review.md",
+        description: "Review a construction material or product submittal for specification compliance, quality, and suitability.",
+        content: `---
+description: Review a construction material or product submittal for specification compliance, quality, and suitability. Trigger when the user mentions material submittal, product approval, shop drawing review, material submission, or sample approval.
+---
+
+# Material Submittal Review
+
+You are a design manager and quality assurance specialist reviewing material submittals for a construction project.
+
+## Task
+
+Review the material/product submittal against project requirements.
+
+### 1. Submittal Information
+
+| Field | Details |
+|-------|---------|
+| Submittal No. | |
+| Date received | |
+| Contractor | |
+| Specification section | |
+| Product/material | |
+| Manufacturer | |
+| Submission includes | Data sheet / Sample / Test certs / Shop drawings |
+
+### 2. Specification Compliance Check
+
+| Spec Requirement | Clause | Required | Submitted | Status |
+|-----------------|--------|----------|-----------|--------|
+| Material type/grade | | | | ✅/❌ |
+| Performance criteria | | | | ✅/❌ |
+| Fire rating | | | | ✅/❌ |
+| Acoustic rating | | | | ✅/❌ |
+| Durability/warranty | | | | ✅/❌ |
+| Finish/appearance | | | | ✅/❌ |
+| Dimensional requirements | | | | ✅/❌ |
+| Sustainability/VOC | | | | ✅/❌ |
+
+### 3. Standards Compliance
+
+| Standard | Required | Certified | Current | Status |
+|----------|----------|-----------|---------|--------|
+| AS/NZS [XXXX] | | | | ✅/❌ |
+| CodeMark/WaterMark | | | | ✅/❌ |
+| NCC/BCA compliance | | | | ✅/❌ |
+
+### 4. Quality Documentation Review
+- [ ] Manufacturer's data sheet provided and current
+- [ ] Test certificates/reports provided
+- [ ] Test reports from NATA-accredited laboratory
+- [ ] Installation instructions provided
+- [ ] Maintenance requirements documented
+- [ ] Warranty terms and conditions provided
+
+### 5. Disposition
+
+| Status | Code | Meaning |
+|--------|------|---------|
+| ✅ Approved | A | No exceptions taken |
+| ✅ Approved as Noted | B | Minor comments, proceed with corrections |
+| ❌ Revise & Resubmit | C | Significant issues, do not proceed |
+| ❌ Rejected | D | Does not meet requirements |
+
+**Disposition:** [A / B / C / D]
+
+**Comments:**
+[Detailed reviewer comments]
+
+**Conditions (if applicable):**
+[List any conditions of approval]`
+      }
+    }
+  }
+};
+
+// ============================================================
+// APPLICATION LOGIC
+// ============================================================
+
+let currentSkill = null;
+let currentSkillRaw = null;
+
+// Build the file tree
+function buildTree() {
+  const tree = document.getElementById('fileTree');
+  let html = '';
+
+  // Root folder
+  html += `<div class="tree-item depth-0" onclick="toggleFolder(this)">
+    <span class="chevron open">▶</span>
+    <span class="icon folder-icon">📂</span>
+    <span>.claude</span>
+  </div>`;
+  html += `<div class="folder-children open">`;
+
+  html += `<div class="tree-item depth-1" onclick="toggleFolder(this)">
+    <span class="chevron open">▶</span>
+    <span class="icon folder-icon">📂</span>
+    <span>skills</span>
+    <span class="tag tag-folder">skills</span>
+  </div>`;
+  html += `<div class="folder-children open">`;
+
+  const colorMap = {
+    contract: 'cat-contract',
+    estimating: 'cat-estimating',
+    project: 'cat-project',
+    design: 'cat-design',
+    safety: 'cat-safety',
+    procurement: 'cat-procurement',
+  };
+
+  for (const [folderKey, folder] of Object.entries(skills)) {
+    const catClass = colorMap[folder.color] || '';
+
+    html += `<div class="tree-item depth-2" onclick="toggleFolder(this)">
+      <span class="chevron">▶</span>
+      <span class="icon folder-icon">📁</span>
+      <span>${folder.label}</span>
+    </div>`;
+    html += `<div class="folder-children">`;
+
+    for (const [fileKey, file] of Object.entries(folder.children)) {
+      html += `<div class="tree-item depth-3 ${catClass}" data-folder="${folderKey}" data-file="${fileKey}" onclick="selectSkill('${folderKey}', '${fileKey}')">
+        <span class="chevron" style="visibility:hidden">▶</span>
+        <span class="icon file-icon">📄</span>
+        <span>${file.label}</span>
+        <span class="tag tag-skill">skill</span>
+      </div>`;
+    }
+
+    html += `</div>`;
+  }
+
+  html += `</div></div>`;
+  tree.innerHTML = html;
+}
+
+function toggleFolder(el) {
+  const children = el.nextElementSibling;
+  if (children && children.classList.contains('folder-children')) {
+    children.classList.toggle('open');
+    const chevron = el.querySelector('.chevron');
+    chevron.classList.toggle('open');
+    // swap folder icon
+    const icon = el.querySelector('.folder-icon');
+    if (icon) {
+      icon.textContent = children.classList.contains('open') ? '📂' : '📁';
+    }
+  }
+}
+
+function selectSkill(folderKey, fileKey) {
+  const file = skills[folderKey].children[fileKey];
+  if (!file) return;
+
+  currentSkill = file;
+  currentSkillRaw = file.content;
+
+  // Update active state
+  document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+  const item = document.querySelector(`[data-folder="${folderKey}"][data-file="${fileKey}"]`);
+  if (item) item.classList.add('active');
+
+  // Update path
+  document.getElementById('contentPath').innerHTML =
+    `.claude / skills / <span>${folderKey}</span> / <span>${fileKey}</span>`;
+
+  // Show copy button
+  document.getElementById('btnCopy').classList.add('visible');
+
+  // Update tab
+  const tab = document.getElementById('tab-skill');
+  tab.textContent = fileKey;
+  tab.classList.add('active');
+  document.querySelector('.header-tab:first-child').classList.remove('active');
+
+  // Render content
+  renderSkill(file);
+}
+
+function renderSkill(file) {
+  const body = document.getElementById('contentBody');
+
+  // Parse out the frontmatter description
+  const content = file.content;
+  let mainContent = content;
+  let description = file.description;
+
+  // Remove frontmatter from rendering
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (fmMatch) {
+    mainContent = fmMatch[2];
+  }
+
+  // Render markdown
+  const rendered = marked.parse(mainContent);
+
+  body.innerHTML = `
+    <div class="md-content">
+      <div class="skill-description">${description}</div>
+      ${rendered}
+    </div>
+  `;
+}
+
+function showWelcome() {
+  currentSkill = null;
+  currentSkillRaw = null;
+
+  document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('btnCopy').classList.remove('visible');
+  document.getElementById('contentPath').innerHTML = '';
+
+  document.querySelector('.header-tab:first-child').classList.add('active');
+  document.getElementById('tab-skill').classList.remove('active');
+  document.getElementById('tab-skill').textContent = 'SKILL.md';
+
+  const body = document.getElementById('contentBody');
+  body.innerHTML = `
+    <div class="welcome">
+      <div class="welcome-title">CONSTRUCTION<br>SKILLS IDE</div>
+      <div class="welcome-sub">
+        A collection of AI skills for building and construction professionals.
+        Browse the folder tree, click a skill to preview it, then copy it into Claude or Cowork.
+      </div>
+      <div class="welcome-instructions">
+        <span class="step-num">1</span> Browse the <span class="highlight">file tree</span> on the left<br>
+        <span class="step-num">2</span> Click any <span class="highlight">skill</span> to preview it<br>
+        <span class="step-num">3</span> Hit <span class="highlight">Copy Skill</span> to grab the markdown<br>
+        <span class="step-num">4</span> Paste into <span class="highlight">Claude</span> or <span class="highlight">Cowork</span>
+      </div>
+      <div class="quick-start" id="quickStart"></div>
+    </div>
+  `;
+
+  // Add quick-start chips
+  const qs = document.getElementById('quickStart');
+  const categories = Object.keys(skills);
+  categories.forEach(cat => {
+    const chip = document.createElement('span');
+    chip.className = 'quick-chip';
+    chip.textContent = cat;
+    chip.onclick = () => {
+      // Expand folder and select first skill
+      const firstFile = Object.keys(skills[cat].children)[0];
+      // Open the folder in the tree
+      document.querySelectorAll('.tree-item.depth-2').forEach(el => {
+        if (el.textContent.includes(cat)) {
+          const children = el.nextElementSibling;
+          if (children && !children.classList.contains('open')) {
+            toggleFolder(el);
+          }
+        }
+      });
+      selectSkill(cat, firstFile);
+    };
+    qs.appendChild(chip);
+  });
+}
+
+function copySkill() {
+  if (!currentSkillRaw) return;
+
+  navigator.clipboard.writeText(currentSkillRaw).then(() => {
+    const btn = document.getElementById('btnCopy');
+    const icon = document.getElementById('copyIcon');
+    btn.classList.add('copied');
+    icon.textContent = '✅';
+    btn.innerHTML = '<span>✅</span> Copied!';
+
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<span>📋</span> Copy Skill';
+    }, 2000);
+  });
+}
+
+function filterTree(query) {
+  const q = query.toLowerCase().trim();
+  const items = document.querySelectorAll('.tree-item.depth-3');
+
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    const folderKey = item.dataset.folder;
+    const fileKey = item.dataset.file;
+    const desc = skills[folderKey]?.children[fileKey]?.description?.toLowerCase() || '';
+
+    if (!q || text.includes(q) || desc.includes(q) || folderKey.includes(q)) {
+      item.classList.remove('hidden');
+    } else {
+      item.classList.add('hidden');
+    }
+  });
+
+  // Auto-expand folders that have visible children
+  if (q) {
+    document.querySelectorAll('.folder-children').forEach(fc => {
+      const hasVisible = fc.querySelector('.tree-item.depth-3:not(.hidden)');
+      if (hasVisible && !fc.classList.contains('open')) {
+        fc.classList.add('open');
+        const chevron = fc.previousElementSibling?.querySelector('.chevron');
+        if (chevron) chevron.classList.add('open');
+        const icon = fc.previousElementSibling?.querySelector('.folder-icon');
+        if (icon) icon.textContent = '📂';
+      }
+    });
+  }
+}
+
+// Initialize
+buildTree();
+showWelcome();
+
+// Count skills
+let totalSkills = 0;
+Object.values(skills).forEach(folder => {
+  totalSkills += Object.keys(folder.children).length;
+});
+document.getElementById('skillCount').textContent = totalSkills + ' skills';
+</script>
+
+</body>
+</html>
