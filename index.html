@@ -821,7 +821,8 @@
     <div class="sidebar-header">
       Explorer <span class="badge">skills</span>
       <div class="sidebar-actions">
-        <button onclick="openNewSkillModal()" title="Add new skill">+ New</button>
+        <button onclick="openNewSkillModal()" title="Suggest a new skill">+ Suggest</button>
+        <button onclick="openReviewModal()" title="Review pending suggestions" id="btnReview" style="display:none;">Review <span id="reviewBadge" style="background:var(--accent-pink);color:#fff;border-radius:50%;padding:0 5px;font-size:10px;margin-left:3px;"></span></button>
         <button onclick="exportSkills()" title="Export skills.json">Export</button>
       </div>
     </div>
@@ -861,51 +862,35 @@
   </div>
 </div>
 
-<!-- New Skill Modal -->
+<!-- Suggest a Skill Modal -->
 <div class="modal-overlay" id="newSkillModal">
   <div class="modal">
     <div class="modal-header">
-      <h2>New Skill</h2>
+      <h2>Suggest a Skill</h2>
       <button class="modal-close" onclick="closeNewSkillModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Category</label>
-          <select id="skillCategory">
-            <option value="">Select a category...</option>
-            <option value="__new__">+ New Category</option>
-          </select>
-        </div>
-        <div class="form-group" id="newCategoryGroup" style="display:none">
-          <label>New Category Key</label>
-          <input type="text" id="newCategoryKey" placeholder="e.g. quality-assurance">
-          <span class="form-hint">lowercase with hyphens</span>
-        </div>
+      <div class="suggestion-notice" style="background:rgba(158,206,106,0.1);border:1px solid var(--accent-green);border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--accent-green);">
+        Suggestions are saved locally for review. They won't appear in the skills library until approved by an administrator.
       </div>
-      <div class="form-group" id="newCategoryColorGroup" style="display:none">
-        <label>Category Color</label>
-        <select id="newCategoryColor">
-          <option value="contract">Orange (contract)</option>
-          <option value="estimating">Green (estimating)</option>
-          <option value="project">Blue (project)</option>
-          <option value="design">Purple (design)</option>
-          <option value="safety">Pink (safety)</option>
-          <option value="procurement">Cyan (procurement)</option>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="skillCategory">
+          <option value="">Select a category...</option>
         </select>
       </div>
       <div class="form-group">
         <label>Skill Filename</label>
-        <input type="text" id="skillFilename" placeholder="e.g. my-new-skill.md">
-        <span class="form-hint">.md extension added automatically if omitted</span>
+        <input type="text" id="skillFilename" placeholder="e.g. my-new-skill" maxlength="100">
+        <span class="form-hint">Lowercase, hyphens only. .md extension added automatically.</span>
       </div>
       <div class="form-group">
         <label>Description</label>
-        <input type="text" id="skillDescription" placeholder="A short description of what this skill does and when to trigger it">
+        <input type="text" id="skillDescription" placeholder="A short description of what this skill does and when to trigger it" maxlength="500">
       </div>
       <div class="form-group">
         <label>Skill Content (Markdown)</label>
-        <textarea id="skillContent" placeholder="---
+        <textarea id="skillContent" maxlength="50000" placeholder="---
 description: Trigger description for Claude...
 ---
 
@@ -920,7 +905,23 @@ You are a...
     </div>
     <div class="modal-footer">
       <button class="btn-modal btn-modal-cancel" onclick="closeNewSkillModal()">Cancel</button>
-      <button class="btn-modal btn-modal-primary" id="btnAddSkill" onclick="addSkill()">Add Skill</button>
+      <button class="btn-modal btn-modal-primary" id="btnAddSkill" onclick="submitSuggestion()">Submit Suggestion</button>
+    </div>
+  </div>
+</div>
+
+<!-- Review Suggestions Modal -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal" style="max-width:900px;">
+    <div class="modal-header">
+      <h2>Review Suggestions</h2>
+      <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="reviewBody" style="max-height:70vh;overflow-y:auto;">
+      <!-- Populated by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal btn-modal-cancel" onclick="closeReviewModal()">Close</button>
     </div>
   </div>
 </div>
@@ -950,6 +951,7 @@ function initApp() {
   renderTabs();
   showWelcome();
   updateSkillCount();
+  updateReviewButton();
 }
 
 // Fallback inline data (subset) in case skills.json is unavailable
@@ -2063,6 +2065,1030 @@ Review the material/product submittal against project requirements.
 [List any conditions of approval]`
       }
     }
+  },
+  "claims-disputes": {
+    label: "claims-disputes",
+    color: "claims",
+    children: {
+      "delay-analysis-report.md": {
+        label: "delay-analysis-report.md",
+        description: "Perform a forensic delay analysis on a construction project using recognised methodologies (TIA, collapsed as-built, windows analysis) to quantify delays and apportion responsibility.",
+        content: `---
+description: Perform a forensic delay analysis on a construction project using recognised methodologies (TIA, collapsed as-built, windows analysis) to quantify delays and apportion responsibility. Trigger when the user mentions delay analysis, forensic delay, delay claim, critical path delay, windows analysis, or time impact analysis.
+---
+
+# Forensic Delay Analysis Report
+
+You are a forensic programming expert specialising in construction delay analysis under Australian and international contracts.
+
+## Task
+
+Analyse the delay circumstances provided and produce a forensic delay analysis report.
+
+### 1. Methodology Selection
+Recommend the most appropriate method based on available data:
+
+| Method | Best For | Data Required |
+|--------|----------|---------------|
+| **Time Impact Analysis (TIA)** | Prospective, detailed | Baseline + updates + delay events |
+| **Windows Analysis** | Retrospective, complex | As-planned + as-built + contemporaneous records |
+| **Collapsed As-Built** | Retrospective, limited data | As-built programme |
+| **As-Planned vs As-Built** | Simple disputes | Baseline + as-built |
+| **Impacted As-Planned** | Early-stage claims | Baseline + delay events |
+
+Reference: SCL Delay and Disruption Protocol (2nd Edition)
+
+### 2. Delay Event Register
+
+| ID | Delay Event | Start | End | Duration | Cause Category | Responsibility | CP Impact |
+|----|-------------|-------|-----|----------|---------------|----------------|-----------|
+| DE-01 | | | | | Principal / Contractor / Neutral | | Yes/No |
+
+### 3. Critical Path Analysis
+For each delay window/period:
+- Identify the critical path at the point of delay
+- Determine whether the delay event impacted the critical path
+- Quantify the net delay to completion
+- Assess concurrency per the Malmaison approach
+
+### 4. Concurrency Assessment
+
+| Period | Principal Delay | Contractor Delay | Concurrent? | Net Entitlement |
+|--------|----------------|-----------------|-------------|-----------------|
+
+### 5. Delay Summary
+
+| Category | Days |
+|----------|------|
+| Original contract period | |
+| Approved EOTs | |
+| Claimed delay — Principal risk | |
+| Claimed delay — Contractor risk | |
+| Concurrent delay | |
+| Assessed completion date | |
+| Actual completion date | |
+
+### 6. Report Structure
+- Executive Summary
+- Methodology and assumptions
+- Chronological narrative
+- Delay event analysis (per event)
+- Critical path analysis
+- Concurrency assessment
+- Conclusions and recommendations`
+      },
+      "disruption-claim.md": {
+        label: "disruption-claim.md",
+        description: "Assess or prepare a construction disruption (loss of productivity) claim, quantifying the impact of disrupting events on labour and plant efficiency.",
+        content: `---
+description: Assess or prepare a construction disruption (loss of productivity) claim, quantifying the impact of disrupting events on labour and plant efficiency. Trigger when the user mentions disruption claim, loss of productivity, measured mile, labour inefficiency, or productivity loss.
+---
+
+# Disruption / Loss of Productivity Claim
+
+You are a quantum expert and claims consultant specialising in construction disruption analysis.
+
+## Task
+
+Analyse the disruption circumstances and quantify the productivity loss.
+
+### 1. Disruption vs Delay
+Clarify the distinction:
+- **Delay** = work takes longer to complete (time)
+- **Disruption** = work costs more to complete due to loss of productivity (cost)
+- A project can be disrupted without being delayed, and vice versa
+
+### 2. Disrupting Events
+Identify and categorise the alleged disrupting events:
+
+| ID | Event | Period | Impact Area | Causation |
+|----|-------|--------|-------------|----------|
+| | | | | Principal / Contractor / Third party |
+
+Common disrupting events:
+- Out-of-sequence working
+- Acceleration / stacking of trades
+- Restricted access
+- Design changes mid-construction
+- Stop-start working
+- Excessive RFIs / late information
+
+### 3. Quantification Methods
+
+| Method | Description | Reliability |
+|--------|-------------|-------------|
+| **Measured Mile** | Compare disrupted vs undisrupted productivity on same project | Highest |
+| **Earned Value Analysis** | Compare planned vs actual productivity using earned hours | High |
+| **Industry Studies** | Apply published productivity factors (e.g., Leonard, MCAA) | Medium |
+| **Total Cost** | Claim actual cost minus estimated cost (last resort) | Low |
+
+### 4. Measured Mile Analysis
+
+| Period | Activity | Planned Hours | Actual Hours | Productivity Factor | Disrupted? |
+|--------|----------|---------------|--------------|--------------------|-----------|
+| Baseline (undisrupted) | | | | 1.00 | No |
+| Period 1 | | | | | Yes/No |
+| Period 2 | | | | | Yes/No |
+
+**Lost hours** = Actual Hours − (Planned Hours × Baseline Productivity)
+**Cost of disruption** = Lost Hours × Blended Labour Rate
+
+### 5. Entitlement Framework
+- Is there a contractual basis for the claim? (variation, breach, qualifying cause)
+- Has the contractor complied with notice requirements?
+- Is the causal link between the disrupting event and productivity loss established?
+- Has the contractor mitigated its losses?
+
+### 6. Claim Summary
+- Total additional hours claimed
+- Total additional cost claimed
+- Breakdown by disrupting event
+- Supporting documentation checklist`
+      },
+      "progress-claim-assessment.md": {
+        label: "progress-claim-assessment.md",
+        description: "Prepare or assess a monthly progress claim / payment application for a construction contract, including valuation of work completed, variations, and retention.",
+        content: `---
+description: Prepare or assess a monthly progress claim / payment application for a construction contract, including valuation of work completed, variations, and retention. Trigger when the user mentions progress claim, payment claim, payment certificate, monthly claim, payment schedule, or valuation.
+---
+
+# Progress Claim / Payment Assessment
+
+You are a senior quantity surveyor preparing or assessing a monthly progress claim under an Australian construction contract.
+
+## Task
+
+Prepare or review the progress claim based on information provided.
+
+### 1. Claim Header
+
+| Field | Details |
+|-------|---------|
+| Project | |
+| Contract No. | |
+| Claim No. | |
+| Period | [Start] to [End] |
+| Due date (under contract) | |
+| Payment terms | [X] business days |
+
+### 2. Contract Sum Summary
+
+| Item | Amount ($) |
+|------|----------|
+| Original contract sum | |
+| Approved variations (net) | |
+| Adjusted contract sum | |
+
+### 3. Valuation of Work
+
+| Ref | Description | Contract Value | Previous | This Period | Cumulative | % Complete |
+|-----|-------------|---------------|----------|-------------|------------|------------|
+| | Lump sum items | | | | | |
+| | Measured work | | | | | |
+| | Provisional sums | | | | | |
+| | Prime cost items | | | | | |
+| | Day works | | | | | |
+| **Subtotal — Contract Work** | | | | | | |
+
+### 4. Variations
+
+| Var No. | Description | Status | Value ($) | Previous | This Period | Cumulative |
+|---------|-------------|--------|-----------|----------|-------------|------------|
+| | | Approved/Pending | | | | |
+| **Subtotal — Variations** | | | | | | |
+
+### 5. Claim Summary
+
+| Item | Amount ($) |
+|------|----------|
+| Gross value of work to date | |
+| Less retention (X%) | |
+| Less previous payments | |
+| **Net amount this claim** | |
+| GST | |
+| **Total payable** | |
+
+### 6. Assessment Notes
+- Items requiring site measurement verification
+- Disputed items and reasons
+- Unfixed materials on/off site
+- Defective work deductions
+- Liquidated damages (if applicable)
+
+### 7. Security of Payment
+Reminder of rights under Building and Construction Industry Security of Payment Act:
+- Payment schedule must be issued within [X] business days
+- Failure to issue = liability for full claimed amount
+- Adjudication rights if payment schedule is less than claimed amount`
+      }
+    }
+  },
+  "quality-management": {
+    label: "quality-management",
+    color: "quality",
+    children: {
+      "inspection-test-plan.md": {
+        label: "inspection-test-plan.md",
+        description: "Create an Inspection and Test Plan (ITP) for a construction activity, defining hold points, witness points, and quality verification requirements.",
+        content: `---
+description: Create an Inspection and Test Plan (ITP) for a construction activity, defining hold points, witness points, and quality verification requirements. Trigger when the user mentions ITP, inspection test plan, quality plan, hold point, witness point, or inspection checklist.
+---
+
+# Inspection and Test Plan (ITP)
+
+You are a quality manager developing Inspection and Test Plans for construction works.
+
+## Task
+
+Create a comprehensive ITP for the construction activity described by the user.
+
+### 1. ITP Header
+
+| Field | Details |
+|-------|---------|
+| Project | |
+| Activity / Trade | |
+| ITP No. | |
+| Revision | |
+| Applicable spec sections | |
+| Applicable drawings | |
+| Applicable standards | |
+
+### 2. Definitions
+
+| Symbol | Type | Description |
+|--------|------|-------------|
+| **H** | Hold Point | Work must STOP. Cannot proceed until inspected and released by [party]. Minimum [X] hours notice. |
+| **W** | Witness Point | [Party] to be notified and invited. Work may proceed if not attended after notice period. |
+| **R** | Review Point | Document review only — no physical inspection required. |
+| **D** | Document | Submit documentation for record. |
+
+### 3. ITP Schedule
+
+| Step | Activity / Process | Inspection / Test | Acceptance Criteria | Reference | Type | Contractor | Superintendent | Records |
+|------|-------------------|-------------------|--------------------|-----------|----- |------------|----------------|---------|
+| 1 | Pre-commencement | Review SWMS, ITP, materials | Approved ITP, SWMS signed | Spec cl. X | R | ✓ | ✓ | ITP sign-off |
+| 2 | Material delivery | Check delivery dockets, visual inspection | Match approved submittals | Spec cl. X | W | ✓ | ○ | Delivery records |
+| 3 | Set-out / survey | Verify levels, alignment, dimensions | Within ±Xmm tolerance | Drawing X | H | ✓ | ✓ | Survey report |
+| 4 | [Activity step] | [What to check] | [Pass criteria] | [Reference] | H/W/R | ✓ | ✓/○ | [Record type] |
+| 5 | Pre-pour / pre-cover | Final check before concealment | All previous items cleared | Spec cl. X | H | ✓ | ✓ | Checklist |
+| 6 | Testing | [Test type] | [Standard requirement] | AS XXXX | W | ✓ | ○ | Test certificate |
+| 7 | Completion | Final inspection, defect list | Defect-free, spec compliant | Spec cl. X | H | ✓ | ✓ | Completion cert |
+
+### 4. Typical ITPs by Trade
+If user doesn't specify, offer ITPs for common trades:
+- Concrete works (footings, slabs, columns)
+- Structural steel (fabrication, erection, connections)
+- Waterproofing
+- Mechanical services (ductwork, pipework)
+- Electrical (containment, cabling, switchboards)
+- Fire services (detection, suppression)
+
+### 5. Notes
+- All hold points require minimum [24] hours written notice
+- Non-conformances must be recorded on NCR form
+- ITP must be approved before work commences
+- Records to be maintained for [X] years post-completion`
+      },
+      "non-conformance-report.md": {
+        label: "non-conformance-report.md",
+        description: "Draft a Non-Conformance Report (NCR) for construction defects or deviations from specifications, including root cause analysis and corrective action.",
+        content: `---
+description: Draft a Non-Conformance Report (NCR) for construction defects or deviations from specifications, including root cause analysis and corrective action. Trigger when the user mentions NCR, non-conformance, non-conformity, defect report, quality issue, or deviation from specification.
+---
+
+# Non-Conformance Report (NCR)
+
+You are a quality assurance manager documenting and resolving non-conformances on a construction project.
+
+## Task
+
+Draft a comprehensive NCR for the defect or deviation described by the user.
+
+### 1. NCR Header
+
+| Field | Details |
+|-------|---------|
+| NCR No. | |
+| Date raised | |
+| Project | |
+| Location | Level / Grid / Zone |
+| Raised by | Name, Role |
+| Trade / Subcontractor | |
+| Priority | Critical / Major / Minor |
+
+### 2. Non-Conformance Description
+
+| Item | Details |
+|------|---------|
+| **What is the non-conformance?** | Clear, factual description of what was found |
+| **Specification requirement** | Clause reference and requirement |
+| **Drawing reference** | Applicable drawing(s) |
+| **Standard reference** | AS/NZS or other standard |
+| **How was it identified?** | Inspection / Testing / Audit / Observation |
+| **Extent** | Quantity, area, or scope affected |
+
+### 3. Supporting Evidence
+- [ ] Photographs attached (with annotations)
+- [ ] Test results attached
+- [ ] Survey results attached
+- [ ] Marked-up drawings attached
+
+### 4. Immediate Action Taken
+- Was work stopped?
+- Was the area isolated/protected?
+- Were affected materials quarantined?
+
+### 5. Root Cause Analysis
+
+| Cause Category | Applicable? | Details |
+|---------------|-------------|--------|
+| Design / documentation error | | |
+| Material defect | | |
+| Workmanship / skill | | |
+| Supervision failure | | |
+| Communication breakdown | | |
+| Equipment / tooling | | |
+| Environmental conditions | | |
+| Process / procedure gap | | |
+
+### 6. Proposed Corrective Action
+
+| Option | Description | Cost Impact | Program Impact | Recommended? |
+|--------|-------------|-------------|----------------|-------------|
+| **Rectify** | Remove and reconstruct to specification | $X | X days | |
+| **Repair** | In-situ repair to achieve compliance | $X | X days | |
+| **Concession** | Accept as-is with engineering justification | Nil | Nil | |
+| **Downgrade** | Accept for lesser use/application | TBD | TBD | |
+
+### 7. Sign-Off
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Raised by | | | |
+| Contractor response | | | |
+| Superintendent disposition | | | |
+| Close-out verification | | | |
+
+### 8. Preventive Action
+- What systemic change will prevent recurrence?
+- Toolbox talk / training required?
+- Process or ITP update needed?
+- Trend analysis — is this a recurring issue?`
+      },
+      "defect-list-manager.md": {
+        label: "defect-list-manager.md",
+        description: "Create and manage a construction defect list (snag list / punch list) for practical completion inspections.",
+        content: `---
+description: Create and manage a construction defect list (snag list / punch list) for practical completion inspections. Trigger when the user mentions defect list, punch list, snag list, practical completion, defect inspection, or snagging.
+---
+
+# Defect List / Punch List Manager
+
+You are a superintendent's representative conducting practical completion inspections and managing defect rectification.
+
+## Task
+
+Create or manage a defect list from the inspection details provided.
+
+### 1. Inspection Header
+
+| Field | Details |
+|-------|---------|
+| Project | |
+| Inspection type | Pre-PC / PC / Post-PC / DLP |
+| Date | |
+| Area / Zone | |
+| Inspector | |
+| Contractor representative | |
+| Inspection No. | |
+
+### 2. Defect Register
+
+| # | Location | Trade | Description | Spec Ref | Priority | Photo | Status | Rectified | Verified |
+|---|----------|-------|-------------|----------|----------|-------|--------|-----------|----------|
+| 001 | L1-A3 | Paint | Uneven finish to wall, visible roller marks | Spec 0671 | Minor | Y | Open | | |
+| 002 | L2-B5 | Plumb | Leaking tap, hot water isolation valve | Spec 0753 | Major | Y | Open | | |
+
+### 3. Priority Classification
+
+| Priority | Definition | Rectification Timeframe |
+|----------|-----------|------------------------|
+| **Critical** | Safety hazard or prevents use/occupation | 24 hours |
+| **Major** | Significant non-compliance, affects function | 7 days |
+| **Minor** | Cosmetic or minor non-compliance | 28 days |
+| **Maintenance** | Not a defect — normal wear/maintenance item | Note only |
+
+### 4. Defect Categories
+Organise defects by trade for efficient rectification:
+- Structural / Concrete
+- Joinery / Carpentry
+- Painting / Finishes
+- Tiling / Waterproofing
+- Plumbing / Hydraulic
+- Mechanical / HVAC
+- Electrical / Comms
+- Fire services
+- Glazing / Facades
+- Landscaping / External
+- Cleaning
+
+### 5. Summary Statistics
+
+| Category | Critical | Major | Minor | Total | Closed | Open |
+|----------|----------|-------|-------|-------|--------|------|
+| [Trade] | | | | | | |
+| **Total** | | | | | | |
+
+### 6. Practical Completion Assessment
+- Total defects identified: [X]
+- Critical defects outstanding: [X]
+- Is the works reasonably fit for occupation/use? Yes / No
+- Recommendation: Issue PC / Do not issue PC / Issue PC subject to conditions
+- Defect liability period: [X] months from PC date
+
+### Notes
+- Each defect needs a unique reference for tracking
+- Photographic evidence is essential
+- Re-inspection required after rectification
+- Incomplete rectification to be re-listed as new item`
+      }
+    }
+  },
+  "site-communications": {
+    label: "site-communications",
+    color: "comms",
+    children: {
+      "rfi-drafter.md": {
+        label: "rfi-drafter.md",
+        description: "Draft a Request for Information (RFI) to resolve design ambiguities, discrepancies, or missing information on construction drawings and specifications.",
+        content: `---
+description: Draft a Request for Information (RFI) to resolve design ambiguities, discrepancies, or missing information on construction drawings and specifications. Trigger when the user mentions RFI, request for information, design query, drawing clarification, or design discrepancy.
+---
+
+# RFI Drafter
+
+You are a project engineer drafting RFIs to resolve design and documentation issues on a construction project.
+
+## Task
+
+Draft a clear, well-structured RFI from the issue described by the user.
+
+### 1. RFI Format
+
+**REQUEST FOR INFORMATION**
+
+| Field | Details |
+|-------|---------|
+| RFI No. | [Project]-RFI-[XXX] |
+| Date | |
+| Project | |
+| From | [Contractor] |
+| To | [Superintendent / Architect / Engineer] |
+| Subject | [Clear, specific title] |
+| Priority | Critical / High / Medium / Low |
+| Required by date | [Allow reasonable response time] |
+| Related drawing(s) | |
+| Related spec section(s) | |
+| Related RFIs | [If follow-up] |
+
+### 2. Issue Description
+Write a clear description that:
+- States the specific issue or ambiguity
+- References exact drawing numbers, detail numbers, spec clauses
+- Describes what the contractor has found or cannot determine
+- Explains why clarification is needed (impact on construction)
+
+### 3. Contractor's Suggested Resolution
+(Optional but recommended — shows you've thought about it)
+- Proposed solution or interpretation
+- Cost/program impact if known
+
+### 4. Attachments
+- [ ] Marked-up drawings highlighting the issue
+- [ ] Photographs if applicable
+- [ ] Relevant extract from specification
+- [ ] Sketch of proposed solution
+
+### 5. Response Required
+Specify what you need:
+- Clarification of design intent
+- Revised drawing or detail
+- Confirmation of proposed solution
+- Additional information
+
+### RFI Best Practices
+- One issue per RFI (don't bundle multiple issues)
+- Be specific — vague RFIs get vague responses
+- Reference exact locations (grid lines, levels, rooms)
+- State the construction impact and urgency
+- Track all RFIs in a register with response status
+- If response creates a variation, flag it immediately
+
+### 6. RFI Register Entry
+
+| RFI No. | Date Sent | Subject | To | Priority | Response Due | Response Date | Status | Variation? |
+|---------|-----------|---------|-----|----------|-------------|---------------|--------|------------|`
+      },
+      "site-instruction-review.md": {
+        label: "site-instruction-review.md",
+        description: "Review or draft a Site Instruction (SI) or Architect's Instruction (AI) for compliance, variation entitlement, and contractual implications.",
+        content: `---
+description: Review or draft a Site Instruction (SI) or Architect's Instruction (AI) for compliance, variation entitlement, and contractual implications. Trigger when the user mentions site instruction, architect's instruction, superintendent's direction, directive, or written instruction from principal.
+---
+
+# Site Instruction Review
+
+You are a contract administrator reviewing site instructions for contractual and commercial implications.
+
+## Task
+
+Review the site instruction provided and analyse its implications.
+
+### 1. Instruction Details
+
+| Field | Details |
+|-------|---------|
+| SI/AI No. | |
+| Date issued | |
+| Issued by | [Superintendent / Architect / PM] |
+| Issued to | [Contractor] |
+| Subject | |
+| Contractual basis | [Clause reference] |
+
+### 2. Classification
+
+Determine the nature of the instruction:
+
+| Type | Description | Variation? |
+|------|-------------|------------|
+| **Direction to vary** | Changes scope, design, or specification | Yes |
+| **Clarification** | Confirms existing scope — no change | No |
+| **Defect rectification** | Directs work already required under contract | No |
+| **Acceleration** | Directs earlier completion or changed sequence | Potentially |
+| **Suspension** | Directs work to stop | Potentially |
+
+### 3. Variation Entitlement Assessment
+
+| Question | Assessment |
+|----------|------------|
+| Does the instruction change the scope of work? | Yes / No |
+| Does it change the specification or standard? | Yes / No |
+| Does it change the sequence or timing? | Yes / No |
+| Is it within the Superintendent's authority? | Yes / No |
+| Does it constitute a direction under the variation clause? | Yes / No |
+
+### 4. Impact Analysis
+
+| Impact Area | Assessment |
+|-------------|------------|
+| **Cost** | Additional cost? Estimate if possible |
+| **Time** | Critical path impact? Additional time? |
+| **Quality** | Change to quality requirements? |
+| **Safety** | New hazards or changed risk profile? |
+| **Third parties** | Impact on subcontractors, suppliers? |
+
+### 5. Required Actions
+
+| # | Action | Responsible | Timeframe |
+|---|--------|-------------|----------|
+| 1 | Issue notice of claim (if variation) | Contractor | Within [X] days |
+| 2 | Provide quotation if requested | Contractor | Within [X] days |
+| 3 | Assess and respond | Superintendent | Within [X] days |
+| 4 | Update program if required | Contractor | Next update |
+| 5 | Update variation register | Both | Immediate |
+
+### 6. Recommendations
+- Accept / Reject / Query the instruction
+- Notice requirements and deadlines
+- Documentation to preserve entitlements
+- Risks of proceeding without agreement on cost/time`
+      },
+      "daily-site-diary.md": {
+        label: "daily-site-diary.md",
+        description: "Generate a structured daily site diary / superintendent's diary recording weather, workforce, activities, deliveries, instructions, and notable events.",
+        content: `---
+description: Generate a structured daily site diary / superintendent's diary recording weather, workforce, activities, deliveries, instructions, and notable events. Trigger when the user mentions site diary, daily diary, superintendent diary, daily report, site log, or daily record.
+---
+
+# Daily Site Diary
+
+You are a site superintendent / project manager recording the daily site diary for a construction project.
+
+## Task
+
+Generate a structured diary entry from the details provided.
+
+### Diary Entry
+
+**PROJECT:** [Name]
+**DATE:** [Day, DD/MM/YYYY]
+**DIARY NO:** [Sequential number]
+**RECORDED BY:** [Name, Role]
+
+---
+
+### 1. Weather
+
+| Time | Conditions | Temp (°C) | Wind | Rain |
+|------|-----------|-----------|------|------|
+| 0600 | | | | |
+| 1200 | | | | |
+| 1500 | | | | |
+
+**Weather impact on work:** None / Partial stoppage / Full stoppage
+**Weather day claimed:** Yes / No
+
+### 2. Workforce
+
+| Trade / Subcontractor | No. of Workers | Area / Activity |
+|-----------------------|---------------|-----------------|
+| [Contractor — direct] | | |
+| [Subcontractor 1] | | |
+| [Subcontractor 2] | | |
+| **Total on site** | **[X]** | |
+
+### 3. Plant & Equipment
+
+| Item | Operator | Hours | Activity |
+|------|----------|-------|----------|
+| | | | |
+
+### 4. Work Performed Today
+
+| Zone / Area | Activity | Status | Notes |
+|-------------|----------|--------|-------|
+| | | In progress / Complete | |
+
+### 5. Deliveries
+
+| Time | Supplier | Material | Quantity | Docket No. | Condition |
+|------|----------|----------|----------|------------|----------|
+| | | | | | |
+
+### 6. Instructions & Communications
+
+| Type | No. | From/To | Subject | Action Required |
+|------|-----|---------|---------|----------------|
+| RFI | | | | |
+| SI | | | | |
+| Variation | | | | |
+| Verbal direction | | | | |
+
+### 7. Inspections & Tests
+
+| Time | Type | Location | Result | By |
+|------|------|----------|--------|---|
+| | | | Pass/Fail | |
+
+### 8. Safety
+- Incidents / Near misses: None / [Details]
+- Toolbox talk topic: [Topic]
+- Safety observations: [Notes]
+
+### 9. Visitors
+
+| Name | Organisation | Time In | Time Out | Purpose |
+|------|-------------|---------|----------|---------|
+| | | | | |
+
+### 10. Notable Events / Issues
+- [Any significant events, delays, disputes, or issues to record]
+
+### Important Notes
+- The site diary is a **contemporaneous record** — it is critical evidence in disputes
+- Record facts, not opinions
+- Note verbal directions and confirm in writing
+- Record any events that may give rise to claims (yours or the other party's)
+- Photograph key events and reference photo numbers
+- Complete the diary on the same day — never backfill`
+      }
+    }
+  },
+  "handover-closeout": {
+    label: "handover-closeout",
+    color: "handover",
+    children: {
+      "practical-completion-checklist.md": {
+        label: "practical-completion-checklist.md",
+        description: "Assess whether a construction project has reached Practical Completion (PC) using a comprehensive checklist of contractual, quality, and documentation requirements.",
+        content: `---
+description: Assess whether a construction project has reached Practical Completion (PC) using a comprehensive checklist of contractual, quality, and documentation requirements. Trigger when the user mentions practical completion, PC assessment, handover readiness, substantial completion, or ready for occupation.
+---
+
+# Practical Completion Assessment
+
+You are a superintendent assessing whether a construction project has reached Practical Completion under an Australian standard-form contract.
+
+## Task
+
+Assess the project against the practical completion criteria.
+
+### 1. Contractual Definition
+Practical Completion typically means the works are complete except for minor omissions and defects that do not prevent the works from being reasonably used for their intended purpose.
+
+Check the specific contract definition — it varies between:
+- AS4000: Clause 42.1
+- AS2124: Clause 42.1
+- AS4902: Clause 42.1
+- JCT / FIDIC: Different terminology ("Substantial Completion" / "Taking Over")
+
+### 2. PC Assessment Checklist
+
+#### A. Works Completion
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| A1 | All contract works substantially complete | ✅/❌ | |
+| A2 | No major defects preventing use | ✅/❌ | |
+| A3 | All services operational and tested | ✅/❌ | |
+| A4 | Essential safety systems operational | ✅/❌ | |
+| A5 | Landscaping / external works complete | ✅/❌ | |
+| A6 | Cleaning complete to occupation standard | ✅/❌ | |
+
+#### B. Compliance & Approvals
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| B1 | Occupation Certificate (OC) issued | ✅/❌ | |
+| B2 | Fire safety certificate issued | ✅/❌ | |
+| B3 | Essential services compliance | ✅/❌ | |
+| B4 | All authority approvals obtained | ✅/❌ | |
+| B5 | Strata / subdivision (if applicable) | ✅/❌ | |
+
+#### C. Commissioning
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| C1 | Mechanical systems commissioned | ✅/❌ | |
+| C2 | Electrical systems tested & commissioned | ✅/❌ | |
+| C3 | Fire systems commissioned & certified | ✅/❌ | |
+| C4 | Hydraulic systems tested | ✅/❌ | |
+| C5 | Lift commissioning complete | ✅/❌ | |
+| C6 | BMS/controls operational | ✅/❌ | |
+| C7 | Integrated systems testing complete | ✅/❌ | |
+
+#### D. Documentation
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| D1 | As-built drawings submitted | ✅/❌ | |
+| D2 | O&M manuals submitted | ✅/❌ | |
+| D3 | Warranties and guarantees | ✅/❌ | |
+| D4 | Test certificates and reports | ✅/❌ | |
+| D5 | Training provided to building manager | ✅/❌ | |
+| D6 | Spare parts and attic stock | ✅/❌ | |
+| D7 | Keys, access cards, codes handed over | ✅/❌ | |
+
+#### E. Commercial
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| E1 | Final account status | | |
+| E2 | Outstanding variations resolved | ✅/❌ | |
+| E3 | Outstanding claims resolved/noted | ✅/❌ | |
+| E4 | Retention release terms understood | ✅/❌ | |
+
+### 3. PC Determination
+
+**Recommendation:** Issue PC / Do not issue PC / Issue PC subject to conditions
+
+**PC Date:** [Recommended date]
+**DLP Period:** [X] months from PC date
+**DLP Expiry:** [Date]
+
+**Conditions (if applicable):**
+- Outstanding items to be completed within [X] days
+- Defect list attached ([X] items, [X] critical)
+
+### 4. Post-PC Obligations
+- Defect rectification within DLP
+- Final defect inspection at DLP expiry
+- Release of retention (50% at PC, 50% at DLP)
+- Final account and final certificate process`
+      },
+      "commissioning-checklist.md": {
+        label: "commissioning-checklist.md",
+        description: "Generate a building services commissioning checklist for mechanical, electrical, hydraulic, and fire systems prior to practical completion.",
+        content: `---
+description: Generate a building services commissioning checklist for mechanical, electrical, hydraulic, and fire systems prior to practical completion. Trigger when the user mentions commissioning, system testing, building services testing, pre-commissioning, or integrated systems test.
+---
+
+# Building Services Commissioning Checklist
+
+You are a commissioning manager overseeing the testing and commissioning of building services for a construction project.
+
+## Task
+
+Generate a commissioning checklist for the systems described, or provide a comprehensive multi-services checklist.
+
+### 1. Commissioning Overview
+
+| Field | Details |
+|-------|---------|
+| Project | |
+| Commissioning agent | |
+| Target PC date | |
+| Commissioning period | [Start] to [End] |
+
+### 2. Commissioning Phases
+
+| Phase | Description | Duration |
+|-------|-------------|----------|
+| **Phase 1 — Pre-commissioning** | Visual checks, installation verification | |
+| **Phase 2 — Individual system testing** | Each system tested independently | |
+| **Phase 3 — Integrated systems testing** | Systems tested together | |
+| **Phase 4 — Witness testing** | Formal witnessed tests with consultants | |
+| **Phase 5 — Seasonal commissioning** | Heating/cooling season adjustments | Post-PC |
+
+### 3. Mechanical (HVAC)
+
+| # | Item | Pre-Comm | Test | Result | Sign-off |
+|---|------|----------|------|--------|----------|
+| M1 | Ductwork pressure test | ☐ | ☐ | | |
+| M2 | Fan performance test (air volume) | ☐ | ☐ | | |
+| M3 | Air balancing — supply/return/exhaust | ☐ | ☐ | | |
+| M4 | Chiller/heat pump performance | ☐ | ☐ | | |
+| M5 | Cooling tower commissioning | ☐ | ☐ | | |
+| M6 | Pump performance test | ☐ | ☐ | | |
+| M7 | Pipe pressure test (hydronic) | ☐ | ☐ | | |
+| M8 | Water balancing — flow rates | ☐ | ☐ | | |
+| M9 | Room temperature setpoint test | ☐ | ☐ | | |
+| M10 | Ventilation rates vs AS1668.2 | ☐ | ☐ | | |
+| M11 | Kitchen/carpark exhaust verification | ☐ | ☐ | | |
+| M12 | Noise level testing vs NCC requirements | ☐ | ☐ | | |
+
+### 4. Electrical
+
+| # | Item | Pre-Comm | Test | Result | Sign-off |
+|---|------|----------|------|--------|----------|
+| E1 | Switchboard inspection & testing | ☐ | ☐ | | |
+| E2 | Cable insulation resistance (megger) | ☐ | ☐ | | |
+| E3 | Earth fault loop impedance | ☐ | ☐ | | |
+| E4 | RCD trip testing | ☐ | ☐ | | |
+| E5 | Emergency lighting — 90min discharge | ☐ | ☐ | | |
+| E6 | Exit signage illumination | ☐ | ☐ | | |
+| E7 | Lighting levels vs AS1680 | ☐ | ☐ | | |
+| E8 | Generator load test | ☐ | ☐ | | |
+| E9 | UPS load test | ☐ | ☐ | | |
+| E10 | Lightning protection test | ☐ | ☐ | | |
+
+### 5. Fire Services
+
+| # | Item | Pre-Comm | Test | Result | Sign-off |
+|---|------|----------|------|--------|----------|
+| F1 | Fire detection — zone/point test | ☐ | ☐ | | |
+| F2 | Sprinkler system — flow/pressure test | ☐ | ☐ | | |
+| F3 | Hydrant system — flow/pressure test | ☐ | ☐ | | |
+| F4 | Fire pump performance test | ☐ | ☐ | | |
+| F5 | Smoke management system test | ☐ | ☐ | | |
+| F6 | Emergency warning intercommunication (EWIS) | ☐ | ☐ | | |
+| F7 | Fire door hold-open device release | ☐ | ☐ | | |
+| F8 | Cause & effect matrix verification | ☐ | ☐ | | |
+| F9 | Interface with BMS — alarms/trips | ☐ | ☐ | | |
+
+### 6. Hydraulic
+
+| # | Item | Pre-Comm | Test | Result | Sign-off |
+|---|------|----------|------|--------|----------|
+| H1 | Pipe pressure test — potable water | ☐ | ☐ | | |
+| H2 | Pipe pressure test — stormwater/sewer | ☐ | ☐ | | |
+| H3 | Hot water system temperature check | ☐ | ☐ | | |
+| H4 | Thermostatic mixing valve (TMV) test | ☐ | ☐ | | |
+| H5 | Backflow prevention device test | ☐ | ☐ | | |
+| H6 | Sump pump operation | ☐ | ☐ | | |
+| H7 | Rainwater harvesting system | ☐ | ☐ | | |
+
+### 7. Integrated Systems Testing
+
+| # | Scenario | Systems Involved | Result | Notes |
+|---|----------|-----------------|--------|-------|
+| I1 | Power failure — generator changeover | Elec, Mech, Fire, BMS | | |
+| I2 | Fire alarm — cause & effect | Fire, Mech, Elec, BMS | | |
+| I3 | After-hours operation | BMS, HVAC, Lighting | | |
+| I4 | Peak load scenario | All mechanical/electrical | | |
+
+### 8. Documentation Required
+- [ ] Commissioning certificates per system
+- [ ] Test result sheets
+- [ ] As-commissioned setpoints and parameters
+- [ ] Defect/snag list from commissioning
+- [ ] O&M manuals updated with commissioning data`
+      },
+      "handover-document-register.md": {
+        label: "handover-document-register.md",
+        description: "Create a comprehensive handover documentation register and checklist for transferring a completed construction project to the owner/operator.",
+        content: `---
+description: Create a comprehensive handover documentation register and checklist for transferring a completed construction project to the owner/operator. Trigger when the user mentions handover, document handover, O&M manuals, as-built drawings, building handover, or project closeout.
+---
+
+# Handover Documentation Register
+
+You are a project manager preparing the handover documentation package for a completed construction project.
+
+## Task
+
+Create a comprehensive register of all documents required for handover.
+
+### 1. Handover Schedule
+
+| Field | Details |
+|-------|---------|
+| Project | |
+| PC Date | |
+| Handover date | |
+| Handover to | [Owner / Facility Manager / Body Corporate] |
+| Prepared by | |
+
+### 2. Statutory Documentation
+
+| # | Document | Required | Received | Status |
+|---|----------|----------|----------|--------|
+| 2.1 | Occupation Certificate (OC) | ✅ | ☐ | |
+| 2.2 | Construction Certificate (CC) | ✅ | ☐ | |
+| 2.3 | Fire Safety Certificate | ✅ | ☐ | |
+| 2.4 | Annual Fire Safety Statement | ✅ | ☐ | |
+| 2.5 | Essential Services schedule | ✅ | ☐ | |
+| 2.6 | Strata plan (if applicable) | | ☐ | |
+| 2.7 | Section 73 compliance (Sydney Water) | | ☐ | |
+| 2.8 | Utility connection certificates | ✅ | ☐ | |
+
+### 3. Design Documentation
+
+| # | Document | Copies | Format | Received | Status |
+|---|----------|--------|--------|----------|--------|
+| 3.1 | As-built architectural drawings | 2 hard + digital | DWG + PDF | ☐ | |
+| 3.2 | As-built structural drawings | 2 hard + digital | DWG + PDF | ☐ | |
+| 3.3 | As-built mechanical drawings | 2 hard + digital | DWG + PDF | ☐ | |
+| 3.4 | As-built electrical drawings | 2 hard + digital | DWG + PDF | ☐ | |
+| 3.5 | As-built hydraulic drawings | 2 hard + digital | DWG + PDF | ☐ | |
+| 3.6 | As-built fire drawings | 2 hard + digital | DWG + PDF | ☐ | |
+| 3.7 | BIM model (if applicable) | Digital | IFC / RVT | ☐ | |
+| 3.8 | Specifications (final) | Digital | PDF | ☐ | |
+
+### 4. O&M Manuals
+
+| # | System / Trade | Sections Required | Received | Status |
+|---|---------------|-------------------|----------|--------|
+| 4.1 | Mechanical / HVAC | Equipment schedules, maintenance procedures, spare parts, warranty | ☐ | |
+| 4.2 | Electrical | Switchboard schedules, circuit charts, emergency procedures | ☐ | |
+| 4.3 | Fire services | System description, maintenance schedule, test procedures | ☐ | |
+| 4.4 | Hydraulic | Pipe layouts, equipment details, maintenance | ☐ | |
+| 4.5 | Lift / Vertical transport | Maintenance contract, emergency procedures | ☐ | |
+| 4.6 | Building fabric | Facade maintenance, roof access, cleaning procedures | ☐ | |
+| 4.7 | Landscaping | Plant schedule, irrigation, maintenance guide | ☐ | |
+| 4.8 | Security / Access control | System guide, access credentials, user manual | ☐ | |
+
+### 5. Warranties & Guarantees
+
+| # | Item | Warranty Period | Start Date | Expiry | Provider | Document |
+|---|------|----------------|-----------|--------|----------|----------|
+| 5.1 | Structural (builder) | 6 years | PC date | | | ☐ |
+| 5.2 | Waterproofing | [X] years | | | | ☐ |
+| 5.3 | Roofing | [X] years | | | | ☐ |
+| 5.4 | Mechanical equipment | [X] years | | | | ☐ |
+| 5.5 | Glazing / Facades | [X] years | | | | ☐ |
+
+### 6. Test Certificates & Reports
+
+| # | Item | Standard | Received | Status |
+|---|------|----------|----------|--------|
+| 6.1 | Concrete test results | AS1379 | ☐ | |
+| 6.2 | Steel mill certificates | AS/NZS 4600 | ☐ | |
+| 6.3 | Waterproofing flood test certificates | AS3740 | ☐ | |
+| 6.4 | Commissioning certificates (per system) | Various | ☐ | |
+| 6.5 | Fire system compliance certificates | AS1851 | ☐ | |
+| 6.6 | Electrical compliance certificate | AS/NZS 3000 | ☐ | |
+
+### 7. Keys & Access
+
+| # | Item | Quantity | Received | Status |
+|---|------|----------|----------|--------|
+| 7.1 | Master key set | | ☐ | |
+| 7.2 | Sub-master keys | | ☐ | |
+| 7.3 | Individual door keys | | ☐ | |
+| 7.4 | Access cards / fobs | | ☐ | |
+| 7.5 | Security codes / passwords | | ☐ | |
+| 7.6 | Plant room keys | | ☐ | |
+
+### 8. Training Register
+
+| # | System | Trainer | Attendees | Date | Duration | Materials |
+|---|--------|---------|-----------|------|----------|-----------|
+| 8.1 | BMS operation | | | | | ☐ |
+| 8.2 | Fire panel operation | | | | | ☐ |
+| 8.3 | Lift emergency procedures | | | | | ☐ |
+| 8.4 | Security system | | | | | ☐ |
+
+### 9. Sign-Off
+
+| Party | Name | Signature | Date |
+|-------|------|-----------|------|
+| Contractor | | | |
+| Superintendent | | | |
+| Owner / FM | | | |`
+      }
+    }
   }
 };
 
@@ -2343,14 +3369,15 @@ function showWelcome() {
 
   // Topic chips — each maps to keywords matched against skill descriptions & filenames
   const topicChips = [
-    { label: 'Cost', keywords: ['cost', 'estimate', 'rate', 'quantity', 'take-off', 'pricing', 'budget', 'valuation', 'tender'] },
-    { label: 'Legal', keywords: ['contract', 'special conditions', 'entitlement', 'claim', 'compliance', 'risk register', 'standard form'] },
+    { label: 'Cost', keywords: ['cost', 'estimate', 'rate', 'quantity', 'take-off', 'pricing', 'budget', 'valuation', 'tender', 'progress claim', 'payment'] },
+    { label: 'Legal', keywords: ['contract', 'special conditions', 'entitlement', 'claim', 'compliance', 'risk register', 'standard form', 'delay analysis', 'disruption', 'site instruction'] },
     { label: 'Safety', keywords: ['safety', 'swms', 'whs', 'incident', 'hazard', 'audit', 'safe work'] },
-    { label: 'Program', keywords: ['program', 'schedule', 'delay', 'eot', 'extension of time', 'critical path', 'float'] },
+    { label: 'Program', keywords: ['program', 'schedule', 'delay', 'eot', 'extension of time', 'critical path', 'float', 'forensic', 'windows analysis'] },
     { label: 'Design', keywords: ['drawing', 'structural', 'clash', 'coordination', 'bim', 'constructability'] },
-    { label: 'Quality', keywords: ['specification', 'compliance', 'submittal', 'material', 'inspection', 'defect'] },
+    { label: 'Quality', keywords: ['specification', 'compliance', 'submittal', 'material', 'inspection', 'defect', 'itp', 'ncr', 'non-conformance', 'punch list', 'snag'] },
     { label: 'Procurement', keywords: ['tender', 'prequalification', 'subcontractor', 'submittal', 'procurement'] },
-    { label: 'Reporting', keywords: ['minutes', 'meeting', 'incident report', 'report', 'register'] },
+    { label: 'Reporting', keywords: ['minutes', 'meeting', 'incident report', 'report', 'register', 'site diary', 'daily diary', 'rfi'] },
+    { label: 'Handover', keywords: ['handover', 'practical completion', 'commissioning', 'closeout', 'o&m', 'as-built', 'defect liability'] },
   ];
 
   const qs = document.getElementById('quickStart');
@@ -2433,11 +3460,119 @@ function filterTree(query) {
 // NEW SKILL PIPELINE
 // ============================================================
 
+// ============================================================
+// SECURITY — Input sanitization & validation
+// ============================================================
+
+function sanitizeInput(str, maxLen) {
+  if (typeof str !== 'string') return '';
+  // Truncate to max length
+  let s = str.slice(0, maxLen);
+  // Strip dangerous HTML tags
+  s = s.replace(/<\s*\/?\s*(script|iframe|object|embed|form|input|button|link|style|meta|base)[^>]*>/gi, '');
+  // Strip on* event handlers (e.g. onerror=, onclick=)
+  s = s.replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '');
+  s = s.replace(/\bon\w+\s*=\s*[^\s>]*/gi, '');
+  // Strip javascript: URLs
+  s = s.replace(/javascript\s*:/gi, '');
+  // Strip data: URLs that could execute (data:text/html, data:application/x-javascript)
+  s = s.replace(/data\s*:\s*(text\/html|application\/x?-?javascript)[^;\s]*/gi, '');
+  // Strip template injection patterns
+  s = s.replace(/\$\{[^}]*\}/g, '');
+  s = s.replace(/\{\{[^}]*\}\}/g, '');
+  return s;
+}
+
+function validateSubmission(category, filename, description, content) {
+  const errors = [];
+
+  // Category must be an existing key
+  if (!category || !skills[category]) {
+    errors.push('Please select a valid category.');
+  }
+
+  // Filename: only lowercase alphanumeric and hyphens
+  const cleanFilename = sanitizeInput(filename, 100).trim().toLowerCase().replace(/\.md$/, '');
+  if (!cleanFilename) {
+    errors.push('Please enter a filename.');
+  } else if (!/^[a-z0-9][a-z0-9-]*$/.test(cleanFilename)) {
+    errors.push('Filename must contain only lowercase letters, numbers, and hyphens.');
+  }
+  // Block path traversal
+  if (/[\/\\]|\.\./.test(filename)) {
+    errors.push('Filename cannot contain path separators or "..".');
+  }
+
+  // Description: plain text, no HTML
+  const cleanDescription = sanitizeInput(description, 500).trim();
+  if (!cleanDescription) {
+    errors.push('Please enter a description.');
+  } else if (/<[^>]+>/.test(cleanDescription)) {
+    errors.push('Description must be plain text (no HTML tags).');
+  }
+
+  // Content: sanitize and check structure
+  const cleanContent = sanitizeInput(content, 50000).trim();
+  if (!cleanContent) {
+    errors.push('Please enter the skill content.');
+  } else if (!cleanContent.startsWith('---')) {
+    errors.push('Skill content should begin with YAML frontmatter (start with ---).');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    sanitized: {
+      filename: cleanFilename + '.md',
+      description: cleanDescription,
+      content: cleanContent
+    }
+  };
+}
+
+// ============================================================
+// SUGGESTION WORKFLOW — Submit, store, review, approve
+// ============================================================
+
+function getSuggestions() {
+  try {
+    return JSON.parse(localStorage.getItem('skillSuggestions') || '[]');
+  } catch { return []; }
+}
+
+function saveSuggestions(suggestions) {
+  localStorage.setItem('skillSuggestions', JSON.stringify(suggestions));
+  updateReviewButton();
+}
+
+function updateReviewButton() {
+  const suggestions = getSuggestions().filter(s => s.status === 'pending');
+  const btn = document.getElementById('btnReview');
+  const badge = document.getElementById('reviewBadge');
+  if (suggestions.length > 0) {
+    btn.style.display = '';
+    badge.textContent = suggestions.length;
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+function showToast(message, type) {
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:60px;right:20px;padding:12px 20px;border-radius:8px;font-size:13px;z-index:10000;transition:opacity 0.3s;font-family:Inter,sans-serif;';
+  toast.style.background = type === 'success' ? 'var(--accent-green)' : type === 'error' ? 'var(--accent-pink)' : 'var(--accent-blue)';
+  toast.style.color = '#1a1b26';
+  toast.style.fontWeight = '600';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
 function openNewSkillModal() {
   const modal = document.getElementById('newSkillModal');
   const categorySelect = document.getElementById('skillCategory');
 
-  // Populate category dropdown from current skills
+  // Populate category dropdown from current skills (existing categories only)
   categorySelect.innerHTML = '<option value="">Select a category...</option>';
   for (const [key, folder] of Object.entries(skills)) {
     const opt = document.createElement('option');
@@ -2445,18 +3580,11 @@ function openNewSkillModal() {
     opt.textContent = folder.label;
     categorySelect.appendChild(opt);
   }
-  const newOpt = document.createElement('option');
-  newOpt.value = '__new__';
-  newOpt.textContent = '+ New Category';
-  categorySelect.appendChild(newOpt);
 
   // Reset form
   document.getElementById('skillFilename').value = '';
   document.getElementById('skillDescription').value = '';
   document.getElementById('skillContent').value = '';
-  document.getElementById('newCategoryKey').value = '';
-  document.getElementById('newCategoryGroup').style.display = 'none';
-  document.getElementById('newCategoryColorGroup').style.display = 'none';
 
   modal.classList.add('open');
 }
@@ -2465,92 +3593,186 @@ function closeNewSkillModal() {
   document.getElementById('newSkillModal').classList.remove('open');
 }
 
-// Show/hide new category fields
-document.getElementById('skillCategory').addEventListener('change', function() {
-  const isNew = this.value === '__new__';
-  document.getElementById('newCategoryGroup').style.display = isNew ? '' : 'none';
-  document.getElementById('newCategoryColorGroup').style.display = isNew ? '' : 'none';
-});
-
 // Close modal on overlay click
 document.getElementById('newSkillModal').addEventListener('click', function(e) {
   if (e.target === this) closeNewSkillModal();
 });
 
-// Close modal on Escape
+// Close modals on Escape
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeNewSkillModal();
+  if (e.key === 'Escape') {
+    closeNewSkillModal();
+    closeReviewModal();
+  }
 });
 
-function addSkill() {
-  const categorySelect = document.getElementById('skillCategory');
-  let categoryKey = categorySelect.value;
-  let filename = document.getElementById('skillFilename').value.trim();
+function submitSuggestion() {
+  const categoryKey = document.getElementById('skillCategory').value;
+  const filename = document.getElementById('skillFilename').value.trim();
   const description = document.getElementById('skillDescription').value.trim();
   const content = document.getElementById('skillContent').value.trim();
 
-  // Validation
-  if (!categoryKey) return alert('Please select a category.');
-  if (!filename) return alert('Please enter a filename.');
-  if (!description) return alert('Please enter a description.');
-  if (!content) return alert('Please enter the skill content.');
-
-  // Handle new category
-  if (categoryKey === '__new__') {
-    categoryKey = document.getElementById('newCategoryKey').value.trim().toLowerCase().replace(/\s+/g, '-');
-    const color = document.getElementById('newCategoryColor').value;
-    if (!categoryKey) return alert('Please enter a category key.');
-
-    skills[categoryKey] = {
-      label: categoryKey,
-      color: color,
-      children: {}
-    };
+  // Validate and sanitize
+  const result = validateSubmission(categoryKey, filename, description, content);
+  if (!result.valid) {
+    alert('Submission issues:\n\n' + result.errors.join('\n'));
+    return;
   }
 
-  // Ensure .md extension
-  if (!filename.endsWith('.md')) filename += '.md';
-
-  // Check for duplicates
-  if (skills[categoryKey]?.children[filename]) {
-    return alert(`A skill named "${filename}" already exists in ${categoryKey}.`);
+  // Check for duplicate filename in existing skills
+  if (skills[categoryKey]?.children[result.sanitized.filename]) {
+    alert('A skill with this filename already exists in the selected category.');
+    return;
   }
 
-  // Add the skill
-  skills[categoryKey].children[filename] = {
-    label: filename,
-    description: description,
-    content: content
+  // Check for duplicate in pending suggestions
+  const suggestions = getSuggestions();
+  const isDuplicate = suggestions.some(s =>
+    s.status === 'pending' && s.category === categoryKey && s.filename === result.sanitized.filename
+  );
+  if (isDuplicate) {
+    alert('A suggestion with this filename is already pending review.');
+    return;
+  }
+
+  // Save to localStorage
+  suggestions.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    category: categoryKey,
+    filename: result.sanitized.filename,
+    description: result.sanitized.description,
+    content: result.sanitized.content,
+    timestamp: new Date().toISOString(),
+    status: 'pending'
+  });
+  saveSuggestions(suggestions);
+
+  closeNewSkillModal();
+  showToast('Suggestion saved! It will be reviewed before being added.', 'success');
+}
+
+// ============================================================
+// REVIEW MODAL — Admin approval workflow
+// ============================================================
+
+function openReviewModal() {
+  const modal = document.getElementById('reviewModal');
+  const body = document.getElementById('reviewBody');
+  const suggestions = getSuggestions().filter(s => s.status === 'pending');
+
+  if (suggestions.length === 0) {
+    body.innerHTML = '<p style="color:var(--text-dim);padding:20px;">No pending suggestions.</p>';
+    modal.classList.add('open');
+    return;
+  }
+
+  body.innerHTML = suggestions.map(s => `
+    <div class="review-card" data-id="${s.id}" style="border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden;">
+      <div style="background:var(--bg-hover);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <strong style="color:var(--accent-blue);">${escapeHtml(s.filename)}</strong>
+          <span style="color:var(--text-dim);margin-left:8px;">in ${escapeHtml(s.category)}</span>
+          <span style="color:var(--text-dim);margin-left:8px;font-size:11px;">${new Date(s.timestamp).toLocaleString()}</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="toggleRawView('${s.id}')" style="background:var(--bg-panel);color:var(--text);border:1px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;">Raw</button>
+          <button onclick="approveSuggestion('${s.id}')" style="background:var(--accent-green);color:#1a1b26;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;">Approve</button>
+          <button onclick="rejectSuggestion('${s.id}')" style="background:var(--accent-pink);color:#1a1b26;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;">Reject</button>
+        </div>
+      </div>
+      <div style="padding:12px 16px;">
+        <p style="color:var(--text-dim);font-size:13px;margin-bottom:8px;"><em>${escapeHtml(s.description)}</em></p>
+        <div class="review-preview" style="background:var(--bg-dark);border-radius:6px;padding:12px;max-height:300px;overflow-y:auto;font-size:13px;">
+          ${typeof marked !== 'undefined' ? marked.parse(s.content) : escapeHtml(s.content)}
+        </div>
+        <pre class="review-raw" id="raw-${s.id}" style="display:none;background:var(--bg-dark);border-radius:6px;padding:12px;max-height:300px;overflow:auto;font-size:12px;white-space:pre-wrap;color:var(--accent-orange);margin-top:8px;">${escapeHtml(s.content)}</pre>
+      </div>
+    </div>
+  `).join('');
+
+  modal.classList.add('open');
+}
+
+function closeReviewModal() {
+  document.getElementById('reviewModal').classList.remove('open');
+}
+
+document.getElementById('reviewModal').addEventListener('click', function(e) {
+  if (e.target === this) closeReviewModal();
+});
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function toggleRawView(id) {
+  const raw = document.getElementById('raw-' + id);
+  raw.style.display = raw.style.display === 'none' ? '' : 'none';
+}
+
+function approveSuggestion(id) {
+  const suggestions = getSuggestions();
+  const idx = suggestions.findIndex(s => s.id === id);
+  if (idx === -1) return;
+
+  const s = suggestions[idx];
+
+  // Add to live skills tree
+  if (!skills[s.category]) return;
+  skills[s.category].children[s.filename] = {
+    label: s.filename,
+    description: s.description,
+    content: s.content
   };
 
-  // Rebuild tree and update count
+  // Mark as approved
+  suggestions[idx].status = 'approved';
+  saveSuggestions(suggestions);
+
+  // Rebuild UI
   buildTree();
   updateSkillCount();
 
-  // Close modal and select the new skill
-  closeNewSkillModal();
-  selectSkill(categoryKey, filename);
+  // Remove card from review modal
+  const card = document.querySelector(`.review-card[data-id="${id}"]`);
+  if (card) card.remove();
 
-  // Expand parent folders so the new skill is visible
-  document.querySelectorAll('.tree-item.depth-2').forEach(el => {
-    if (el.textContent.includes(categoryKey)) {
-      const children = el.nextElementSibling;
-      if (children && !children.classList.contains('open')) {
-        toggleFolder(el);
-      }
-    }
-  });
+  // Check if any pending left
+  const remaining = getSuggestions().filter(s => s.status === 'pending');
+  if (remaining.length === 0) {
+    document.getElementById('reviewBody').innerHTML = '<p style="color:var(--text-dim);padding:20px;">All suggestions reviewed!</p>';
+  }
 
-  // Also expand the skills and .claude folders
-  document.querySelectorAll('.folder-children').forEach(fc => {
-    if (!fc.classList.contains('open')) {
-      fc.classList.add('open');
-      const chevron = fc.previousElementSibling?.querySelector('.chevron');
-      if (chevron) chevron.classList.add('open');
-      const icon = fc.previousElementSibling?.querySelector('.folder-icon');
-      if (icon) icon.textContent = '📂';
-    }
-  });
+  showToast('Skill approved and added to library!', 'success');
+
+  // Offer to download updated skills.json
+  if (confirm('Skill approved! Download updated skills.json to commit to your repository?')) {
+    exportSkills();
+  }
+}
+
+function rejectSuggestion(id) {
+  if (!confirm('Reject this suggestion? It will be permanently removed.')) return;
+
+  const suggestions = getSuggestions();
+  const idx = suggestions.findIndex(s => s.id === id);
+  if (idx === -1) return;
+
+  suggestions.splice(idx, 1);
+  saveSuggestions(suggestions);
+
+  // Remove card from review modal
+  const card = document.querySelector(`.review-card[data-id="${id}"]`);
+  if (card) card.remove();
+
+  const remaining = getSuggestions().filter(s => s.status === 'pending');
+  if (remaining.length === 0) {
+    document.getElementById('reviewBody').innerHTML = '<p style="color:var(--text-dim);padding:20px;">All suggestions reviewed!</p>';
+  }
+
+  showToast('Suggestion rejected and removed.', 'info');
 }
 
 function exportSkills() {
