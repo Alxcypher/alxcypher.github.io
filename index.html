@@ -124,12 +124,37 @@
   /* Sidebar */
   .sidebar {
     width: 280px;
-    min-width: 280px;
+    min-width: 140px;
+    max-width: 600px;
     background: var(--bg-sidebar);
-    border-right: 1px solid var(--border);
+    border-right: none;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .resize-handle {
+    width: 5px;
+    cursor: col-resize;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.2s;
+    position: relative;
+  }
+
+  .resize-handle:hover,
+  .resize-handle.dragging {
+    background: var(--accent-purple);
+  }
+
+  .resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -3px;
+    right: -3px;
+    bottom: 0;
   }
 
   .sidebar-header {
@@ -176,6 +201,8 @@
     transition: background 0.15s;
     user-select: none;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .tree-item:hover { background: var(--bg-hover); }
@@ -532,6 +559,208 @@
 
   .tree-item.hidden { display: none; }
 
+  /* Sidebar action buttons */
+  .sidebar-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .sidebar-actions button {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg-dark);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .sidebar-actions button:hover {
+    border-color: var(--accent-purple);
+    color: var(--text);
+    background: var(--bg-hover);
+  }
+
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 640px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-header h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: var(--bg-hover); color: var(--text); }
+
+  .modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent-purple);
+  }
+
+  .form-group textarea {
+    min-height: 200px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23565f89'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  .form-group select option {
+    background: var(--bg-dark);
+    color: var(--text);
+  }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .form-row .form-group { flex: 1; }
+
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-modal {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .btn-modal-cancel {
+    background: var(--bg-dark);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .btn-modal-cancel:hover {
+    color: var(--text);
+    border-color: var(--text-dim);
+  }
+
+  .btn-modal-primary {
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+    color: white;
+  }
+
+  .btn-modal-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(122, 162, 247, 0.3);
+  }
+
+  .btn-modal-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .form-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
   /* Tag badges */
   .tag {
     font-size: 9px;
@@ -570,12 +799,19 @@
   <div class="sidebar">
     <div class="sidebar-header">
       Explorer <span class="badge">skills</span>
+      <div class="sidebar-actions">
+        <button onclick="openNewSkillModal()" title="Add new skill">+ New</button>
+        <button onclick="exportSkills()" title="Export skills.json">Export</button>
+      </div>
     </div>
     <div class="search-box">
       <input type="text" class="search-input" placeholder="Search skills..." oninput="filterTree(this.value)">
     </div>
     <div class="file-tree" id="fileTree"></div>
   </div>
+
+  <!-- Resize Handle -->
+  <div class="resize-handle" id="resizeHandle"></div>
 
   <!-- Content -->
   <div class="content">
@@ -604,12 +840,98 @@
   </div>
 </div>
 
+<!-- New Skill Modal -->
+<div class="modal-overlay" id="newSkillModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>New Skill</h2>
+      <button class="modal-close" onclick="closeNewSkillModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="skillCategory">
+            <option value="">Select a category...</option>
+            <option value="__new__">+ New Category</option>
+          </select>
+        </div>
+        <div class="form-group" id="newCategoryGroup" style="display:none">
+          <label>New Category Key</label>
+          <input type="text" id="newCategoryKey" placeholder="e.g. quality-assurance">
+          <span class="form-hint">lowercase with hyphens</span>
+        </div>
+      </div>
+      <div class="form-group" id="newCategoryColorGroup" style="display:none">
+        <label>Category Color</label>
+        <select id="newCategoryColor">
+          <option value="contract">Orange (contract)</option>
+          <option value="estimating">Green (estimating)</option>
+          <option value="project">Blue (project)</option>
+          <option value="design">Purple (design)</option>
+          <option value="safety">Pink (safety)</option>
+          <option value="procurement">Cyan (procurement)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Skill Filename</label>
+        <input type="text" id="skillFilename" placeholder="e.g. my-new-skill.md">
+        <span class="form-hint">.md extension added automatically if omitted</span>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="skillDescription" placeholder="A short description of what this skill does and when to trigger it">
+      </div>
+      <div class="form-group">
+        <label>Skill Content (Markdown)</label>
+        <textarea id="skillContent" placeholder="---
+description: Trigger description for Claude...
+---
+
+# Skill Title
+
+You are a...
+
+## Task
+
+..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal btn-modal-cancel" onclick="closeNewSkillModal()">Cancel</button>
+      <button class="btn-modal btn-modal-primary" id="btnAddSkill" onclick="addSkill()">Add Skill</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
-// SKILL DATA — All 18 construction skills embedded here
+// SKILL DATA — Loaded from skills.json + runtime additions
 // ============================================================
 
-const skills = {
+let skills = {};
+
+// Load skills from external JSON, then initialize the app
+fetch('skills.json')
+  .then(r => r.json())
+  .then(data => {
+    skills = data;
+    initApp();
+  })
+  .catch(err => {
+    console.warn('Could not load skills.json, using fallback inline data:', err);
+    skills = fallbackSkills;
+    initApp();
+  });
+
+function initApp() {
+  buildTree();
+  showWelcome();
+  updateSkillCount();
+}
+
+// Fallback inline data (subset) in case skills.json is unavailable
+const fallbackSkills = {
   "contract-administration": {
     label: "contract-administration",
     color: "contract",
@@ -1729,6 +2051,15 @@ Review the material/product submittal against project requirements.
 let currentSkill = null;
 let currentSkillRaw = null;
 
+// Update skill count in header
+function updateSkillCount() {
+  let totalSkills = 0;
+  Object.values(skills).forEach(folder => {
+    totalSkills += Object.keys(folder.children).length;
+  });
+  document.getElementById('skillCount').textContent = totalSkills + ' skills';
+}
+
 // Build the file tree
 function buildTree() {
   const tree = document.getElementById('fileTree');
@@ -1957,16 +2288,174 @@ function filterTree(query) {
   }
 }
 
-// Initialize
-buildTree();
-showWelcome();
+// ============================================================
+// NEW SKILL PIPELINE
+// ============================================================
 
-// Count skills
-let totalSkills = 0;
-Object.values(skills).forEach(folder => {
-  totalSkills += Object.keys(folder.children).length;
+function openNewSkillModal() {
+  const modal = document.getElementById('newSkillModal');
+  const categorySelect = document.getElementById('skillCategory');
+
+  // Populate category dropdown from current skills
+  categorySelect.innerHTML = '<option value="">Select a category...</option>';
+  for (const [key, folder] of Object.entries(skills)) {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = folder.label;
+    categorySelect.appendChild(opt);
+  }
+  const newOpt = document.createElement('option');
+  newOpt.value = '__new__';
+  newOpt.textContent = '+ New Category';
+  categorySelect.appendChild(newOpt);
+
+  // Reset form
+  document.getElementById('skillFilename').value = '';
+  document.getElementById('skillDescription').value = '';
+  document.getElementById('skillContent').value = '';
+  document.getElementById('newCategoryKey').value = '';
+  document.getElementById('newCategoryGroup').style.display = 'none';
+  document.getElementById('newCategoryColorGroup').style.display = 'none';
+
+  modal.classList.add('open');
+}
+
+function closeNewSkillModal() {
+  document.getElementById('newSkillModal').classList.remove('open');
+}
+
+// Show/hide new category fields
+document.getElementById('skillCategory').addEventListener('change', function() {
+  const isNew = this.value === '__new__';
+  document.getElementById('newCategoryGroup').style.display = isNew ? '' : 'none';
+  document.getElementById('newCategoryColorGroup').style.display = isNew ? '' : 'none';
 });
-document.getElementById('skillCount').textContent = totalSkills + ' skills';
+
+// Close modal on overlay click
+document.getElementById('newSkillModal').addEventListener('click', function(e) {
+  if (e.target === this) closeNewSkillModal();
+});
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeNewSkillModal();
+});
+
+function addSkill() {
+  const categorySelect = document.getElementById('skillCategory');
+  let categoryKey = categorySelect.value;
+  let filename = document.getElementById('skillFilename').value.trim();
+  const description = document.getElementById('skillDescription').value.trim();
+  const content = document.getElementById('skillContent').value.trim();
+
+  // Validation
+  if (!categoryKey) return alert('Please select a category.');
+  if (!filename) return alert('Please enter a filename.');
+  if (!description) return alert('Please enter a description.');
+  if (!content) return alert('Please enter the skill content.');
+
+  // Handle new category
+  if (categoryKey === '__new__') {
+    categoryKey = document.getElementById('newCategoryKey').value.trim().toLowerCase().replace(/\s+/g, '-');
+    const color = document.getElementById('newCategoryColor').value;
+    if (!categoryKey) return alert('Please enter a category key.');
+
+    skills[categoryKey] = {
+      label: categoryKey,
+      color: color,
+      children: {}
+    };
+  }
+
+  // Ensure .md extension
+  if (!filename.endsWith('.md')) filename += '.md';
+
+  // Check for duplicates
+  if (skills[categoryKey]?.children[filename]) {
+    return alert(`A skill named "${filename}" already exists in ${categoryKey}.`);
+  }
+
+  // Add the skill
+  skills[categoryKey].children[filename] = {
+    label: filename,
+    description: description,
+    content: content
+  };
+
+  // Rebuild tree and update count
+  buildTree();
+  updateSkillCount();
+
+  // Close modal and select the new skill
+  closeNewSkillModal();
+  selectSkill(categoryKey, filename);
+
+  // Expand parent folders so the new skill is visible
+  document.querySelectorAll('.tree-item.depth-2').forEach(el => {
+    if (el.textContent.includes(categoryKey)) {
+      const children = el.nextElementSibling;
+      if (children && !children.classList.contains('open')) {
+        toggleFolder(el);
+      }
+    }
+  });
+
+  // Also expand the skills and .claude folders
+  document.querySelectorAll('.folder-children').forEach(fc => {
+    if (!fc.classList.contains('open')) {
+      fc.classList.add('open');
+      const chevron = fc.previousElementSibling?.querySelector('.chevron');
+      if (chevron) chevron.classList.add('open');
+      const icon = fc.previousElementSibling?.querySelector('.folder-icon');
+      if (icon) icon.textContent = '📂';
+    }
+  });
+}
+
+function exportSkills() {
+  const json = JSON.stringify(skills, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'skills.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Resizable sidebar
+const resizeHandle = document.getElementById('resizeHandle');
+const sidebar = document.querySelector('.sidebar');
+let isResizing = false;
+
+resizeHandle.addEventListener('mousedown', (e) => {
+  isResizing = true;
+  resizeHandle.classList.add('dragging');
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isResizing) return;
+  const newWidth = e.clientX;
+  const min = parseInt(getComputedStyle(sidebar).minWidth);
+  const max = parseInt(getComputedStyle(sidebar).maxWidth);
+  sidebar.style.width = Math.max(min, Math.min(max, newWidth)) + 'px';
+});
+
+document.addEventListener('mouseup', () => {
+  if (isResizing) {
+    isResizing = false;
+    resizeHandle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }
+});
+
+// Skill count is now updated dynamically via updateSkillCount()
 </script>
 
 </body>
