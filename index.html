@@ -327,6 +327,8 @@
     flex: 1;
     overflow-y: auto;
     padding: 30px 40px;
+    display: flex;
+    justify-content: center;
   }
 
   .content-body::-webkit-scrollbar { width: 8px; }
@@ -341,7 +343,7 @@
     justify-content: center;
     text-align: center;
     padding: 40px 20px;
-    margin: 0;
+    max-width: 600px;
     width: 100%;
     box-sizing: border-box;
     min-height: calc(100vh - 160px);
@@ -414,6 +416,10 @@
   }
 
   /* Markdown rendered content */
+  .md-content {
+    width: 100%;
+  }
+
   .md-content h1 {
     font-family: 'JetBrains Mono', monospace;
     font-size: 26px;
