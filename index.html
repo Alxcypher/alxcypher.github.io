@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal Skills Bank</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Left Nav -->
+    <nav class="nav-sidebar">
+      <div class="nav-sidebar__top">
+        <a href="#" class="nav-item nav-item--active" data-view="skills">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span>Skills</span>
+        </a>
+        <a href="#" class="nav-item" data-view="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <span>Search</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-tags" data-view="tags">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>Tags</span>
+        </a>
+      </div>
+      <div class="nav-sidebar__bottom">
+        <a href="https://github.com/alxcypher/alxcypher.github.io" target="_blank" rel="noopener" class="nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Customize Panel -->
+    <div class="customize-panel">
+      <div class="customize-panel__header">
+        <h2>Customize</h2>
+      </div>
+      <div class="customize-panel__tabs">
+        <button class="customize-tab customize-tab--active" data-tab="skills">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Skills
+        </button>
+        <button class="customize-tab" data-tab="tags">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Tags
+        </button>
+      </div>
+      <div class="customize-panel__content">
+        <!-- Category list -->
+        <div class="category-list" id="category-list">
+          <div class="category-section">
+            <div class="category-section__header">Practice Areas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills List Panel -->
+    <div class="skills-panel">
+      <div class="skills-panel__header">
+        <h2>Skills</h2>
+        <div class="skills-panel__actions">
+          <button class="icon-btn" id="btn-search" title="Search skills">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search bar (hidden by default) -->
+      <div class="skills-panel__search" id="search-container" style="display:none;">
+        <input type="text" id="search-input" placeholder="Search skills..." autocomplete="off" spellcheck="false">
+      </div>
+
+      <!-- Active tag filters -->
+      <div class="skills-panel__filters" id="active-filters" style="display:none;">
+        <div class="active-filters-label">Filters:</div>
+        <div class="active-filters-list" id="active-filters-list"></div>
+        <button class="clear-filters-btn" id="clear-filters">Clear all</button>
+      </div>
+
+      <!-- Skills list -->
+      <div class="skills-list" id="skills-list">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Skill Detail Panel -->
+    <div class="detail-panel" id="detail-panel">
+      <!-- Welcome state -->
+      <div class="detail-welcome" id="detail-welcome">
+        <div class="detail-welcome__icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <h2>Legal Skills Bank</h2>
+        <p>Select a skill from the list to view its details, or browse by category.</p>
+        <div class="detail-welcome__stats">
+          <div class="stat-chip"><span id="welcome-skill-count">0</span> skills</div>
+          <div class="stat-chip"><span id="welcome-category-count">0</span> categories</div>
+          <div class="stat-chip"><span id="welcome-tag-count">0</span> tags</div>
+        </div>
+      </div>
+
+      <!-- Skill detail view (hidden by default) -->
+      <div class="detail-view" id="detail-view" style="display:none;">
+        <div class="detail-view__top">
+          <h1 id="detail-title"></h1>
+          <div class="detail-view__controls">
+            <label class="toggle" title="Skill enabled">
+              <input type="checkbox" checked>
+              <span class="toggle__slider"></span>
+            </label>
+            <button class="icon-btn" id="btn-copy-skill" title="Copy skill content">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-view__meta">
+          <div class="meta-row">
+            <span class="meta-label">Added by</span>
+            <span class="meta-value" id="detail-author">Community</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Last updated</span>
+            <span class="meta-value" id="detail-updated">Mar 7, 2026</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Jurisdiction</span>
+            <span class="meta-value" id="detail-jurisdiction"></span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Complexity</span>
+            <span class="meta-value" id="detail-complexity"></span>
+          </div>
+        </div>
+
+        <div class="detail-view__tags" id="detail-tags"></div>
+
+        <div class="detail-view__description">
+          <span class="desc-label">Description <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+          <p id="detail-summary"></p>
+        </div>
+
+        <div class="detail-view__content" id="detail-content">
+          <!-- Rendered skill markdown -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="skills.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
