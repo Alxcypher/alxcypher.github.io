@@ -200,6 +200,8 @@
     border-radius: 8px;
     font-size: 10px;
     font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .file-tree {
@@ -324,7 +326,7 @@
   .content-body {
     flex: 1;
     overflow-y: auto;
-    padding: 30px 40px;
+    padding: 30px 40px 30px 60px;
   }
 
   .content-body::-webkit-scrollbar { width: 8px; }
@@ -3832,6 +3834,8 @@ document.addEventListener('mousemove', (e) => {
   const min = parseInt(getComputedStyle(sidebar).minWidth);
   const max = parseInt(getComputedStyle(sidebar).maxWidth);
   sidebar.style.width = Math.max(min, Math.min(max, newWidth)) + 'px';
+  const badge = sidebar.querySelector('.badge');
+  if (badge) badge.style.display = (newWidth < 180) ? 'none' : '';
 });
 
 document.addEventListener('mouseup', () => {
