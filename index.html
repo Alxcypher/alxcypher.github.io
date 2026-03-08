@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Construction Skills IDE</title>
+<title>Construction Skills</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
@@ -81,7 +81,12 @@
     gap: 2px;
     height: 100%;
     align-items: flex-end;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+
+  .header-tabs::-webkit-scrollbar { display: none; }
 
   .header-tab {
     font-family: 'JetBrains Mono', monospace;
@@ -93,10 +98,27 @@
     cursor: pointer;
     border-radius: 6px 6px 0 0;
     transition: all 0.2s;
+    white-space: nowrap;
+    position: relative;
   }
 
   .header-tab:hover { background: var(--bg-hover); color: var(--text); }
   .header-tab.active { background: var(--bg-panel); color: var(--accent-cyan); }
+
+  .header-tab .tab-close {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    vertical-align: middle;
+  }
+
+  .header-tab:hover .tab-close,
+  .header-tab.active .tab-close { opacity: 1; }
+  .header-tab .tab-close:hover { color: var(--accent-pink); }
 
   .header-right {
     display: flex;
@@ -781,11 +803,10 @@
 <div class="header">
   <div class="header-left">
     <span class="logo-icon">🏗️</span>
-    <span class="logo">CONSTRUCTION SKILLS IDE</span>
+    <span class="logo">CONSTRUCTION SKILLS</span>
   </div>
-  <div class="header-tabs">
-    <button class="header-tab active" onclick="showWelcome()">Welcome</button>
-    <button class="header-tab" id="tab-skill">SKILL.md</button>
+  <div class="header-tabs" id="headerTabs">
+    <button class="header-tab active" data-tab="welcome" onclick="activateTab('welcome')">Welcome</button>
   </div>
   <div class="header-right">
     <span class="skill-count" id="skillCount">18 skills</span>
@@ -926,6 +947,7 @@ fetch('skills.json')
 
 function initApp() {
   buildTree();
+  renderTabs();
   showWelcome();
   updateSkillCount();
 }
@@ -2045,11 +2067,21 @@ Review the material/product submittal against project requirements.
 };
 
 // ============================================================
-// APPLICATION LOGIC
+// APPLICATION LOGIC — Multi-tab support
 // ============================================================
 
+// Tab state: array of { id, folderKey, fileKey, label }
+// 'welcome' is a special tab that's always available
+let openTabs = [{ id: 'welcome', folderKey: null, fileKey: null, label: 'Welcome' }];
+let activeTabId = 'welcome';
+
+// Current skill for copy button
 let currentSkill = null;
 let currentSkillRaw = null;
+
+function getTabId(folderKey, fileKey) {
+  return `${folderKey}/${fileKey}`;
+}
 
 // Update skill count in header
 function updateSkillCount() {
@@ -2060,12 +2092,91 @@ function updateSkillCount() {
   document.getElementById('skillCount').textContent = totalSkills + ' skills';
 }
 
+// Render the tab bar
+function renderTabs() {
+  const tabBar = document.getElementById('headerTabs');
+  tabBar.innerHTML = '';
+
+  openTabs.forEach(tab => {
+    const btn = document.createElement('button');
+    btn.className = 'header-tab' + (tab.id === activeTabId ? ' active' : '');
+    btn.dataset.tab = tab.id;
+
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = tab.label;
+    btn.appendChild(labelSpan);
+
+    btn.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('tab-close')) {
+        activateTab(tab.id);
+      }
+    });
+
+    // Close button (not on welcome tab)
+    if (tab.id !== 'welcome') {
+      const close = document.createElement('span');
+      close.className = 'tab-close';
+      close.textContent = '×';
+      close.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeTab(tab.id);
+      });
+      btn.appendChild(close);
+    }
+
+    tabBar.appendChild(btn);
+  });
+}
+
+function activateTab(tabId) {
+  activeTabId = tabId;
+  renderTabs();
+
+  if (tabId === 'welcome') {
+    showWelcome();
+  } else {
+    const tab = openTabs.find(t => t.id === tabId);
+    if (tab) {
+      showSkillContent(tab.folderKey, tab.fileKey);
+    }
+  }
+}
+
+function closeTab(tabId) {
+  const idx = openTabs.findIndex(t => t.id === tabId);
+  if (idx === -1) return;
+
+  openTabs.splice(idx, 1);
+
+  // If we closed the active tab, activate the nearest tab
+  if (activeTabId === tabId) {
+    const newIdx = Math.min(idx, openTabs.length - 1);
+    activeTabId = openTabs[newIdx].id;
+    activateTab(activeTabId);
+  } else {
+    renderTabs();
+  }
+
+  // Update tree active state
+  updateTreeActiveState();
+}
+
+// Middle-click to close a tab
+document.getElementById('headerTabs').addEventListener('mousedown', (e) => {
+  if (e.button === 1) {
+    const tabBtn = e.target.closest('.header-tab');
+    if (tabBtn && tabBtn.dataset.tab !== 'welcome') {
+      e.preventDefault();
+      closeTab(tabBtn.dataset.tab);
+    }
+  }
+});
+
 // Build the file tree
 function buildTree() {
   const tree = document.getElementById('fileTree');
   let html = '';
 
-  // Root folder
   html += `<div class="tree-item depth-0" onclick="toggleFolder(this)">
     <span class="chevron open">▶</span>
     <span class="icon folder-icon">📂</span>
@@ -2122,7 +2233,6 @@ function toggleFolder(el) {
     children.classList.toggle('open');
     const chevron = el.querySelector('.chevron');
     chevron.classList.toggle('open');
-    // swap folder icon
     const icon = el.querySelector('.folder-icon');
     if (icon) {
       icon.textContent = children.classList.contains('open') ? '📂' : '📁';
@@ -2131,16 +2241,34 @@ function toggleFolder(el) {
 }
 
 function selectSkill(folderKey, fileKey) {
-  const file = skills[folderKey].children[fileKey];
+  const file = skills[folderKey]?.children[fileKey];
+  if (!file) return;
+
+  const tabId = getTabId(folderKey, fileKey);
+
+  // Open tab if not already open
+  if (!openTabs.find(t => t.id === tabId)) {
+    openTabs.push({
+      id: tabId,
+      folderKey: folderKey,
+      fileKey: fileKey,
+      label: fileKey
+    });
+  }
+
+  // Activate the tab
+  activateTab(tabId);
+}
+
+function showSkillContent(folderKey, fileKey) {
+  const file = skills[folderKey]?.children[fileKey];
   if (!file) return;
 
   currentSkill = file;
   currentSkillRaw = file.content;
 
-  // Update active state
-  document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
-  const item = document.querySelector(`[data-folder="${folderKey}"][data-file="${fileKey}"]`);
-  if (item) item.classList.add('active');
+  // Update tree active state
+  updateTreeActiveState();
 
   // Update path
   document.getElementById('contentPath').innerHTML =
@@ -2149,31 +2277,34 @@ function selectSkill(folderKey, fileKey) {
   // Show copy button
   document.getElementById('btnCopy').classList.add('visible');
 
-  // Update tab
-  const tab = document.getElementById('tab-skill');
-  tab.textContent = fileKey;
-  tab.classList.add('active');
-  document.querySelector('.header-tab:first-child').classList.remove('active');
-
   // Render content
   renderSkill(file);
+}
+
+function updateTreeActiveState() {
+  document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+
+  if (activeTabId !== 'welcome') {
+    const tab = openTabs.find(t => t.id === activeTabId);
+    if (tab) {
+      const item = document.querySelector(`[data-folder="${tab.folderKey}"][data-file="${tab.fileKey}"]`);
+      if (item) item.classList.add('active');
+    }
+  }
 }
 
 function renderSkill(file) {
   const body = document.getElementById('contentBody');
 
-  // Parse out the frontmatter description
   const content = file.content;
   let mainContent = content;
   let description = file.description;
 
-  // Remove frontmatter from rendering
   const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (fmMatch) {
     mainContent = fmMatch[2];
   }
 
-  // Render markdown
   const rendered = marked.parse(mainContent);
 
   body.innerHTML = `
@@ -2188,18 +2319,14 @@ function showWelcome() {
   currentSkill = null;
   currentSkillRaw = null;
 
-  document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+  updateTreeActiveState();
   document.getElementById('btnCopy').classList.remove('visible');
   document.getElementById('contentPath').innerHTML = '';
-
-  document.querySelector('.header-tab:first-child').classList.add('active');
-  document.getElementById('tab-skill').classList.remove('active');
-  document.getElementById('tab-skill').textContent = 'SKILL.md';
 
   const body = document.getElementById('contentBody');
   body.innerHTML = `
     <div class="welcome">
-      <div class="welcome-title">CONSTRUCTION<br>SKILLS IDE</div>
+      <div class="welcome-title">CONSTRUCTION<br>SKILLS</div>
       <div class="welcome-sub">
         A collection of AI skills for building and construction professionals.
         Browse the folder tree, click a skill to preview it, then copy it into Claude or Cowork.
@@ -2214,7 +2341,6 @@ function showWelcome() {
     </div>
   `;
 
-  // Add quick-start chips
   const qs = document.getElementById('quickStart');
   const categories = Object.keys(skills);
   categories.forEach(cat => {
@@ -2222,9 +2348,7 @@ function showWelcome() {
     chip.className = 'quick-chip';
     chip.textContent = cat;
     chip.onclick = () => {
-      // Expand folder and select first skill
       const firstFile = Object.keys(skills[cat].children)[0];
-      // Open the folder in the tree
       document.querySelectorAll('.tree-item.depth-2').forEach(el => {
         if (el.textContent.includes(cat)) {
           const children = el.nextElementSibling;
@@ -2244,9 +2368,7 @@ function copySkill() {
 
   navigator.clipboard.writeText(currentSkillRaw).then(() => {
     const btn = document.getElementById('btnCopy');
-    const icon = document.getElementById('copyIcon');
     btn.classList.add('copied');
-    icon.textContent = '✅';
     btn.innerHTML = '<span>✅</span> Copied!';
 
     setTimeout(() => {
@@ -2273,7 +2395,6 @@ function filterTree(query) {
     }
   });
 
-  // Auto-expand folders that have visible children
   if (q) {
     document.querySelectorAll('.folder-children').forEach(fc => {
       const hasVisible = fc.querySelector('.tree-item.depth-3:not(.hidden)');
