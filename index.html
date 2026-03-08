@@ -788,12 +788,21 @@
     font-size: 9px;
     padding: 1px 6px;
     border-radius: 4px;
-    margin-left: 8px;
+    margin-left: 4px;
     font-weight: 600;
     letter-spacing: 0.5px;
   }
 
   .tag-skill { background: rgba(187, 154, 247, 0.2); color: var(--accent-purple); }
+  .tag-cost { background: rgba(224, 175, 104, 0.2); color: #e0af68; }
+  .tag-legal { background: rgba(187, 154, 247, 0.2); color: #bb9af7; }
+  .tag-safety { background: rgba(247, 118, 142, 0.2); color: #f7768e; }
+  .tag-program { background: rgba(125, 207, 255, 0.2); color: #7dcfff; }
+  .tag-design { background: rgba(115, 218, 202, 0.2); color: #73daca; }
+  .tag-quality { background: rgba(158, 206, 106, 0.2); color: #9ece6a; }
+  .tag-procurement { background: rgba(255, 158, 100, 0.2); color: #ff9e64; }
+  .tag-reporting { background: rgba(122, 162, 247, 0.2); color: #7aa2f7; }
+  .tag-handover { background: rgba(187, 154, 247, 0.2); color: #c0caf5; }
   .tag-folder { background: rgba(224, 175, 104, 0.15); color: var(--folder-color); }
 </style>
 </head>
@@ -3238,11 +3247,27 @@ function buildTree() {
     html += `<div class="folder-children">`;
 
     for (const [fileKey, file] of Object.entries(folder.children)) {
+      const haystack = (file.description + ' ' + fileKey + ' ' + folderKey).toLowerCase();
+      const topicDefs = [
+        { label: 'cost', keywords: ['cost', 'estimate', 'rate', 'quantity', 'take-off', 'pricing', 'budget', 'valuation', 'tender', 'progress claim', 'payment'] },
+        { label: 'legal', keywords: ['contract', 'special conditions', 'entitlement', 'claim', 'compliance', 'risk register', 'standard form', 'delay analysis', 'disruption', 'site instruction'] },
+        { label: 'safety', keywords: ['safety', 'swms', 'whs', 'incident', 'hazard', 'audit', 'safe work'] },
+        { label: 'program', keywords: ['program', 'schedule', 'delay', 'eot', 'extension of time', 'critical path', 'float', 'forensic', 'windows analysis'] },
+        { label: 'design', keywords: ['drawing', 'structural', 'clash', 'coordination', 'bim', 'constructability'] },
+        { label: 'quality', keywords: ['specification', 'compliance', 'submittal', 'material', 'inspection', 'defect', 'itp', 'ncr', 'non-conformance', 'punch list', 'snag'] },
+        { label: 'procurement', keywords: ['tender', 'prequalification', 'subcontractor', 'submittal', 'procurement'] },
+        { label: 'reporting', keywords: ['minutes', 'meeting', 'incident report', 'report', 'register', 'site diary', 'daily diary', 'rfi'] },
+        { label: 'handover', keywords: ['handover', 'practical completion', 'commissioning', 'closeout', 'o&m', 'as-built', 'defect liability'] },
+      ];
+      const matched = topicDefs.filter(t => t.keywords.some(kw => haystack.includes(kw)));
+      const tags = matched.length > 0
+        ? matched.map(t => `<span class="tag tag-${t.label}">${t.label}</span>`).join('')
+        : `<span class="tag tag-skill">skill</span>`;
       html += `<div class="tree-item depth-3 ${catClass}" data-folder="${folderKey}" data-file="${fileKey}" onclick="selectSkill('${folderKey}', '${fileKey}')">
         <span class="chevron" style="visibility:hidden">▶</span>
         <span class="icon file-icon">📄</span>
         <span>${file.label}</span>
-        <span class="tag tag-skill">skill</span>
+        ${tags}
       </div>`;
     }
 
