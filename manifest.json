@@ -1,0 +1,116 @@
+{
+  "manifest_version": 3,
+  "name": "FitShift",
+  "version": "0.1.0",
+  "description": "Find your perfect fit across running shoe brands",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.nike.com/*"],
+      "js": ["content-scripts/nike.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.brooksrunning.com/*"],
+      "js": ["content-scripts/brooks.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.saucony.com/*"],
+      "js": ["content-scripts/saucony.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.asics.com/*"],
+      "js": ["content-scripts/asics.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.adidas.com/*"],
+      "js": ["content-scripts/adidas.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.hoka.com/*"],
+      "js": ["content-scripts/hoka.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.on-running.com/*"],
+      "js": ["content-scripts/on-running.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.underarmour.com/*"],
+      "js": ["content-scripts/under-armour.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.newbalance.com/*"],
+      "js": ["content-scripts/new-balance.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://us.puma.com/*"],
+      "js": ["content-scripts/puma.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://runrepeat.com/*"],
+      "js": ["content-scripts/runrepeat.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-scripts/retailer-generic.js"],
+      "run_at": "document_idle",
+      "exclude_matches": [
+        "https://www.nike.com/*",
+        "https://www.brooksrunning.com/*",
+        "https://www.saucony.com/*",
+        "https://www.asics.com/*",
+        "https://www.adidas.com/*",
+        "https://www.hoka.com/*",
+        "https://www.on-running.com/*",
+        "https://www.underarmour.com/*",
+        "https://www.newbalance.com/*",
+        "https://us.puma.com/*",
+        "https://runrepeat.com/*"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/sql-wasm.wasm", "data/seed-sizes.json", "data/brand-registry.json"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

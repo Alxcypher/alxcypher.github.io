@@ -1,0 +1,104 @@
+{
+  "brands": [
+    {
+      "name": "Nike",
+      "domain": "www.nike.com",
+      "sizeChartUrl": "https://www.nike.com/size-fit-guide/mens-702702",
+      "sizeChartSelectors": {
+        "table": "table, [data-testid='size-grid']",
+        "sizeGuideUrl": "/size-fit-guide"
+      },
+      "contentScript": "content-scripts/nike.js"
+    },
+    {
+      "name": "Brooks",
+      "domain": "www.brooksrunning.com",
+      "sizeChartUrl": "https://www.brooksrunning.com/en_us/size-charts",
+      "sizeChartSelectors": {
+        "table": ".size-chart-table, .pdp-size-chart table",
+        "sizeGuideUrl": "/size-charts"
+      },
+      "contentScript": "content-scripts/brooks.js"
+    },
+    {
+      "name": "Saucony",
+      "domain": "www.saucony.com",
+      "sizeChartUrl": "https://www.saucony.com/en/sizing-guide",
+      "sizeChartSelectors": {
+        "table": ".size-chart table, .sizing-guide table",
+        "sizeGuideUrl": "/sizing-guide"
+      },
+      "contentScript": "content-scripts/saucony.js"
+    },
+    {
+      "name": "Asics",
+      "domain": "www.asics.com",
+      "sizeChartUrl": "https://www.asics.com/us/en-us/size-chart.html",
+      "sizeChartSelectors": {
+        "table": ".size-chart-table, .size-table table",
+        "sizeGuideUrl": "/size-chart"
+      },
+      "contentScript": "content-scripts/asics.js"
+    },
+    {
+      "name": "Adidas",
+      "domain": "www.adidas.com",
+      "sizeChartUrl": "https://www.adidas.com/us/help/size-charts",
+      "sizeChartSelectors": {
+        "table": ".size-chart__table, [data-auto-id='size-chart-table']",
+        "sizeGuideUrl": "/help/size-charts"
+      },
+      "contentScript": "content-scripts/adidas.js"
+    },
+    {
+      "name": "HOKA",
+      "domain": "www.hoka.com",
+      "sizeChartUrl": "https://www.hoka.com/en/us/size-guide.html",
+      "sizeChartSelectors": {
+        "table": ".size-chart table, .size-guide table",
+        "sizeGuideUrl": "/size-guide"
+      },
+      "contentScript": "content-scripts/hoka.js"
+    },
+    {
+      "name": "On Running",
+      "domain": "www.on-running.com",
+      "sizeChartUrl": "https://www.on-running.com/en-us/size-guide",
+      "sizeChartSelectors": {
+        "table": ".size-guide table, [data-testid='size-chart']",
+        "sizeGuideUrl": "/size-guide"
+      },
+      "contentScript": "content-scripts/on-running.js"
+    },
+    {
+      "name": "Under Armour",
+      "domain": "www.underarmour.com",
+      "sizeChartUrl": "https://www.underarmour.com/en-us/size-charts",
+      "sizeChartSelectors": {
+        "table": ".size-chart-table, .size-chart table",
+        "sizeGuideUrl": "/size-charts"
+      },
+      "contentScript": "content-scripts/under-armour.js"
+    },
+    {
+      "name": "New Balance",
+      "domain": "www.newbalance.com",
+      "sizeChartUrl": "https://www.newbalance.com/size-guide",
+      "sizeChartSelectors": {
+        "table": ".size-chart table, .pdp-size-chart table",
+        "sizeGuideUrl": "/size-guide"
+      },
+      "contentScript": "content-scripts/new-balance.js"
+    },
+    {
+      "name": "Puma",
+      "domain": "us.puma.com",
+      "sizeChartUrl": "https://us.puma.com/us/en/size-chart",
+      "sizeChartSelectors": {
+        "table": ".size-chart table, [data-testid='size-chart']",
+        "sizeGuideUrl": "/size-chart"
+      },
+      "contentScript": "content-scripts/puma.js"
+    }
+  ]
+}
